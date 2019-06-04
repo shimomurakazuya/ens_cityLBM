@@ -1,0 +1,28 @@
+$	../makefile	/^	cd src && $(MAKE) $@$/
+Cal	../hardcopy.4	/^~                                                 /
+MPI_COMM_WORLD	../hardcopy.4	65
+MPI_COMM_WORLD	../hardcopy.4	66
+MPI_COMM_WORLD	../hardcopy.4	67
+c_ref	../hardcopy.4	86
+cout_step	../hardcopy.4	/^~                                                 /
+dx	../hardcopy.4	85
+i	../hardcopy.4	57
+i	../hardcopy.4	68
+id_tasks	../hardcopy.4	56
+j	../hardcopy.4	102
+lv_obs	../hardcopy.4	93
+n_leaf	../hardcopy.4	55
+n_leaf_g	../hardcopy.4	63
+n_leaf_g_max	../hardcopy.4	63
+n_leaf_g_min	../hardcopy.4	63
+n_leaf_lv_g	../hardcopy.4	64
+n_leaf_lv_g_max	../hardcopy.4	64
+n_leaf_lv_g_min	../hardcopy.4	64
+offset0	../hardcopy.4	100
+offsets	../hardcopy.4	97
+parameters	../hardcopy.4	51
+rho	../hardcopy.4	88
+tree	../hardcopy.4	50
+u	../hardcopy.4	89
+v	../hardcopy.4	90
+w	../hardcopy.4	91

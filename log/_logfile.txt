@@ -1,0 +1,1431 @@
+--------------------------------------------------------------------------
+A requested component was not found, or was unable to be opened.  This
+means that this component is either not installed or is unable to be
+used on your system (e.g., sometimes this means that shared libraries
+that the component requires are unable to be found/loaded).  Note that
+Open MPI stopped checking at the first component that it did not find.
+
+Host:      r8i6n4
+Framework: mtl
+Component: psm
+--------------------------------------------------------------------------
+rank / ncpu = 0 / 16
+rank / ncpu = 1 / 16
+rank / ncpu = 2 / 16
+rank / ncpu = 3 / 16
+rank / ncpu = 4 / 16
+rank / ncpu = 5 / 16
+rank / ncpu = 6 / 16
+rank / ncpu = 7 / 16
+rank / ncpu = 8 / 16
+rank / ncpu = 9 / 16
+rank / ncpu = 10 / 16
+rank / ncpu = 11 / 16
+rank / ncpu = 12 / 16
+rank / ncpu = 13 / 16
+rank / ncpu = 14 / 16
+rank / ncpu = 15 / 16
+use_shared_memory
+start :  preset_tree
+Tree InitTree::tree_all_region(const Grid*, int)
+std::vector<int> InitMonitorLevelset::create_id_flags(const Grid*)
+void InitMonitorLevelset::check_amr_level(int*, int, int, int)
+std::vector<InitTree::id_amr_init> InitTree::create_id_amr_init(const Tree&, const Grid*, int, std::vector<int>)
+calculate flag
+allocate flag
+[r1i3n7:23122] 15 more processes have sent help message help-mca-base.txt / find-available:not-valid
+[r1i3n7:23122] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+id_init
+void InitTree::update_basic_informations(Tree&, const Tree&, const Grid*, int, const std::vector<InitTree::id_amr_init>&)
+set_num_nodes_lv
+void InitTree::update_connections(Tree&, const Tree&, const Grid*, int, const std::vector<InitTree::id_amr_init>&)
+void InitTree::update_NodeCalFlags(Tree&)
+void InitTree_for_MPI::set_MPIGetInfo(std::vector<LocalNode>&)
+win_create : lid_dst
+win_create : offset_dst
+update
+void InitTree_for_MPI::set_MPIPutInfo(std::vector<LocalNode>&, const Tree&)
+void InitTree_for_MPI::set_LocalTree(Tree&, const Tree&, const Grid*)
+void InitTree_for_MPI::createMPIPutGetInfo(const Tree&, std::vector<MPIPutGetInfo>&) const
+lv = 0 : createMPIPutInfoSrcDst_lv
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 15, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 13, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 12, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 9, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 15, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 13, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 0, 0, 1700
+lv = 1 : createMPIPutInfoSrcDst_lv
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 1, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 3, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 2, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 5, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 10, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 8, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 7, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 14, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 4, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 6, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 12, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 9, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 5, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 3, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 11, 0, 1700
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 13, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 15, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 2, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 0, 1, 4488
+lv = 2 : createMPIPutInfoSrcDst_lv
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 1, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 8, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 14, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 10, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 6, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 4, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 12, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 7, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 9, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 5, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 3, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 2, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 0, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 1, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 14, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 10, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 6, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 4, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 8, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 11, 1, 4488
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 7, 2, 8580
+void Tree::createMPIPutInfoSrcDst_lv(std::vector<MPIPutInfo>&, int, const std::vector<MPIPutGetInfo>&) : rank, lv, num_mpiPutInfo = 11, 2, 8580
+lv = 0 : createMPIDataypeInfoSrcDst_lv (lbm)
+lv = 0 : createMPIDataypeInfoSrcDst_lv (val)
+lv = 0 : createMPIPackUnpack_lv
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 0
+rank, lv = 0, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 3, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 14, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 5, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 13, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 12, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 9, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 15, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 8, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 1, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 2, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 6, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 10, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 7, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 4, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+rank, lv = 11, 0 : num_slist_leaf, num_rlist_leaf = 1700, 1700
+lv = 1 : createMPIDataypeInfoSrcDst_lv (lbm)
+lv = 1 : createMPIDataypeInfoSrcDst_lv (val)
+lv = 1 : createMPIPackUnpack_lv
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 1
+rank, lv = 5, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 3, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 12, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 0, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 14, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 13, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 8, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 15, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 9, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 10, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 1, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 6, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 2, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 7, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 4, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+rank, lv = 11, 1 : num_slist_leaf, num_rlist_leaf = 4488, 4488
+lv = 2 : createMPIDataypeInfoSrcDst_lv (lbm)
+lv = 2 : createMPIDataypeInfoSrcDst_lv (val)
+lv = 2 : createMPIPackUnpack_lv
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+void Tree::createMPIPackUnpack_lv(MPIPackUnpackInfo&, int, const std::vector<MPIDatatypeInfoSrcDst>&) : lv = 2
+rank, lv = 5, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 3, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 12, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 0, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 14, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 13, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 8, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 1, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 9, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 15, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 6, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 2, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 10, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 7, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 4, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, lv = 11, 2 : num_slist_leaf, num_rlist_leaf = 8580, 8580
+rank, device = 13, 1
+rank, device = 5, 1
+rank, device = 15, 3
+rank, device = 12, 0
+rank, device = 3, 3
+rank, device = 9, 1
+rank, device = 2, 2
+void Field::init_parameters(Parameters&)
+rank, device = 0, 0
+void Field::init_taskID(TaskID&, const Tree&)
+rank, device = 1, 1
+rank, device = 7, 3
+rank, device = 14, 2
+rank, device = 10, 2
+rank, device = 6, 2
+rank, device = 8, 0
+rank, device = 4, 0
+void Field::init_elapsedTimeInfo(const Parameters&)
+void Field::init_meshValues(const Grid*, const Tree&, MeshValue*)
+rank, device = 11, 3
+void Field::copy_tree(Tree&, const Tree&, bool)
+void Field::copy_meshValues(MeshValue*, const MeshValue*, const Grid*, const Tree&, bool)
+end : preset_tree
+read map data
+300, 375
+void TestOklahoma::InitObjectFloarRoof(const Grid*, const Tree&, const Parameters&, MeshValue*)
+void TestOklahoma::InitDecoBoco(const Grid*, const Tree&, const Parameters&, MeshValue*)
+void TestOklahoma::DigitalizeObject(const Grid*, const Tree&, const Parameters&, MeshValue*)
+
+void BoundaryConditions::InitializeByWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 420 minutes
+
+void BoundaryConditions::InitializeByGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 420 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 421 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 421 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 421 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 421 minutes
+init_taskID_opt
+void Field::init_taskID_opt(TaskID&, const Tree&, const MeshValue*)
+void Field::copy_meshValues(MeshValue*, const MeshValue*, const Grid*, const Tree&, bool)
+-
+t / step_end = 0 / 337500 ( time = 0 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.0682041 :  ( 10.2306 m/s )
+rho_all        = 4.85008e+10
+energy         = 9.59089e+11
+scalar_all     = 0
+T(ave,min,max) = 303.647 ( 293.15, 312.67 ) 
+sgs_vis/vis    = 0, 0 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+void Field::copy_io_field()
+void Field::copy_tree(Tree&, const Tree&, bool)
+void Field::copy_meshValues(MeshValue*, const MeshValue*, const Grid*, const Tree&, bool)
+io work : t fout = 0
+void Field::write_field(int) const
+void Parameters::writeParameters(std::string, int) const : time, step, fstep = 0, 0, 0
+void Field::write_grid(int, const Grid*, int) const
+void Field::write_tree(int, const Tree&, int) const
+void Field::write_taskID(int, const TaskID&, int) const
+void Field::write_meshValues(int, const Grid*, const Tree&, const Parameters&, const MeshValue*, int) const
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 421 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 421 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 420 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 420 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 422 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 422 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 421 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 421 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 1000 / 337500 ( time = 106.667 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.162549 :  ( 24.3824 m/s )
+rho_all        = 4.97194e+10
+energy         = 3.01115e+11
+scalar_all     = 0
+T(ave,min,max) = 303.529 ( 293.15, 312.192 ) 
+sgs_vis/vis    = 395.239, 353148 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 3751.41, 234.463 :  (min, max) = ( 231.876, 251.347 ) 
+sec/step = 0.164493  ( total elapsed_time (minites) = 2.73888 ) 
+time  ratio (gpu, comm) = 0.584977, 0.415023
+*****
+-----------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 423 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 423 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 422 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 422 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 424 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 424 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 423 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 423 minutes
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 2000 / 337500 ( time = 213.333 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.22945 :  ( 34.4175 m/s )
+rho_all        = 4.9077e+10
+energy         = 1.17319e+12
+scalar_all     = 0
+T(ave,min,max) = 303.584 ( 293.099, 312.392 ) 
+sgs_vis/vis    = 1145.47, 807144 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4198.28, 262.392 :  (min, max) = ( 262.388, 262.455 ) 
+sec/step = 0.145365  ( total elapsed_time (minites) = 5.16162 ) 
+time  ratio (gpu, comm) = 0.6194, 0.3806
+*****
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 425 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 425 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 424 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 424 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 426 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 426 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 425 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 425 minutes
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 3000 / 337500 ( time = 320 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.306229 :  ( 45.9344 m/s )
+rho_all        = 4.8825e+10
+energy         = 1.86627e+12
+scalar_all     = 0
+T(ave,min,max) = 303.586 ( 293.432, 312.156 ) 
+sgs_vis/vis    = 2773.98, 849958 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4463.06, 278.941 :  (min, max) = ( 278.941, 278.943 ) 
+sec/step = 0.136738  ( total elapsed_time (minites) = 7.4406 ) 
+time  ratio (gpu, comm) = 0.640945, 0.359055
+*****
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 427 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 427 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 426 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 426 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 428 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 428 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 427 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 427 minutes
+--------------------------------------------------------------
+t / step_end = 4000 / 337500 ( time = 426.667 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.279644 :  ( 41.9466 m/s )
+rho_all        = 4.8727e+10
+energy         = 1.85783e+12
+scalar_all     = 0
+T(ave,min,max) = 303.66 ( 298.694, 312.129 ) 
+sgs_vis/vis    = 3435.83, 774996 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4708.17, 294.261 :  (min, max) = ( 294.261, 294.262 ) 
+sec/step = 0.12962  ( total elapsed_time (minites) = 9.60093 ) 
+time  ratio (gpu, comm) = 0.70611, 0.29389
+*****
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 429 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 429 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 428 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 428 minutes
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 5000 / 337500 ( time = 533.333 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.206049 :  ( 30.9074 m/s )
+rho_all        = 4.86806e+10
+energy         = 1.49385e+12
+scalar_all     = 0
+T(ave,min,max) = 303.729 ( 298.361, 312.422 ) 
+sgs_vis/vis    = 3287.63, 666256 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4764.06, 297.754 :  (min, max) = ( 297.753, 297.755 ) 
+sec/step = 0.128099  ( total elapsed_time (minites) = 11.7359 ) 
+time  ratio (gpu, comm) = 0.690125, 0.309875
+*****
+---------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 430 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 430 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 429 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 429 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 431 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 431 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 430 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 430 minutes
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 6000 / 337500 ( time = 640 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.310321 :  ( 46.5481 m/s )
+rho_all        = 4.86752e+10
+energy         = 1.19612e+12
+scalar_all     = 0
+T(ave,min,max) = 303.772 ( 296.866, 312.426 ) 
+sgs_vis/vis    = 2589.69, 524581 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4493.45, 280.84 :  (min, max) = ( 280.84, 280.842 ) 
+sec/step = 0.135814  ( total elapsed_time (minites) = 13.9995 ) 
+time  ratio (gpu, comm) = 0.648495, 0.351505
+*****
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 432 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 432 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 431 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 431 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 433 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 433 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 432 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 432 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 7000 / 337500 ( time = 746.667 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.356871 :  ( 53.5307 m/s )
+rho_all        = 4.8685e+10
+energy         = 1.10678e+12
+scalar_all     = 0
+T(ave,min,max) = 303.778 ( 296.683, 312.583 ) 
+sgs_vis/vis    = 2167.77, 511554 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4407, 275.438 :  (min, max) = ( 275.437, 275.439 ) 
+sec/step = 0.138478  ( total elapsed_time (minites) = 16.3074 ) 
+time  ratio (gpu, comm) = 0.653145, 0.346855
+*****
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 434 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 434 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 433 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 433 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 435 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 435 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 434 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 434 minutes
+-----------------------------------------------------------------------------------------------------------------------------
+t / step_end = 8000 / 337500 ( time = 853.333 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.337099 :  ( 50.5648 m/s )
+rho_all        = 4.8698e+10
+energy         = 1.06754e+12
+scalar_all     = 0
+T(ave,min,max) = 303.775 ( 296.41, 312.606 ) 
+sgs_vis/vis    = 1927.35, 399199 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4532.25, 283.265 :  (min, max) = ( 283.265, 283.267 ) 
+sec/step = 0.134651  ( total elapsed_time (minites) = 18.5516 ) 
+time  ratio (gpu, comm) = 0.650942, 0.349058
+*****
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 436 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 436 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 435 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 435 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 9000 / 337500 ( time = 960 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.338952 :  ( 50.8429 m/s )
+rho_all        = 4.87196e+10
+energy         = 1.02122e+12
+scalar_all     = 0
+T(ave,min,max) = 303.77 ( 295.753, 312.589 ) 
+sgs_vis/vis    = 1758.08, 380519 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4679.88, 292.492 :  (min, max) = ( 292.492, 292.494 ) 
+sec/step = 0.130403  ( total elapsed_time (minites) = 20.725 ) 
+time  ratio (gpu, comm) = 0.661554, 0.338446
+*****
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 437 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 437 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 436 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 436 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 438 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 438 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 437 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 437 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 10000 / 337500 ( time = 1066.67 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.372659 :  ( 55.8989 m/s )
+rho_all        = 4.87455e+10
+energy         = 9.84241e+11
+scalar_all     = 0
+T(ave,min,max) = 303.771 ( 294.607, 312.579 ) 
+sgs_vis/vis    = 1689.73, 462389 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4617.12, 288.57 :  (min, max) = ( 288.57, 288.571 ) 
+sec/step = 0.132176  ( total elapsed_time (minites) = 22.928 ) 
+time  ratio (gpu, comm) = 0.652639, 0.347361
+*****
+-----------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 439 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 439 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 438 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 438 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 440 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 440 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 439 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 439 minutes
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 11000 / 337500 ( time = 1173.33 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.198189 :  ( 29.7284 m/s )
+rho_all        = 4.87583e+10
+energy         = 9.70323e+11
+scalar_all     = 0
+T(ave,min,max) = 303.77 ( 294.585, 312.558 ) 
+sgs_vis/vis    = 1598.12, 313632 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4450.79, 278.174 :  (min, max) = ( 278.174, 278.176 ) 
+sec/step = 0.137115  ( total elapsed_time (minites) = 25.2132 ) 
+time  ratio (gpu, comm) = 0.653669, 0.346331
+*****
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 441 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 441 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 440 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 440 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 442 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 442 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 441 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 441 minutes
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 12000 / 337500 ( time = 1280 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.167378 :  ( 25.1068 m/s )
+rho_all        = 4.87678e+10
+energy         = 9.6749e+11
+scalar_all     = 0
+T(ave,min,max) = 303.764 ( 293.998, 312.566 ) 
+sgs_vis/vis    = 1506.24, 312814 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4604.16, 287.76 :  (min, max) = ( 287.76, 287.761 ) 
+sec/step = 0.132548  ( total elapsed_time (minites) = 27.4224 ) 
+time  ratio (gpu, comm) = 0.665435, 0.334565
+*****
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 443 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 443 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 442 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 442 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 444 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 444 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 443 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 443 minutes
+--------------------------------------------------------------
+t / step_end = 13000 / 337500 ( time = 1386.67 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.148348 :  ( 22.2522 m/s )
+rho_all        = 4.87696e+10
+energy         = 9.73818e+11
+scalar_all     = 0
+T(ave,min,max) = 303.759 ( 293.556, 312.588 ) 
+sgs_vis/vis    = 1419.62, 269461 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4667.41, 291.713 :  (min, max) = ( 291.713, 291.714 ) 
+sec/step = 0.130752  ( total elapsed_time (minites) = 29.6015 ) 
+time  ratio (gpu, comm) = 0.673642, 0.326358
+*****
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 445 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 445 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 444 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 444 minutes
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 14000 / 337500 ( time = 1493.33 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.0880622 :  ( 13.2093 m/s )
+rho_all        = 4.87704e+10
+energy         = 9.818e+11
+scalar_all     = 0
+T(ave,min,max) = 303.753 ( 294.017, 312.599 ) 
+sgs_vis/vis    = 1353.98, 228144 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4657.02, 291.064 :  (min, max) = ( 291.063, 291.065 ) 
+sec/step = 0.131043  ( total elapsed_time (minites) = 31.7856 ) 
+time  ratio (gpu, comm) = 0.669658, 0.330342
+*****
+---------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 446 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 446 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 445 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 445 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 447 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 447 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 446 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 446 minutes
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 15000 / 337500 ( time = 1600 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.114149 :  ( 17.1223 m/s )
+rho_all        = 4.87765e+10
+energy         = 9.86223e+11
+scalar_all     = 0
+T(ave,min,max) = 303.747 ( 293.379, 312.601 ) 
+sgs_vis/vis    = 1301.87, 234636 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4792.21, 299.513 :  (min, max) = ( 299.513, 299.514 ) 
+sec/step = 0.127347  ( total elapsed_time (minites) = 33.9081 ) 
+time  ratio (gpu, comm) = 0.686175, 0.313825
+*****
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 448 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 448 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 447 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 447 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 449 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 449 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 448 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 448 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 16000 / 337500 ( time = 1706.67 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.0851298 :  ( 12.7695 m/s )
+rho_all        = 4.87768e+10
+energy         = 9.89676e+11
+scalar_all     = 0
+T(ave,min,max) = 303.747 ( 292.284, 312.605 ) 
+sgs_vis/vis    = 1258.87, 262688 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4541.34, 283.834 :  (min, max) = ( 283.834, 283.835 ) 
+sec/step = 0.134381  ( total elapsed_time (minites) = 36.1477 ) 
+time  ratio (gpu, comm) = 0.657231, 0.342769
+*****
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 450 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 450 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 449 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 449 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 451 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 451 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 450 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 450 minutes
+-----------------------------------------------------------------------------------------------------------------------------
+t / step_end = 17000 / 337500 ( time = 1813.33 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.0820997 :  ( 12.315 m/s )
+rho_all        = 4.87743e+10
+energy         = 9.91419e+11
+scalar_all     = 0
+T(ave,min,max) = 303.747 ( 291.574, 312.596 ) 
+sgs_vis/vis    = 1215.7, 206478 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4591.23, 286.952 :  (min, max) = ( 286.952, 286.953 ) 
+sec/step = 0.132921  ( total elapsed_time (minites) = 38.3631 ) 
+time  ratio (gpu, comm) = 0.679899, 0.320101
+*****
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 452 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 452 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 451 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 451 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 18000 / 337500 ( time = 1920 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.0805349 :  ( 12.0802 m/s )
+rho_all        = 4.87712e+10
+energy         = 9.8884e+11
+scalar_all     = 0
+T(ave,min,max) = 303.753 ( 292.817, 312.598 ) 
+sgs_vis/vis    = 1189.02, 202896 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4618.33, 288.646 :  (min, max) = ( 288.646, 288.647 ) 
+sec/step = 0.132141  ( total elapsed_time (minites) = 40.5655 ) 
+time  ratio (gpu, comm) = 0.664194, 0.335806
+*****
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 453 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 453 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 452 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 452 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 454 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 454 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 453 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 453 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 19000 / 337500 ( time = 2026.67 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.155359 :  ( 23.3039 m/s )
+rho_all        = 4.87749e+10
+energy         = 9.8315e+11
+scalar_all     = 0
+T(ave,min,max) = 303.76 ( 293.315, 312.588 ) 
+sgs_vis/vis    = 1209.9, 317095 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4598.11, 287.382 :  (min, max) = ( 287.381, 287.383 ) 
+sec/step = 0.132722  ( total elapsed_time (minites) = 42.7775 ) 
+time  ratio (gpu, comm) = 0.671354, 0.328646
+*****
+-----------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 455 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 455 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 454 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 454 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 456 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 456 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 455 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 455 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+io join : t = 19999
+-
+t / step_end = 20000 / 337500 ( time = 2133.33 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.284909 :  ( 42.7364 m/s )
+rho_all        = 4.87742e+10
+energy         = 9.7806e+11
+scalar_all     = 0
+T(ave,min,max) = 303.769 ( 293.336, 312.587 ) 
+sgs_vis/vis    = 1237.96, 309727 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4664.86, 291.554 :  (min, max) = ( 291.554, 291.555 ) 
+sec/step = 0.130823  ( total elapsed_time (minites) = 44.9579 ) 
+time  ratio (gpu, comm) = 0.671587, 0.328413
+*****
+void Field::copy_io_field()
+void Field::copy_tree(Tree&, const Tree&, bool)
+void Field::copy_meshValues(MeshValue*, const MeshValue*, const Grid*, const Tree&, bool)
+io work : t fout = 1
+void Field::write_field(int) const
+void Parameters::writeParameters(std::string, int) const : time, step, fstep = 2133.33, 20000, 1
+void Field::write_grid(int, const Grid*, int) const
+------void Field::write_tree(int, const Tree&, int) const
+--void Field::write_taskID(int, const TaskID&, int) const
+void Field::write_meshValues(int, const Grid*, const Tree&, const Parameters&, const MeshValue*, int) const
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 457 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 457 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 456 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 456 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 458 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 458 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 457 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 457 minutes
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 21000 / 337500 ( time = 2240 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.303552 :  ( 45.5328 m/s )
+rho_all        = 4.87727e+10
+energy         = 9.73002e+11
+scalar_all     = 0
+T(ave,min,max) = 303.773 ( 293.109, 312.592 ) 
+sgs_vis/vis    = 1252.47, 322684 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4530.64, 283.165 :  (min, max) = ( 283.165, 283.166 ) 
+sec/step = 0.134699  ( total elapsed_time (minites) = 47.2029 ) 
+time  ratio (gpu, comm) = 0.664552, 0.335448
+*****
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 459 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 459 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 458 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 458 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 460 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 460 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 459 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 459 minutes
+--------------------------------------------------------------
+t / step_end = 22000 / 337500 ( time = 2346.67 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.240532 :  ( 36.0798 m/s )
+rho_all        = 4.877e+10
+energy         = 9.67519e+11
+scalar_all     = 0
+T(ave,min,max) = 303.778 ( 292.572, 312.605 ) 
+sgs_vis/vis    = 1263.64, 342461 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4597.69, 287.356 :  (min, max) = ( 287.356, 287.357 ) 
+sec/step = 0.132734  ( total elapsed_time (minites) = 49.4151 ) 
+time  ratio (gpu, comm) = 0.663437, 0.336563
+*****
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 461 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 461 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 460 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 460 minutes
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 23000 / 337500 ( time = 2453.33 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.203077 :  ( 30.4616 m/s )
+rho_all        = 4.87672e+10
+energy         = 9.64149e+11
+scalar_all     = 0
+T(ave,min,max) = 303.778 ( 292.597, 312.618 ) 
+sgs_vis/vis    = 1281.66, 353402 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4737.47, 296.092 :  (min, max) = ( 296.092, 296.093 ) 
+sec/step = 0.128818  ( total elapsed_time (minites) = 51.5621 ) 
+time  ratio (gpu, comm) = 0.713949, 0.286051
+*****
+---------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 462 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 462 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 461 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 461 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 463 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 463 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 462 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 462 minutes
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 24000 / 337500 ( time = 2560 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.250195 :  ( 37.5292 m/s )
+rho_all        = 4.87668e+10
+energy         = 9.4491e+11
+scalar_all     = 0
+T(ave,min,max) = 303.798 ( 291.875, 312.641 ) 
+sgs_vis/vis    = 1306.22, 395852 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4642.31, 290.144 :  (min, max) = ( 290.144, 290.146 ) 
+sec/step = 0.131459  ( total elapsed_time (minites) = 53.7531 ) 
+time  ratio (gpu, comm) = 0.692365, 0.307635
+*****
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 464 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 464 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 463 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 463 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 465 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 465 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 464 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 464 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 25000 / 337500 ( time = 2666.67 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.233794 :  ( 35.069 m/s )
+rho_all        = 4.87642e+10
+energy         = 9.33654e+11
+scalar_all     = 0
+T(ave,min,max) = 303.804 ( 291.815, 312.671 ) 
+sgs_vis/vis    = 1307.52, 381605 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4444.83, 277.802 :  (min, max) = ( 277.801, 277.803 ) 
+sec/step = 0.137299  ( total elapsed_time (minites) = 56.0414 ) 
+time  ratio (gpu, comm) = 0.661477, 0.338523
+*****
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 466 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 466 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 465 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 465 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 467 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 467 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 466 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 466 minutes
+-----------------------------------------------------------------------------------------------------------------------------
+t / step_end = 26000 / 337500 ( time = 2773.33 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.225075 :  ( 33.7612 m/s )
+rho_all        = 4.87604e+10
+energy         = 9.27915e+11
+scalar_all     = 0
+T(ave,min,max) = 303.81 ( 292.204, 312.701 ) 
+sgs_vis/vis    = 1293.7, 336939 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4249.04, 265.565 :  (min, max) = ( 265.565, 265.566 ) 
+sec/step = 0.143626  ( total elapsed_time (minites) = 58.4352 ) 
+time  ratio (gpu, comm) = 0.648531, 0.351469
+*****
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 468 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 468 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 467 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 467 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 27000 / 337500 ( time = 2880 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.26283 :  ( 39.4244 m/s )
+rho_all        = 4.87579e+10
+energy         = 9.25663e+11
+scalar_all     = 0
+T(ave,min,max) = 303.806 ( 293.891, 312.724 ) 
+sgs_vis/vis    = 1282.09, 273501 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4667.92, 291.745 :  (min, max) = ( 291.745, 291.747 ) 
+sec/step = 0.130737  ( total elapsed_time (minites) = 60.6141 ) 
+time  ratio (gpu, comm) = 0.669611, 0.330389
+*****
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 469 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 469 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 468 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 468 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 470 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 470 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 469 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 469 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 28000 / 337500 ( time = 2986.67 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.203138 :  ( 30.4708 m/s )
+rho_all        = 4.87544e+10
+energy         = 9.0032e+11
+scalar_all     = 0
+T(ave,min,max) = 303.825 ( 296.725, 312.763 ) 
+sgs_vis/vis    = 1289.08, 279800 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4516.84, 282.302 :  (min, max) = ( 282.302, 282.303 ) 
+sec/step = 0.13511  ( total elapsed_time (minites) = 62.866 ) 
+time  ratio (gpu, comm) = 0.639001, 0.360999
+*****
+-----------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 471 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 471 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 470 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 470 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 472 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 472 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 471 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 471 minutes
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 29000 / 337500 ( time = 3093.33 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.229079 :  ( 34.3619 m/s )
+rho_all        = 4.87505e+10
+energy         = 8.86674e+11
+scalar_all     = 0
+T(ave,min,max) = 303.837 ( 296.916, 312.781 ) 
+sgs_vis/vis    = 1280.42, 334486 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4462.55, 278.909 :  (min, max) = ( 278.909, 278.911 ) 
+sec/step = 0.136754  ( total elapsed_time (minites) = 65.1452 ) 
+time  ratio (gpu, comm) = 0.653308, 0.346692
+*****
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 473 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 473 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 472 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 472 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 474 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 474 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 473 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 473 minutes
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 30000 / 337500 ( time = 3200 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.32454 :  ( 48.681 m/s )
+rho_all        = 4.8748e+10
+energy         = 8.79655e+11
+scalar_all     = 0
+T(ave,min,max) = 303.838 ( 297.346, 312.786 ) 
+sgs_vis/vis    = 1264.29, 377842 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4574.61, 285.913 :  (min, max) = ( 285.913, 285.915 ) 
+sec/step = 0.133404  ( total elapsed_time (minites) = 67.3686 ) 
+time  ratio (gpu, comm) = 0.668412, 0.331588
+*****
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 475 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 475 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 474 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 474 minutes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 476 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 476 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 475 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 475 minutes
+--------------------------------------------------------------
+t / step_end = 31000 / 337500 ( time = 3306.67 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.330348 :  ( 49.5522 m/s )
+rho_all        = 4.87466e+10
+energy         = 8.77009e+11
+scalar_all     = 0
+T(ave,min,max) = 303.831 ( 298.148, 312.792 ) 
+sgs_vis/vis    = 1259.29, 450202 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4490.43, 280.652 :  (min, max) = ( 280.651, 280.653 ) 
+sec/step = 0.135905  ( total elapsed_time (minites) = 69.6337 ) 
+time  ratio (gpu, comm) = 0.66329, 0.33671
+*****
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 477 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 477 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 476 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 476 minutes
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+t / step_end = 32000 / 337500 ( time = 3413.33 / 36000 ) 
+n_leaf(total)       = 3391552 ( 129600, 746496, 2515456,  )  : nn_global (10^6) = 217.059
+n_leaf(max@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_max    (10^6) = 13.5662
+n_leaf(min@node)    = 211972 ( 8100, 46656, 157216,  )  : nn_min    (10^6) = 13.5662
+n_leaf(total, lv)    : updated           =  ( 98304, 524288, 2097152,  ) grid points(total, lv) 10^6 : updated    =  ( 6.29146, 33.5544, 134.218,  ) 
+n_leaf(max@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(max@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+n_leaf(min@node, lv) : updated           =  ( 6144, 32768, 131072,  ) grid points(min@node, lv) 10^6 : updated =  ( 0.393216, 2.09715, 8.38861,  ) 
+vel_max        = 0.284861 :  ( 42.7292 m/s )
+rho_all        = 4.87477e+10
+energy         = 8.80381e+11
+scalar_all     = 0
+T(ave,min,max) = 303.824 ( 298.919, 312.78 ) 
+sgs_vis/vis    = 1249.23, 436297 (average, max)
+dt(coarse)     = 0.106667 (sec.)
+dx             = 16, 8, 4, 
+*****
+MLUPS w/o halo,  total, mean = 4601.75, 287.609 :  (min, max) = ( 287.609, 287.61 ) 
+sec/step = 0.132617  ( total elapsed_time (minites) = 71.844 ) 
+time  ratio (gpu, comm) = 0.681229, 0.318771
+*****
+---------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 478 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 478 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 477 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 477 minutes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 479 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 479 minutes
+
+void BoundaryConditions::ReadWRFData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 478 minutes
+
+void BoundaryConditions::ReadGroundData(int, const Grid*, const Tree&, const Parameters&, MeshValue*) : time = 478 minutes
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

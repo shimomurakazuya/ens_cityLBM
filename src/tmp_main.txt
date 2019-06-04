@@ -1,0 +1,52 @@
+#include <mpi.h>
+#include <omp.h>
+#include <iostream>
+#include <cstdlib>
+#include "FuncAllocate.h"
+
+
+#include "TestFlowAroundCube.h"
+#include "TestMapFlow.h"
+
+
+int main(int argc, char* argv[])
+{
+    // MPI_Init //
+//    int  required = MPI_THREAD_FUNNELED;
+    int  required = MPI_THREAD_SERIALIZED;
+//    int  required = MPI_THREAD_MULTIPLE;
+    int  provided;
+    MPI_Init_thread(&argc, &argv, required, &provided);
+    if (required != provided) { std::cout << "error : MPI_Init_thread" << std::endl; exit(0); }
+
+
+    int  ncpu, rank;
+    MPI_Comm_size(MPI_COMM_WORLD, &ncpu);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    std::cout << "rank / ncpu = " << rank << " / " << ncpu << std::endl;
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if (rank == 0) {
+#ifdef USE_SHARED_MEMORY__
+        std::cout << "use_shared_memory" << std::endl;
+#endif
+    }
+
+
+    // validation test //
+    TestFlowAroundCube  testFlowAroundCube;
+    testFlowAroundCube.FlowAroundCube(argc, argv);
+//    TestMapFlow  testMapFlow;
+//    testMapFlow.Flow(argc, argv);
+
+
+    // finalize //
+    MPI_Barrier(MPI_COMM_WORLD);
+    std::cout << "finish" << std::endl;
+    MPI_Finalize();
+
+    return  EXIT_SUCCESS;
+}
+

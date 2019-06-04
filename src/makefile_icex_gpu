@@ -1,0 +1,139 @@
+PROGRAM_NAME := run.exe
+
+
+#HDF5=/usr/apps.sp3/nosupport/hdf5/1.8.11 # tsubame
+#HDF5=/home/g5/a170085/software/hdf5/1.8.11 # HDF5 icex #
+
+
+OUT_DIR         := ../bin
+SOURCE_DIR      := ./
+HEADER_DIR      := ../include
+OBJ_DIR         := ../obj
+TEST_DIR        := ../test_srcs
+VALIDATION_DIR  := ../validation_srcs
+FUNCTION_DIR    := ../function_srcs
+INDEX_DIR       := ../index_srcs
+LIBRARY_SRC_DIR := ../library_srcs
+INITIALIZE_DIR  := ../initialize_srcs
+DEFINE_DIR      := ../defines
+RESULT_DIR      := ../io
+
+#CPP  = icpc -O3  -std=c++11 -fopenmp
+CPP  = g++  -O3  -std=c++11 -fopenmp
+#CPP  = nvcc -O3  -std=c++11 -c -Xcompiler -fopenmp #--expt-relaxed-constexpr
+NVCC = nvcc -O3  -std=c++11 -restrict -Xcompiler -fopenmp #--expt-relaxed-constexpr
+#NVCC +=  --relocatable-device-code=true --compile
+
+
+# CFLAGS
+CFLAGS   = -use_fast_math # --ptxas-options=-v
+CFLAGS  += -I/home/g5/a170085/software/hdf5/1.8.11/include
+
+CFLAGS += #-I/usr/apps.sp3/cuda/7.5/include
+CFLAGS += --default-stream per-thread
+CFLAGS += -Xptxas -v
+CFLAGS += --gpu-architecture=sm_50  -maxrregcount 63
+
+
+# LDFLAGS
+LDFLAGS  = -lm -lstdc++ -lgomp
+LDFLAGS += -L/home/g5/a170085/software/hdf5/1.8.11/lib
+LDFLAGS += -lhdf5 -lhdf5_hl
+
+LDFLAGS += -L/home/app/mpt/mpt-2.15/lib # MPI icex #
+LDFLAGS += -lmpi -lmpi++ # icex
+LDFLAGS += -lcudart -rdc=true -Xnvlink -w
+
+
+
+LIBS     =
+INCLUDE  = -I$(HEADER_DIR)
+INCLUDE += -I$(DEFINE_DIR)
+INCLUDE += -I$(FUNCTION_DIR)
+INCLUDE += -I$(INDEX_DIR)
+INCLUDE += -I$(LIBRARY_SRC_DIR)
+INCLUDE += -I$(INITIALIZE_DIR)
+INCLUDE += -I$(TEST_DIR)
+INCLUDE += -I$(VALIDATION_DIR)
+TARGET   = $(OUT_DIR)/$(PROGRAM_NAME)
+
+
+ifeq "$(strip $(OBJ_DIR))" ""
+  OBJ_DIR= .
+endif
+CPP_SOURCES  := $(notdir $(wildcard $(SOURCE_DIR)/*.cpp)) $(notdir $(wildcard $(FUNCTION_DIR)/*.cpp)) $(notdir $(wildcard $(INDEX_DIR)/*.cpp)) $(notdir $(wildcard $(LIBRARY_SRC_DIR)/*.cpp)) $(notdir $(wildcard $(INITIALIZE_DIR)/*.cpp)) $(notdir $(wildcard $(TEST_DIR)/*.cpp)) $(notdir $(wildcard $(VALIDATION_DIR)/*.cpp))
+NVCC_SOURCES := $(notdir $(wildcard $(SOURCE_DIR)/*.cu)) $(notdir $(wildcard $(FUNCTION_DIR)/*.cu))  $(notdir $(wildcard $(INDEX_DIR)/*.cu)) $(notdir $(wildcard $(LIBRARY_SRC_DIR)/*.cu)) $(notdir $(wildcard $(INITIALIZE_DIR)/*.cu)) $(notdir $(wildcard $(TEST_DIR)/*.cu)) $(notdir $(wildcard $(VALIDATION_DIR)/*.cu))
+OBJECTS  = $(addprefix $(OBJ_DIR)/, $(CPP_SOURCES:.cpp=.o) $(NVCC_SOURCES:.cu=.o))
+
+DEPENDS  = $(OBJECTS:.o=.d)
+vpath %.cu  $(SOURCE_DIR)
+vpath %.cpp $(SOURCE_DIR)
+vpath %.h   $(HEADER_DIR)
+vpath %.hpp $(HEADER_DIR)
+vpath %.h   $(DEFINE_DIR)
+vpath %.cu  $(FUNCTION_DIR)
+vpath %.cpp $(FUNCTION_DIR)
+vpath %.h   $(FUNCTION_DIR)
+vpath %.hpp $(FUNCTION_DIR)
+vpath %.cu  $(INDEX_DIR)
+vpath %.cpp $(INDEX_DIR)
+vpath %.h   $(INDEX_DIR)
+vpath %.hpp $(INDEX_DIR)
+vpath %.cu  $(LIBRARY_SRC_DIR)
+vpath %.cpp $(LIBRARY_SRC_DIR)
+vpath %.h   $(LIBRARY_SRC_DIR)
+vpath %.hpp $(LIBRARY_SRC_DIR)
+vpath %.cu  $(INITIALIZE_DIR)
+vpath %.cpp $(INITIALIZE_DIR)
+vpath %.h   $(INITIALIZE_DIR)
+vpath %.hpp $(INITIALIZE_DIR)
+vpath %.cu  $(TEST_DIR)
+vpath %.cpp $(TEST_DIR)
+vpath %.h   $(TEST_DIR)
+vpath %.hpp $(TEST_DIR)
+vpath %.cu  $(VALIDATION_DIR)
+vpath %.cpp $(VALIDATION_DIR)
+vpath %.h   $(VALIDATION_DIR)
+vpath %.hpp $(VALIDATION_DIR)
+
+
+$(TARGET): $(OBJECTS) $(LIBS)
+	@mkdir -p $(OUT_DIR)
+	$(NVCC) -o $@ $^ $(LDFLAGS)
+
+
+$(OBJ_DIR)/%.o: %.cpp
+	@[ -d $(OBJ_DIR) ]|| mkdir -p $(OBJ_DIR)
+	$(CPP) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+
+
+$(OBJ_DIR)/%.o: %.cu
+	@[ -d $(OBJ_DIR) ]|| mkdir -p $(OBJ_DIR)
+	$(NVCC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+
+
+all: $(TARGET)
+
+-include $(DEPENDS)
+
+
+clean:
+	rm -fr $(OUT_DIR)/*.exe
+	rm -fr $(OUT_DIR)/*.optrpt
+	rm -fr $(OBJ_DIR)/*.o
+	rm -fr $(OBJ_DIR)/*.optrpt
+	rm -rf $(DEPEND_DIR)
+
+resultclean:
+	rm -fr $(OUT_DIR)/*.exe
+	rm -fr $(OUT_DIR)/*.optrpt
+	rm -fr $(OBJ_DIR)/*.o
+	rm -fr $(OBJ_DIR)/*.optrpt
+	rm -rf $(DEPEND_DIR)
+	rm -rf $(RESULT_DIR)/output/*
+	rm -rf $(RESULT_DIR)/iofiles/*.dat
+	rm -rf $(RESULT_DIR)/iofiles/*.h5
+	rm -rf $(RESULT_DIR)/iofiles/*.xmf
+
+tagfiles:
+	ctags -R --langmap=c:+.cu --exclude=bin --exclude=recodes --exclude=log  --exclude=obj  --exclude=io  --exclude=run ../*

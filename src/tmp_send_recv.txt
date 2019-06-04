@@ -1,0 +1,115 @@
+#include <mpi.h>
+#include <omp.h>
+#include <iostream>
+#include <cstdlib>
+#include "FuncAllocate.h"
+
+
+#include "TestFlowAroundCube.h"
+#include "TestMapFlow.h"
+
+
+int main(int argc, char* argv[])
+{
+    // MPI_Init //
+//    int  required = MPI_THREAD_FUNNELED;
+    int  required = MPI_THREAD_SERIALIZED;
+//    int  required = MPI_THREAD_MULTIPLE;
+    int  provided;
+    MPI_Init_thread(&argc, &argv, required, &provided);
+    if (required != provided) { std::cout << "error : MPI_Init_thread" << std::endl; exit(0); }
+
+    int  ncpu, rank;
+    MPI_Comm_size(MPI_COMM_WORLD, &ncpu);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Barrier(MPI_COMM_WORLD);
+
+#if 1
+    int  n = 8;
+    int* ah;
+    int* bh;
+    int* ad;
+    int* bd;
+    int* am;
+    int* bm;
+    int* a;
+    int* b;
+    FuncAllocate::allocate_value(&ah, n, MemType::Host);
+    FuncAllocate::allocate_value(&bh, n, MemType::Host);
+    FuncAllocate::allocate_value(&ad, n, MemType::Device);
+    FuncAllocate::allocate_value(&bd, n, MemType::Device);
+    FuncAllocate::allocate_value(&am, n, MemType::Managed);
+    FuncAllocate::allocate_value(&bm, n, MemType::Managed);
+
+    for (int i=0; i<n; i++) {
+        ah[i] = i;
+        bh[i] = 0;
+//        std::cout << "rank, i = " << rank << ", " << i << " : a, b = " << ah[i] << ", " << bh[i] << std::endl;
+    }
+    cudaMemcpy(ah, ad, n, cudaMemcpyDefault);
+    cudaMemcpy(bh, bd, n, cudaMemcpyDefault);
+    
+    cudaMemcpy(ah, am, n, cudaMemcpyDefault);
+    cudaMemcpy(bh, bm, n, cudaMemcpyDefault);
+
+    a = ah; b = bh;
+//    a = ad; b = bd;
+//    a = am; b = bm;
+
+    const int origin = 0;
+    const int target = 1;
+    int tag = 0;
+    MPI_Status status;
+    if (rank == 0) {
+        MPI_Send(a, n, MPI_INT, target, tag, MPI_COMM_WORLD);
+    }
+    else if (rank == target) {
+        MPI_Recv(b, n, MPI_INT, origin, tag, MPI_COMM_WORLD, &status);
+    }
+
+
+    cudaMemcpy(a, ah, n, cudaMemcpyDefault);
+    cudaMemcpy(b, bh, n, cudaMemcpyDefault);
+
+    for (int i=0; i<n; i++) {
+        std::cout << "rank, i = " << rank << ", " << i << " : a, b = " << ah[i] << ", " << bh[i] << std::endl;
+    }
+
+    FuncAllocate::release_value(ah, MemType::Host);
+    FuncAllocate::release_value(bh, MemType::Host);
+    FuncAllocate::release_value(ad, MemType::Device);
+    FuncAllocate::release_value(bd, MemType::Device);
+    FuncAllocate::release_value(am, MemType::Managed);
+    FuncAllocate::release_value(bm, MemType::Managed);
+    
+
+#endif
+
+#if 0
+
+    std::cout << "rank / ncpu = " << rank << " / " << ncpu << std::endl;
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if (rank == 0) {
+#ifdef USE_SHARED_MEMORY__
+        std::cout << "use_shared_memory" << std::endl;
+#endif
+    }
+
+
+    // validation test //
+    TestFlowAroundCube  testFlowAroundCube;
+    testFlowAroundCube.FlowAroundCube(argc, argv);
+//    TestMapFlow  testMapFlow;
+//    testMapFlow.Flow(argc, argv);
+
+#endif
+
+    // finalize //
+    MPI_Barrier(MPI_COMM_WORLD);
+    std::cout << "finish" << std::endl;
+    MPI_Finalize();
+
+    return  EXIT_SUCCESS;
+}
+
