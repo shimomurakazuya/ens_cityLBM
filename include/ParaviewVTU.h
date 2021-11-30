@@ -10,7 +10,8 @@
 #include <mpi.h>
 #include "definePrecision.h"
 #include "defineFilenames.h"
-
+#include "MPICommEnsemble.h"
+#include "mpi_wrapper.hpp"
 
 enum VTKDataType {
     UInt64,
@@ -22,12 +23,13 @@ enum VTKDataType {
     Int16,
     Float32,
 };
-    
+
 
 enum VTKOutputScale {
     Full,
     Downsize2,
-    Downsize4
+    Downsize4,
+    Slice_Full
 };
 
 
@@ -65,22 +67,27 @@ private:
     const VTKDataType  header_type_ = UInt64;
     const std::string  format_ = "appended";
 
-    int  rank_;
-    VTKOutputScale  vtkOutputScale_ = VTKOutputScale::Full;
+    const MPICommEnsemble comm_;
+    const util::mpi::int_type rank_;
+    const VTKOutputScale  vtkOutputScale_;
 
 public:
-    ParaviewVTU() {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
-    };
+    ParaviewVTU() = delete;
 
-    ParaviewVTU(VTKOutputScale vtkOutputScale) : vtkOutputScale_(vtkOutputScale) {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
-    };
+    ParaviewVTU(
+    const MPICommEnsemble comm, 
+    VTKOutputScale vtkOutputScale = VTKOutputScale::Full
+    ) : 
+    comm_(comm), 
+    rank_(comm.world().rank()),
+    vtkOutputScale_(vtkOutputScale) 
+    { }
+
     ~ParaviewVTU() {};
 
 public:
     void set_number_of_points_and_cells(int number_of_points, int number_of_cells)
-    { 
+    {
         number_of_points_ = number_of_points;
         number_of_cells_  = number_of_cells;
     }
@@ -136,7 +143,7 @@ private:
     void SetPDataArray(std::ofstream& fout, std::string name, VTKDataType type, int number_of_components);
 
     void HeaderPVTUFile(std::ofstream& fout);
-    void SetPieceSource(std::ofstream& fout, int step, int nprocs);
+    void SetPieceSource(std::ofstream& fout, int step, int nprocs, int iproc0); // iproc0: head of comm.col_vector()
 
 private:
     std::string cout_type(VTKDataType datatype)
@@ -151,8 +158,8 @@ private:
                 ( datatype == VTKDataType::Float32 ) ? "Float32"  :
                                                     " ";
     }
-    
-    
+
+
     uint64_t get_sizeof(VTKDataType datatype)
     {
         return  ( datatype == VTKDataType::UInt64  ) ? sizeof(uint64_t) :
@@ -172,39 +179,46 @@ private:
     {
         const int m = sizeof(T)/sizeof(BYTE);
         const BYTE* tmp = (BYTE*) &a;
-    
+
         vec.insert( vec.end(), tmp, tmp + m );
     }
-    
-    
+
+
     template<typename T>
     void
     add_appended_data(std::vector<BYTE>& vec, const T* a, const int n)
     {
         const int m = sizeof(T)/sizeof(BYTE) * n;
         const BYTE* tmp = (BYTE*)a;
-    
+
         vec.insert( vec.end(), tmp, tmp + m );
     }
 
 
     std::string io_folder() { return Foldernames::io_folder; }
+    std::string to_str_zf(int i, int digit=4) {  return std::string(digit - std::to_string(i).length(), '0') + std::to_string(i); }
 
     std::string fname_vtu(int step, int rank)
     {
-        return (vtkOutputScale_ == VTKOutputScale::Full     ) ? Filenames::vtu_value_name0                + "-rank" + std::to_string(rank) + "-step" + std::to_string(step) + ".vtu":
-               (vtkOutputScale_ == VTKOutputScale::Downsize2) ? Filenames::vtu_value_name0 + "-downsize2" + "-rank" + std::to_string(rank) + "-step" + std::to_string(step) + ".vtu":
-               (vtkOutputScale_ == VTKOutputScale::Downsize4) ? Filenames::vtu_value_name0 + "-downsize4" + "-rank" + std::to_string(rank) + "-step" + std::to_string(step) + ".vtu":
-                                                                Filenames::vtu_value_name0                + "-rank" + std::to_string(rank) + "-step" + std::to_string(step) + ".vtu";
+        const auto str_rank = to_str_zf(rank);
+        const auto str_step = to_str_zf(step);
+        return (vtkOutputScale_ == VTKOutputScale::Full      ) ? Filenames::vtu_value_name0                + "-rank" + str_rank + "-step" + str_step + ".vtu":
+               (vtkOutputScale_ == VTKOutputScale::Downsize2 ) ? Filenames::vtu_value_name0 + "-downsize2" + "-rank" + str_rank + "-step" + str_step + ".vtu":
+               (vtkOutputScale_ == VTKOutputScale::Downsize4 ) ? Filenames::vtu_value_name0 + "-downsize4" + "-rank" + str_rank + "-step" + str_step + ".vtu":
+               (vtkOutputScale_ == VTKOutputScale::Slice_Full) ? Filenames::vtu_value_name0 + "-slice"     + "-rank" + str_rank + "-step" + str_step + ".vtu":
+                                                                 Filenames::vtu_value_name0 + "-unknown"   + "-rank" + str_rank + "-step" + str_step + ".vtu";
     }
 
 
     std::string fname_pvtu(int step)
     {
-        return (vtkOutputScale_ == VTKOutputScale::Full     ) ? Filenames::pvtu_value_name0                + "-step" + std::to_string(step) + ".pvtu":
-               (vtkOutputScale_ == VTKOutputScale::Downsize2) ? Filenames::pvtu_value_name0 + "-downsize2" + "-step" + std::to_string(step) + ".pvtu":
-               (vtkOutputScale_ == VTKOutputScale::Downsize4) ? Filenames::pvtu_value_name0 + "-downsize4" + "-step" + std::to_string(step) + ".pvtu":
-                                                                Filenames::pvtu_value_name0                + "-step" + std::to_string(step) + ".pvtu";
+        const auto str_ens = to_str_zf(comm_.col_id());
+        const auto str_step = to_str_zf(step);
+        return (vtkOutputScale_ == VTKOutputScale::Full     )  ? Filenames::pvtu_value_name0                + "-ens" + str_ens + "-step" + str_step + ".pvtu":
+               (vtkOutputScale_ == VTKOutputScale::Downsize2)  ? Filenames::pvtu_value_name0 + "-downsize2" + "-ens" + str_ens + "-step" + str_step + ".pvtu":
+               (vtkOutputScale_ == VTKOutputScale::Downsize4)  ? Filenames::pvtu_value_name0 + "-downsize4" + "-ens" + str_ens + "-step" + str_step + ".pvtu":
+               (vtkOutputScale_ == VTKOutputScale::Slice_Full) ? Filenames::pvtu_value_name0 + "-slice"     + "-ens" + str_ens + "-step" + str_step + ".pvtu":
+                                                                 Filenames::pvtu_value_name0 + "-unknown"   + "-ens" + str_ens + "-step" + str_step + ".pvtu";
     }
 
 };

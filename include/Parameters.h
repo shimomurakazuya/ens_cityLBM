@@ -12,6 +12,8 @@
 #include "definePrecision.h"
 #include "Parser.h"
 
+#include "MPICommEnsemble.h"
+
 
 struct  GPUDevice {
     int  id_gpu;
@@ -68,6 +70,10 @@ struct  CoefDomain {
     real  x_global_domain_max;
     real  y_global_domain_max;
     real  z_global_domain_max;
+
+    real x_global_domain_center() const { return (x_global_domain_min + x_global_domain_max)*0.5; }
+    real y_global_domain_center() const { return (y_global_domain_min + y_global_domain_max)*0.5; }
+    real z_global_domain_center() const { return (z_global_domain_min + z_global_domain_max)*0.5; }
 };
 
 
@@ -80,6 +86,7 @@ struct  stIOStep {
 
 class  Parameters {
 private:
+    const MPICommEnsemble comm_;
     GPUDevice             gpuDevice_;
 
     CoefFluidPropertyLBM  coefFluidPropertyLBM_;
@@ -90,7 +97,8 @@ private:
     int                   gpu_per_node_;
 
 public:
-    Parameters () {}
+    Parameters () = delete;
+    Parameters (const MPICommEnsemble comm):  comm_(comm) {}
     ~Parameters () {}
 
 public:
@@ -123,28 +131,29 @@ public:
     bool  is_step_end(int t) const { return (t == step_end() - 1); }
 
 public:
-    void  init(const OptionParser* optionParser);
+    void  init(const OptionParser& optionParser);
     void  copy(const Parameters& parameters);
 
-    void  readParameters (const OptionParser*  optionParser, const std::string  filename);
+    void  readParameters (const OptionParser&  optionParser, const std::string  filename);
     void  writeParameters(const std::string  filename, int step) const;
+    void  coutParameters() const;
 
     std::string  filename(const int step) const;
 
 private:
-    void  initGPUDevice(const OptionParser* optionParser);
+    void  initGPUDevice(const OptionParser& optionParser);
     void  copyGPUDevice(const GPUDevice& gpuDevice);
 
-    void  initCoefFluidPropertyLBM(const OptionParser* optionParser);
+    void  initCoefFluidPropertyLBM(const OptionParser& optionParser);
     void  copyCoefFluidPropertyLBM(const CoefFluidPropertyLBM& coefFluidPropertyLBM);
 
-    void  initCoefTime(const OptionParser* optionParser);
+    void  initCoefTime(const OptionParser& optionParser);
     void  copyCoefTime(const CoefTime& coefTime);
 
-    void  initCoefCFROutput(const OptionParser* optionParser);
+    void  initCoefCFROutput(const OptionParser& optionParser);
     void  copyCoefCFROutput(const CoefCFROutput& coefCFROutput);
 
-    void  initCoefDomain(const OptionParser* optionParser);
+    void  initCoefDomain(const OptionParser& optionParser);
     void  copyCoefDomain(const CoefDomain& coefDomain);
 };
 

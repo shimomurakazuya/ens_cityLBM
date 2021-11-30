@@ -14,14 +14,13 @@
 #include "ValueNS.h"
 #include "ValueObjLS.h"
 #include "ValueLBM.h"
-#include "ValueBuff.h"
-
 
 class  MeshValue {
 private:
     MemType memType_{MemType::NullPtr};
 
     int     nn_max_;
+    int     n_scalars_;
 
     // coordinates xyz //
     Coordinates     coordinates_;
@@ -31,10 +30,8 @@ private:
     ValueNS         valueNS_;
     ValueLBM        valueLBM_;
 
-    ValueBuff       valueBuff_;
-
 public:
-    MeshValue ()  { 
+    MeshValue ()  {
         memType_ = MemType::Host;
 #ifdef GPU_CALCULATION__
         memType_ = MemType::Managed;
@@ -44,6 +41,7 @@ public:
 
 public:
     int  nn_max() const { return  nn_max_; }
+    int  n_scalars() const { return n_scalars_; }
 
     // coordinates xyz //
           Coordinates& coordinates()          { return  coordinates_; }
@@ -59,11 +57,8 @@ public:
           ValueLBM& valueLBM()          { return  valueLBM_; }
     const ValueLBM& valueLBM()    const { return  valueLBM_; }
 
-          ValueBuff& valueBuff()          { return  valueBuff_; }
-    const ValueBuff& valueBuff()    const { return  valueBuff_; }
-
 public:
-    void init(const int  nn_max);
+    void init(const int  nn_max, const int n_scalars);
     void set_coordinate(const int  lv, const Grid& grid, const Tree& tree);
 
     void copy_MeshValue(
@@ -73,9 +68,12 @@ public:
         const bool          is_reset
         );
 
+    void mask_meshValue_wo_halo(const Tree& tree, const int lv);
+    void mask_meshValue_wo_obj (const Tree& tree, const int lv);
+
 private:
     void  init_coordinates(const int  nn_max);
-    void  init_mesh_values(const int  nn_max);
+    void  init_mesh_values(const int  nn_max, const int n_scalars);
 
 
 };

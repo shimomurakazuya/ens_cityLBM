@@ -7,9 +7,13 @@
 
 
 namespace  DefAMR {
-//    const int  LV_MAX  = 1;
-//    const int  LV_MAX  = 2;
-    const int  LV_MAX  = 3;
+
+    // LV_MAX: by DEFINEAMR_LV_MAX, or set Oklahoma config as default
+    #ifdef DEFINEAMR_LV_MAX
+    constexpr int  LV_MAX  = DEFINEAMR_LV_MAX;
+    #else
+    constexpr int  LV_MAX  = 3;
+    #endif
 
     const int  NX_LEAF = 4;
 //    const int  NX_LEAF = 8;

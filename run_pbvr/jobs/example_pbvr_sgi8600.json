@@ -1,0 +1,23 @@
+{
+    "JOB_settings": {
+        "ACCOUNT": "PG21001",
+        "JOB_NAME": "test_pbvr",
+        "NB_PROCS": 32,
+        "NB_THREADS": 12,
+        "OUT_DIR": "./test_pbvr",
+        "TIME": "16:00:00",
+        "USE_GPUs": true
+    },
+    "citylbm_settings": {
+        "cfr_flags": [ 1, 1 ],
+        "cfr_steps": [ 750, 750 ],
+        "domain_length": [ 4096, 4096, 2560 ],
+        "domain_min": [ -2048, -2048, -8 ],
+        "n_ensemble_members": 1,
+        "number_of_grid_point": [ 40, 2 ],
+        "ofs_ensemble_idx": 0,
+        "restart_flags_and_step": [ 0, 99999 ],
+        "time_end": 36000.0,
+        "velocity_lbm": [ 10.0, 0.075 ]
+    }
+}

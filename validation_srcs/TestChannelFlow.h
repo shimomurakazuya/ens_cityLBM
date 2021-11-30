@@ -15,7 +15,10 @@ class  TestChannelFlow {
 public:
     int  rank_;
 
-    TestChannelFlow(){ MPI_Comm_rank(MPI_COMM_WORLD, &rank_); }
+    TestChannelFlow(){ 
+        //MPI_Comm_rank_(MPI_COMM_WORLD, &rank_);
+        rank_ = -1;
+    }
     ~TestChannelFlow(){}
 
     // source //

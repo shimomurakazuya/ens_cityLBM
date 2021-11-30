@@ -2,9 +2,18 @@
 #ifndef DEFINEFILENAMES_H_
 #define DEFINEFILENAMES_H_
 
+#include <string>
+
 
 namespace  Foldernames {
-    const std::string  input_folder = "../io/input";
+    // input_folder: by defined macros DEFINEFILENAME_INPUT_FOLDER
+    // or, set Oklahoma config as defualt
+    #ifdef DEFINEFILENAME_INPUT_FOLDER
+    const std::string  input_folder = DEFINEFILENAME_INPUT_FOLDER;
+    #else
+    const std::string  input_folder = "../io/input/oklahoma";
+    #endif
+
     const std::string  output_folder = "../io/output";
     const std::string  io_folder = "../io/iofiles";
 };

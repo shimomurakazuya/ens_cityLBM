@@ -1,0 +1,22 @@
+{
+    "JOB_settings": {
+        "ACCOUNT": "PG21001",
+        "JOB_NAME": "flow_cube",
+        "NB_PROCS": 40,
+        "NB_THREADS": 12,
+        "OUT_DIR": "./result",
+        "TIME": "10:00:00",
+        "USE_GPUs": true
+    },
+    "citylbm_settings": {
+        "cfr_flags": [ 1, 1 ],
+        "cfr_steps": [ 500, 2500 ],
+        "domain_length": [ 40, 1.92, 1.92 ],
+        "domain_min": [ -20, -0.96, -0.08 ],
+        "number_of_grid_point": [ 12, 2 ],
+        "restart_flags_and_step": [ 0, 99999 ],
+        "n_ensemble_members": 10,
+        "time_end": 660,
+        "velocity_lbm": [ 10.0, 0.1 ]
+    }
+}

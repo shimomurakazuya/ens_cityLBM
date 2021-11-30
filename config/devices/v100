@@ -1,0 +1,10 @@
+# Nvidia V100 on SGI8600
+COMPILER  = nvcc
+CXXFLAGS  = -arch=sm_70 -x cu -O3 -std=c++14 -restrict --expt-extended-lambda -use_fast_math --default-stream per-thread
+CXXFLAGS += -maxrregcount 127 --nvlink-options -Werror
+CXXFLAGS += -ccbin mpicxx
+LDFLAGS = -lm -lstdc++ -lz
+TARGET = $(OUT_DIR)/citylbm.v100_cuda
+
+# Linker
+LINKER = nvcc -ccbin mpicxx

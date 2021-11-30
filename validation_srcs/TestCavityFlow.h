@@ -9,16 +9,19 @@
 #include "defineCUDA.h"
 #include "Field.h"
 #include "defineLBM.h"
-
+#include "MPICommEnsemble.h"
 
 class  TestCavityFlow {
+    const MPICommEnsemble comm_;
+    const OptionParser& opt_;
+
 public:
     int rank_;
-    TestCavityFlow(){ MPI_Comm_rank(MPI_COMM_WORLD, &rank_); }
+    TestCavityFlow(const OptionParser& opt, const MPICommEnsemble comm): opt_(opt), comm_(comm) {} 
     ~TestCavityFlow(){}
 
 public:
-    void  CavityFlow2D(int argc, char* argv[]);
+    void  Flow();
 
 
 private:

@@ -1,0 +1,196 @@
+{
+    "Aquarius": {
+        "CPU_name": "Icelake",
+        "CPUs_per_node": 2,
+        "Cores_per_cpu": 36,
+        "GPU_name": "A100",
+        "GPUs_per_node": 8,
+        "Job_classes": {
+            "regular-a0": [
+                1,
+                2,
+                "12:00:00"
+            ],
+            "regular-a1": [
+                3,
+                4,
+                "12:00:00"
+            ],
+            "regular-a2": [
+                5,
+                8,
+                "6:00:00"
+            ]
+        },
+        "batch_command": "pjsub"
+    },
+    "Flow": {
+        "CPU_name": "A64FX",
+        "CPUs_per_node": 4,
+        "Cores_per_cpu": 12,
+        "GPUs_per_node": 0,
+        "Job_classes": {
+            "fx-large": [
+                96,
+                192,
+                "12:00:00"
+            ],
+            "fx-middle": [
+                12,
+                96,
+                "12:00:00"
+            ],
+            "fx-small": [
+                1,
+                12,
+                "12:00:00"
+            ],
+            "fx-xlarge": [
+                192,
+                768,
+                "12:00:00"
+            ]
+        },
+        "batch_command": "pjsub"
+    },
+    "JFRS1": {
+        "CPU_name": "Skylake",
+        "CPUs_per_node": 2,
+        "Cores_per_cpu": 20,
+        "GPUs_per_node": 0,
+        "Job_classes": {
+            "L": [
+                32,
+                256,
+                "24:00:00"
+            ],
+            "LL": [
+                512,
+                1370,
+                "24:00:00"
+            ],
+            "S-M": [
+                8,
+                32,
+                "24:00:00"
+            ],
+            "dev": [
+                1,
+                2,
+                " 3:00:00"
+            ]
+        },
+        "batch_command": "sbatch"
+    },
+    "Odyssey": {
+        "CPU_name": "A64FX",
+        "CPUs_per_node": 4,
+        "Cores_per_cpu": 12,
+        "GPUs_per_node": 0,
+        "Job_classes": {
+            "regular-o0": [
+                1,
+                144,
+                "12:00:00"
+            ],
+            "regular-o1": [
+                145,
+                576,
+                "12:00:00"
+            ],
+            "regular-o2": [
+                577,
+                1152,
+                "12:00:00"
+            ],
+            "regular-o3": [
+                1153,
+                2304,
+                "6:00:00"
+            ]
+        },
+        "batch_command": "pjsub"
+    },
+    "SGI8600": {
+        "CPU_name": "Cascadelake",
+        "CPUs_per_node": 2,
+        "Cores_per_cpu": 24,
+        "GPU_name": "V100",
+        "GPUs_per_node": 4,
+        "Job_classes": {
+            "hg32": [
+                1,
+                32,
+                "48:00:00"
+            ],
+            "hg72": [
+                1,
+                72,
+                "48:00:00"
+            ],
+            "hg9": [
+                1,
+                9,
+                "48:00:00"
+            ],
+            "ng72": [
+                1,
+                72,
+                "24:00:00"
+            ],
+            "pg1": [
+                1,
+                1,
+                "48:00:00"
+            ]
+        },
+        "batch_command": "qsub"
+    },
+    "SGI8600_CPU": {
+        "CPU_name": "Cascadelake",
+        "CPUs_per_node": 2,
+        "Cores_per_cpu": 20,
+        "GPUs_per_node": 0,
+        "Job_classes": {
+            "hc12": [
+                1,
+                12,
+                "48:00:00"
+            ],
+            "hc192": [
+                65,
+                192,
+                "48:00:00"
+            ],
+            "hc64": [
+                13,
+                64,
+                "48:00:00"
+            ],
+            "hc6d": [
+                1,
+                6,
+                "1:00:00"
+            ]
+        },
+        "batch_command": "qsub"
+    },
+    "Tsubame3.0": {
+        "CPU_name": "Broadwell",
+        "CPUs_per_node": 2,
+        "Cores_per_cpu": 14,
+        "GPU_name": "P100",
+        "GPUs_per_node": 4,
+        "Job_classes": {
+            "f_node": [
+                1,
+                72,
+                "24:00:00"
+            ]
+        },
+        "batch_command": "qsub",
+        "batch_options": [
+            "-g"
+        ]
+    }
+}

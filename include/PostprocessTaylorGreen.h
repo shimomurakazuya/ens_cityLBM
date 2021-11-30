@@ -19,7 +19,10 @@ private:
     int  rank_;
 
 public:
-    PostprocessTaylorGreen () { MPI_Comm_rank(MPI_COMM_WORLD, &rank_); }
+    PostprocessTaylorGreen () { 
+        //MPI_Comm_rank_(MPI_COMM_WORLD, &rank_); 
+        rank_ = -1;
+    }
     ~PostprocessTaylorGreen () {}
 
 public:

@@ -16,13 +16,13 @@ namespace  fluid_property {
 //    constexpr real  GravitationalAcceleration = -1.0;
 //    constexpr real  GravitationalAcceleration = 0.0;
 
-//    constexpr real  Temperature0 = 273.15; 
-    constexpr real  Temperature0 = 273.15 + 30.0; 
-//    constexpr real  Temperature0 = 300.0; 
-//    constexpr real  Temperature0 = 312.0; 
-//    constexpr real  Temperature0 = 288; 
-    constexpr real  Temperature_bouyancy = Temperature0; 
-//    constexpr real  Temperature_bouyancy = 0.5; 
+//    constexpr real  Temperature0 = 273.15;
+    constexpr real  Temperature0 = 273.15 + 30.0;
+//    constexpr real  Temperature0 = 300.0;
+//    constexpr real  Temperature0 = 312.0;
+//    constexpr real  Temperature0 = 288;
+    constexpr real  Temperature_bouyancy = Temperature0;
+//    constexpr real  Temperature_bouyancy = 0.5;
 };
 
 
@@ -30,7 +30,13 @@ namespace  fluid_property {
 namespace  air_property {
     constexpr real  DensitySA = 1.205; // kg / m3 //
 
+    // KViscosity: by DEFINEFLUIDPROP_KVIS
+    // or, as defualt, set physical property of the air
+    #ifdef DEFINEFLUIDPROP_KVIS
+    constexpr real  KViscosity = DEFINEFLUIDPROP_KVIS;
+    #else
     constexpr real  KViscosity = 1.512 * 1.0e-5;
+    #endif
     constexpr real  Viscosity  = KViscosity*DensitySA;
 
     constexpr real  Re_tau = 1.0/KViscosity;
@@ -39,9 +45,13 @@ namespace  air_property {
     constexpr real  HeatConduction = 0.0257;
 
     constexpr real  Pr  = 0.71;
-    constexpr real  xi = Viscosity / Pr;
+    constexpr real  xi = KViscosity / Pr;
 
-    constexpr real  beta = 1.0/273.15;
+//    constexpr real  beta = 1.0/273.15;
+    constexpr real  beta = 1.0/fluid_property::Temperature0;
+
+//    constexpr real  Cd_pad = 0.125;
+    constexpr real  Cd_pad = 0.10;
 };
 #endif
 

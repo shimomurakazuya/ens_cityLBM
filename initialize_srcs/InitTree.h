@@ -5,6 +5,7 @@
 
 #include "Tree.h"
 #include "Grid.h"
+#include "MPICommEnsemble.h"
 
 
 namespace  InitTree {
@@ -33,11 +34,20 @@ init_tree_amr(
           Tree& tree,
     const Grid* grids,
     const int   lv_max
+    ) = delete;
+
+void
+init_tree_amr_with_map(
+          Tree& tree,
+    const Grid* grids,
+    const int   lv_max,
+    const MapData& map
     );
 
 
 Tree
 tree_all_region(
+    const MPICommEnsemble comm,
     const Grid* grids,
     const int   lv_max
     );

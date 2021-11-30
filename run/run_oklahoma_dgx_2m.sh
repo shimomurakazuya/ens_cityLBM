@@ -16,18 +16,18 @@ export MV2_CUDA_IPC=1
 export MV2_CUDA_ENABLE_MANAGED=1   # this flag must be set of managed memory is used otherwise it fails
 export MV2_CUDA_MANAGED_IPC=1
 
-export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=3
 
 
 mpiexec  \
     -n 16  --bind-to board   ./run.exe \
     -gpu_per_node              16 \
-    -time_end                  25200.0 \
+    -time_end                  24300.0 \
     -velocity_lbm              10.0  0.100 \
     -number_of_grid_point      80   2 \
     -domain_min                -2048.0  -2048.0    -8.0  \
     -domain_length              4096.0   4096.0  2560.0  \
-    -cfr_steps                 1500  1500 \
+    -cfr_steps                 750  750 \
     -cfr_flags                 1  1 \
     -restart_flags_and_step    0 99999 \
  > ../log/logfile.txt 2>&1

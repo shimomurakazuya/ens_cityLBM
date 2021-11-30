@@ -1,0 +1,28 @@
+name: Test Make
+on:
+  pull_request:
+    branches:
+      - master
+    types: [opened, synchronize]
+jobs:
+  cpubuild:
+    name: cpubuild
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run docker-compose
+        shell: bash
+        run: |
+            docker-compose run gnu make -j8
+  gpubuild:
+    name: gpubuild
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run docker-compose
+        shell: bash
+        run: |
+            docker-compose run cuda make -j8
+

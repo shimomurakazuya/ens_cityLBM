@@ -1,0 +1,10 @@
+# Fujitsu A64FX on Fugaku (Riken, Japan)
+COMPILER = mpiFCCpx
+CXXFLAGS = -O3 -std=c++14 -Kfast,parallel,openmp -Nlst=t
+CXXFLAGS += -D NO_IOTHREAD
+LDFLAGS = -Kfast,parallel,openmp
+TARGET = $(OUT_DIR)/citylbm.fugaku_a64fx_omp
+
+# Linker
+LINKER = $(COMPILER)
+

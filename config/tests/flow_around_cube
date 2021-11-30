@@ -1,0 +1,25 @@
+## VVTARGET
+VVTARGET := TestFlowAroundCube
+citylbm_addopt += VVTARGET_$(VVTARGET)
+
+## error or warning on defines
+citylbm_addopt += CHECK_DEFINES # library_srcs/check_citylbm_defines.h
+citylbm_addopt += CHECK_DEFINES_INFO # library_srcs/check_citylbm_defines.h
+
+## cal option
+citylbm_addopt += NO_BUOYANCY
+citylbm_addopt += SC_SCALAR_ALWAYS
+citylbm_addopt += SCALAR_NON_PRIODIC
+citylbm_addopt += ENSEMBLE_SPIKE
+
+## io
+citylbm_addopt += NO_IODATA_RESTART
+
+## io paraview
+citylbm_addopt += PARAVIEW_FULL
+citylbm_addopt += PARAVIEW_ENS0
+
+## mesh_settings
+citylbm_addopt += DEFINEAMR_LV_MAX=4
+citylbm_addopt += DEFINEFILENAME_INPUT_FOLDER='"../io/input/aistwt"'
+

@@ -12,11 +12,11 @@
 #include "WorkerThread.h"
 #include "LBMCalculation.h"
 #include "OutputFunc.h"
-
+#include "MPICommEnsemble.h"
 
 class  TimeEvolutionLoop {
 private:
-    int  rank_;
+    const MPICommEnsemble comm_;
 
     const int  start_step_;
     const int  finish_step_;
@@ -33,30 +33,23 @@ private:
 
 public:
     TimeEvolutionLoop(
+        const MPICommEnsemble comm,
             int  start_step,
             int  finish_step,
             real start_time,
             real finish_time,
             real dt
         ) :
+        comm_(comm),
         start_step_(start_step),
         finish_step_(finish_step),
         start_time_(start_time),
         finish_time_(finish_time),
-        dt_(dt)
+        dt_(dt),
+        //
+        outputFunc_(comm),
+        lbmCalculation_(comm)
     {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
-
-        // check dt //
-//        const double _dt = (double)(finish_time - start_time) / (finish_step - start_step);
-//        const double  ep = 1.0e-16;
-//        if ( ! ((dt > _dt - ep) && (dt < _dt + ep)) ) {
-//            std::cout << "error dt : " << __PRETTY_FUNCTION__ << std::endl;
-//            std::cout << "dt = " << dt_ << ", " << _dt << std::endl;
-//            exit(-1);
-//        }
-
-//        std::cout << __PRETTY_FUNCTION__ << std::endl;
     }
 
     int  step()        const { return  step_; }

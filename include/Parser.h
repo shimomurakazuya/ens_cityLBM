@@ -25,7 +25,6 @@ public:
 //        for (int i=0; i<argc; i++) {
 //            std::cout << "argv[] = " << argv[i] << std::endl;
 //        }
-//        MPI_Barrier(MPI_COMM_WORLD);
 
 
         const int   ret = optionParser_->parse_args(argc, argv);

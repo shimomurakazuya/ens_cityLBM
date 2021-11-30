@@ -15,7 +15,10 @@ class  TestMapFlow {
 public:
     int  rank_;
 
-    TestMapFlow(){ MPI_Comm_rank(MPI_COMM_WORLD, &rank_); }
+    TestMapFlow(){ 
+        //MPI_Comm_rank_(MPI_COMM_WORLD, &rank_);
+        rank_ = -1;
+    }
     ~TestMapFlow(){}
 
     const real  bc_layer_min_[3] = { 64.0, 64.0,   0.0 };

@@ -9,11 +9,12 @@
 #include <sys/time.h>
 #include "Field.h"
 #include "WorkerThread.h"
+#include "MPICommEnsemble.h"
 
 
 class  OutputFunc {
 private:
-    int  rank_;
+    const MPICommEnsemble comm_;
 
     struct timeval  t_begin_;
     struct timeval  t_mid_;
@@ -21,9 +22,10 @@ private:
 
 
 public:
-    OutputFunc(){
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
+    OutputFunc() = delete;
 
+    OutputFunc(const MPICommEnsemble comm): comm_(comm)
+    {
         gettimeofday(&t_begin_, NULL);
         gettimeofday(&t_mid_,   NULL);
         gettimeofday(&t_end_,   NULL);

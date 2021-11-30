@@ -70,6 +70,35 @@ OPTION_PARSER_OPTARG (
 	"number of GPUs per node",
 	"Requires one argument" )
 
+// number of ensemble members //
+OPTION_PARSER_OPTARG (
+	n_ensemble_members,
+	 "-n_ensemble_members",
+	"--n_ensemble_members",
+	int,
+	1,
+	"number of ensemble members",
+	"Requires one argument" )
+
+// index offset of ensemble //
+OPTION_PARSER_OPTARG (
+	ofs_ensemble_idx,
+	 "-ofs_ensemble_idx",
+	"--ofs_ensemble_idx",
+	int,
+	0,
+	"index offset of ensemble",
+	"Requires one argument" )
+
+// output io_field on every n step //
+OPTION_PARSER_OPTARG (
+	iofield_freq,
+	 "-iofield_freq",
+	"--iofield_freq",
+	int,
+	1,
+	"skip rate for iofield",
+	"Requires one argument" )
 
 OPTION_PARSER_OPTARGS (
 	number_of_grid_point,
@@ -108,6 +137,15 @@ OPTION_PARSER_OPTARG (
         double,
         10.0,
         "time_end",
+        "Requires one argument" )
+
+OPTION_PARSER_OPTARG (
+        wrf_start,
+        "-wrf_start",
+        "--wrf_start",
+        int,
+        360,
+        "wrf_start",
         "Requires one argument" )
 
 
@@ -150,3 +188,12 @@ OPTION_PARSER_OPTARGS (
 	G({"restart_flag", "restart_step" }),
 	"Requires two arguments" )
 
+
+OPTION_PARSER_OPTARG (
+        number_of_scalars,
+        "-number_of_scalars",
+        "--number_of_scalars",
+        int,
+        1,
+        "number_of_scalars",
+        "Requires one argument" )

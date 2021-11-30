@@ -1,0 +1,21 @@
+{
+    "JOB_settings": {
+        "ACCOUNT": "PG21001",
+        "JOB_NAME": "cavity",
+        "NB_PROCS": 4,
+        "NB_THREADS": 12,
+        "OUT_DIR": "./result",
+        "TIME": "0:10:00",
+        "USE_GPUs": true
+    },
+    "citylbm_settings": {
+        "cfr_flags": [ 1, 1 ],
+        "cfr_steps": [ 1000, 10000 ],
+        "domain_length": [ 1.0625, 1.0625, 0.03125 ],
+        "domain_min": [ -0.53135, -0.53125, -0.015625 ],
+        "number_of_grid_point": [ 1, 2 ],
+        "restart_flags_and_step": [ 0, 99999 ],
+        "time_end": 50,
+        "velocity_lbm": [ 1.0, 0.1 ]
+    }
+}

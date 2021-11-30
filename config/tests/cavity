@@ -1,0 +1,23 @@
+## VVTARGET
+VVTARGET := TestCavityFlow
+citylbm_addopt += VVTARGET_$(VVTARGET)
+
+## error or warning on defines
+citylbm_addopt += CHECK_DEFINES # library_srcs/check_citylbm_defines.h
+citylbm_addopt += CHECK_DEFINES_INFO # library_srcs/check_citylbm_defines.h
+
+## cal option
+citylbm_addopt += NO_SGS
+citylbm_addopt += NO_BUOYANCY
+
+## io paraview
+citylbm_addopt += PARAVIEW_FULL
+
+## mesh_settings
+citylbm_addopt += DEFINECAL_PERIODIC_X=false
+citylbm_addopt += DEFINECAL_PERIODIC_Y=false
+citylbm_addopt += DEFINECAL_PERIODIC_Z=true
+citylbm_addopt += DEFINEAMR_LV_MAX=2
+citylbm_addopt += DEFINEFILENAME_INPUT_FOLDER='"../io/input/cavity"'
+citylbm_addopt += DEFINEFLUIDPROP_KVIS='1e-3' # 1/Re
+

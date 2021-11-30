@@ -1,0 +1,120 @@
+#!/bin/bash
+#SBATCH --job-name      city
+#SBATCH --partition     large
+#SBATCH --ntasks        16
+#SBATCH --cpus-per-task 4
+#SBATCH --gres          gpu:16
+#SBATCH --output        log/logfile.txt
+echo start citylbm
+export citylbm_dx=4
+export citylbm_n_ens=4 # number of ensemble members
+export citylbm_ofs_ens=0 # index offset of ensemble members
+
+# cd: citylbm/ or citylbm/run/ are accepted
+cd run
+cd ..
+
+# module
+. /etc/profile.d/modules.sh 
+module purge 
+#module load cuda/10.0 mvapich2/2.3/gcc-7.3.0.lp gdrcopy/1.3/cuda10.0-mvapich2.3 enable-mvapich2-gdr
+#module load cuda/10.1-update2 compiler/intel-19.0.2 openmpi/4.0.2/intel-19.0.2
+module load cuda/10.1-update2 compiler/gcc-7.3.0 openmpi/4.0.2/gcc-7.4.0
+module list 2>&1 
+export OMP_NUM_THREADS=4
+
+mkdir -p io/iofiles/restart io/output
+
+# citylbm options
+export citylbm_addopt="EXPECT_DX_MESH=$citylbm_dx "
+if [[ "$@" =~ "--debug" ]]; then
+    export citylbm_addopt+="NO_POSTPROCESS_MONITOR "
+    export citylbm_addopt+="NO_IODATA_PARAVIEW "
+    #export citylbm_addopt+="NO_IOTHREAD "
+    #export citylbm_addopt+="NO_INIT_DECOBOCO "
+    #export citylbm_addopt+="NO_IODATA_GZBIN "
+fi
+export citylbm_addopt+="NO_CITYBOX "
+#export citylbm_addopt+="ENSEMBLE_NUDGING "
+#export citylbm_addopt+="ENSEMBLE_UVWT "
+export citylbm_addopt+="ENSEMBLE_SPIKE "
+
+# regression test by binary check. 
+# 1: terminate after init
+# 2: terminate after init (with restart write/read/write at the end of init)
+# 3: t = endtime
+# 4: t = endtime (with restart write/read/write at the end of init)
+[[ "$@" =~ "--debug" ]] && export citylbm_addopt+="REGRESSION_TEST=3 " 
+
+# make
+make clean
+[[ "$@" =~ "--debug" ]] && make resultclean
+make -k -j8 CITYLBM_DEFINES="$citylbm_addopt" 2>&1
+rm run/run.exe 
+rm run/core
+ln -snf bin/run.exe run/run.exe
+
+# mpi
+export citylbm_mx=$((8/citylbm_dx))
+export citylbm_my=$((8/citylbm_dx))
+export citylbm_lxy=4096 # origin 4096 # lxy%32 == 0
+export citylbm_nz=$((160/citylbm_dx)) # 160 for dx=1, 80 for dx=2
+export citylbm_crft=$((1500/citylbm_dx)) # 60 sec
+
+cd run 
+
+env
+
+run_citylbm () {
+    endtime=$1
+    restart=${2:-0}
+    restart_t=${3:-99999}
+
+    echo && echo && echo "run citylbm endtime=$endtime restart={$restart, $restart_t}" && echo
+
+    ulimit -c unlimited && \
+    mpirun \
+        -n $((citylbm_mx * citylbm_my* citylbm_ens)) \
+        -x UCX_MEMTYPE_CACHE=n \
+        --mca shmem_mmap_reallocate_backing_file 1 \
+        --mca btl_vader_single_copy_mechanism none \
+        --output-filename ../log/mpiranks \
+        --merge-stderr-to-stdout \
+      ../bin/run.exe \
+        -n_ensemble_members        $citylbm_n_ens \
+        -ofs_ensemble_idx          $citylbm_ofs_ens \
+        -gpu_per_node              16 \
+        -time_end                  $endtime \
+        -velocity_lbm              10.0  0.100 \
+        -number_of_grid_point      $citylbm_nz   2 \
+        -domain_min                -$((citylbm_lxy/2))  -$((citylbm_lxy/2))    -8.0  \
+        -domain_length              $((citylbm_lxy  ))   $((citylbm_lxy  ))  2560.0  \
+        -cfr_steps                 $citylbm_crft $citylbm_crft \
+        -cfr_flags                 1  1 \
+        -restart_flags_and_step    $restart $restart_t \
+        -iofield_freq              10 \
+
+    ret=$?
+
+    lns=../bindiff/symlink/$endtime
+    [ -L $lns ] && rm $lns
+    ln -s $(readlink -m ../io/iofiles/restart/$((endtime/60))) $lns
+
+    return $ret
+}
+
+if [[ "$@" =~ "--debug" ]]; then
+    #run_citylbm 1 
+    #run_citylbm 61 
+    run_citylbm 121
+    run_citylbm 301 1 2
+    #run_citylbm 301
+else
+    rest="$(ls -v ../io/iofiles/restart/ | tail -n2 | head -n1)"
+    if [ -n "$rest" ]; then
+        run_citylbm 24300 1 $rest
+    else
+        run_citylbm 24300
+    fi
+fi
+

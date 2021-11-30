@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <functional>
 #include <sys/time.h>
-
+#include "MPICommEnsemble.h"
 
 class  TimerSimple {
 private:
@@ -22,9 +22,10 @@ private:
     double  t_comm_total_;
 
 public:
-    TimerSimple(){
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
+    TimerSimple() = delete;
 
+    TimerSimple(const MPICommEnsemble comm): rank_(comm.world().rank())
+    {
         gettimeofday(&t_cal_begin_, NULL);
         gettimeofday(&t_cal_end_,   NULL);
         t_cal_total_ = 0.0;
@@ -33,6 +34,7 @@ public:
         gettimeofday(&t_comm_end_,   NULL);
         t_comm_total_ = 0.0;
     }
+
     ~TimerSimple(){}
 
 public:

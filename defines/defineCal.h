@@ -46,9 +46,7 @@
   #define __DEVICE__
 #endif
 
-
-#define TEMPORAL_BLOCKING_
-
+#define __HD__  __HOST__ __DEVICE__ 
 
 //const int CUDA_THREAD_MAX = 32;
 //const int CUDA_THREAD_MAX = 64;
@@ -58,10 +56,26 @@ const int CUDA_THREAD_MAX = 256;
 
 
 namespace OuterBoundaryConditions {
-    const bool  OuterPeriodicCommX = true;
-    const bool  OuterPeriodicCommY = true;
-//    const bool  OuterPeriodicCommZ = true;
-    const bool  OuterPeriodicCommZ = false;
+    // by defined macros DEFINECAL_PERIODIC_{X,Y,Z}
+    // or, set Oklahoma config as defualt
+
+    #ifdef DEFINECAL_PERIODIC_X
+    constexpr bool  OuterPeriodicCommX = DEFINECAL_PERIODIC_X;
+    #else
+    constexpr bool  OuterPeriodicCommX = true;
+    #endif
+
+    #ifdef DEFINECAL_PERIODIC_Y
+    constexpr bool  OuterPeriodicCommY = DEFINECAL_PERIODIC_Y;
+    #else
+    constexpr bool  OuterPeriodicCommY = true;
+    #endif
+
+    #ifdef DEFINECAL_PERIODIC_Z
+    constexpr bool  OuterPeriodicCommZ = DEFINECAL_PERIODIC_Z;
+    #else
+    constexpr bool  OuterPeriodicCommZ = false;
+    #endif
 };
 
 

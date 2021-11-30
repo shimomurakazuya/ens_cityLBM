@@ -10,13 +10,18 @@
 #include "Field.h"
 #include "defineLBM.h"
 #include "defineFluidProperty.h"
-
+#include "FuncMapData.h"
+#include "MPICommEnsemble.h"
 
 class  TestOklahoma {
+    const MPICommEnsemble comm_;
+    const OptionParser& opt_;
+
 public:
-    int rank_;
-    TestOklahoma() {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
+
+    TestOklahoma() = delete;
+
+    TestOklahoma(const OptionParser& opt, const MPICommEnsemble comm): opt_(opt), comm_(comm) {
     }
     ~TestOklahoma(){}
 
@@ -35,10 +40,13 @@ public:
     const real  bc_dirichlet_min_[3] = { 256.0, 256.0,    0.0 };
     const real  bc_dirichlet_max_[3] = { 256.0, 256.0, 1024.0 };
 
-    int  start_minutes_{ 360 };
+    int start_minutes0_ { -99999 };
+    int  start_minutes_restart_{ -99999 };
+
+    MapData mapData_;
 
 public:
-    void  Flow(int argc, char* argv[]);
+    void  Flow();
 
 
 private:
@@ -48,7 +56,6 @@ private:
         const Parameters&   parameters,
               MeshValue*    meshValues
         );
-
 
     void  InitValue(
         const Grid*         grids,
@@ -79,19 +86,36 @@ private:
               MeshValue*    meshValues
         );
 
+    void ReadMapFile(const Parameters& parameters);
+    void InitObjectMap(
+        const Grid*         grids,
+        const Tree&         tree,
+        const Parameters&   parameters,
+              MeshValue*    meshValues
+    );
+
+
     void  InitObjectMapTokyo(
         const Grid*         grids,
         const Tree&         tree,
         const Parameters&   parameters,
               MeshValue*    meshValues
-        );
+        ) = delete; // use ReadMapFile() instead
 
     void  InitObjectMapOklahoma(
         const Grid*         grids,
         const Tree&         tree,
         const Parameters&   parameters,
               MeshValue*    meshValues
+        ) = delete; // use ReadMapFile() instead
+
+    void  InitPlantDensity(
+        const Grid*         grids,
+        const Tree&         tree,
+        const Parameters&   parameters,
+              MeshValue*    meshValues
         );
+
 
     void  InitDecoBoco(
         const Grid*         grids,

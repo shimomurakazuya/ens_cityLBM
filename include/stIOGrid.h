@@ -1,9 +1,5 @@
-#pragma once
 #ifndef STIOGRID_H_
 #define STIOGRID_H_
-
-
-#include "definePrecision.h"
 
 
 struct  stIOGrid {
@@ -11,11 +7,11 @@ struct  stIOGrid {
     int  ny;
     int  nz;
 
-    real offset_x;
-    real offset_y;
-    real offset_z;
+    double offset_x;
+    double offset_y;
+    double offset_z;
 
-    real dx;
+    double dx;
 };
 
 

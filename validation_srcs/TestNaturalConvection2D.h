@@ -14,7 +14,10 @@
 class  TestNaturalConvection2D {
 public:
     int rank_;
-    TestNaturalConvection2D(){ MPI_Comm_rank(MPI_COMM_WORLD, &rank_); }
+    TestNaturalConvection2D(){ 
+        //MPI_Comm_rank_(MPI_COMM_WORLD, &rank_);
+        rank = -1;
+    }
     ~TestNaturalConvection2D(){}
 
 public:

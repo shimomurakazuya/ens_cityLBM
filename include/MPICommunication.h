@@ -11,32 +11,55 @@
 #include "MPIDatatypeInfo.h"
 #include "Field.h"
 #include "MeshValue.h"
+#include "MPICommEnsemble.h"
 
 
 class  MPICommunication {
 private:
-    int  rank_;
-    int  nprocs_;
+    const MPICommEnsemble comm_;
 
     int  halo_;
-    int  val_outdated_[DefAMR::LV_MAX];
-    int  lbm_outdated_[DefAMR::LV_MAX];
+    int  T_outdated_     [DefAMR::LV_MAX];
+    int  scalar_outdated_[DefAMR::LV_MAX];
+    int  lbm_outdated_   [DefAMR::LV_MAX];
+
+    #ifdef TB_COUNT
+    const int  n_T_outdated_     {TB_COUNT};
+    const int  n_scalar_outdated_{TB_COUNT};
+    const int  n_lbm_outdated_   {TB_COUNT};
+    #else
+    const int  n_T_outdated_     {3};
+    const int  n_scalar_outdated_{3};
+    const int  n_lbm_outdated_   {3};
+    #endif
 
 public:
-    MPICommunication(){
-        MPI_Comm_size(MPI_COMM_WORLD, &nprocs_);
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
+    MPICommunication() = delete;
 
+    MPICommunication(const MPICommEnsemble comm): comm_(comm) {
         halo_ = DefAMR::NX_LEAF;
         for (int i=0; i<DefAMR::LV_MAX; i++) {
-            val_outdated_[i] = halo_;
-            lbm_outdated_[i] = halo_;
+//            val_outdated_   [i] = halo_;
+            T_outdated_     [i] = halo_;
+            scalar_outdated_[i] = halo_;
+            lbm_outdated_   [i] = halo_;
         }
     }
     ~MPICommunication(){}
 
 public:
-    bool ValCommPackUnpack(
+    bool TCommPackUnpack(
+        const int                       lv,
+              Field&                    field, 
+        const MPIPackUnpackInfo&        mpiPackUnpackInfo,
+        const Tree&                     tree,
+              ValueNS&                  valueNS,
+              ValueObjLS&               valueObjLS,
+              ValueBuff&                valueBuff
+        );
+
+
+    bool ScalarCommPackUnpack(
         const int                       lv,
               Field&                    field, 
         const MPIPackUnpackInfo&        mpiPackUnpackInfo,
@@ -55,6 +78,7 @@ public:
         const int                       nmax,
         const int                       nmax_global,
         const Tree&                     tree,
+              ValueNS&                  ValueNS,
               ValueLBM&                 valueLBM,
               ValueBuff&                valueBuff
         );
@@ -79,16 +103,6 @@ private:
 
 
     void LBMComm_pack_unpack(
-        const int                       lv,
-              Field&                    field, 
-        const MPIPackUnpackInfo&        mpiPackUnpackInfo,
-        const Tree&                     tree,
-              ValueLBM&                 valueLBM,
-              ValueBuff&                valueBuff
-        );
-
-
-    void LBMComm_pack_unpack_host(
         const int                       lv,
               Field&                    field, 
         const MPIPackUnpackInfo&        mpiPackUnpackInfo,

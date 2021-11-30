@@ -47,7 +47,8 @@ public:
         z_min_channel_(-1.0),
         z_max_channel_( 1.0)
     {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
+        //MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
+        rank_ = -1;
     }
     ~PostprocessChannelFlow () {}
 
@@ -59,34 +60,34 @@ private:
         const int        lv,
         const Field&     field,
         const MeshValue* meshValues,
-        const std::vector<int>& id_tasks
+        const TaskID::vector_type& id_tasks
         );
 
     void  mean_values(
         const int        lv,
         const Field&     field,
         const MeshValue* meshValues,
-        const std::vector<int>& id_tasks
+        const TaskID::vector_type& id_tasks
         );
 
     void  rms_values(
         const int        lv,
         const Field&     field,
         const MeshValue* meshValues,
-        const std::vector<int>& id_tasks
+        const TaskID::vector_type& id_tasks
         );
 
     void  init_value_cf();
-    void  add_exist_flag (const int lv, const int idz, const real z_obs);
-    void  add_mean_values(const int lv, const int idz, const real z_obs, const real u, const real v, const real w, const real T);
-    void  add_rms_values (const int lv, const int idz, const real z_obs, const real u, const real v, const real w, const real T);
+    void  add_exist_flag (const int lv, const int idz, const real z_obj);
+    void  add_mean_values(const int lv, const int idz, const real z_obj, const real u, const real v, const real w, const real T);
+    void  add_rms_values (const int lv, const int idz, const real z_obj, const real u, const real v, const real w, const real T);
     void  average_num        (const int lv);
     void  average_mean_values(const int lv);
     void  average_rms_values (const int lv);
 
     void  output_values(int step);
 
-    void  z_obs_channel_flow(int& idz, real& z_obs, const real z, const real dx, const real lv_obs);
+    void  z_obj_channel_flow(int& idz, real& z_obj, const real z, const real dx, const real lv_obj);
 
     std::string filename(const int t){
         return  Foldernames::output_folder + "/" + Filenames::ChannelFlow_statics + "_step" + std::to_string(t) + ".csv";

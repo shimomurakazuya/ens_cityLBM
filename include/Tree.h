@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <map>
 #include <fstream>
 
 #include "defineAMR.h"
@@ -16,12 +17,12 @@
 #include "Grid.h"
 #include "Array3D.h"
 #include "MPIDatatypeInfo.h"
-
+#include "FuncMapData.h"
+#include "MPICommEnsemble.h"
 
 class  Tree {
 private:
-    int  rank_;
-    int  num_procs_;
+    const MPICommEnsemble comm_;
 
     int  num_nodes_global_total_;
     int  num_nodes_global_max_;
@@ -43,6 +44,10 @@ private:
     // causion : external node index is 0. but nodes(0) is different from external node(0). //
 
 
+    // array size = num_nodes_lv_[DefAMR::LV_MAX];
+    std::map<int, int>  meshoffset2id_nodes_[DefAMR::LV_MAX];
+
+
     // mesh val //
     stNodeValArray  stnodeValArray_;
 
@@ -57,10 +62,10 @@ private:
     MPIPackUnpackInfo        mpiPackUnpackInfo_[DefAMR::LV_MAX]; // lbm & val //
 
 public:
-    Tree ()
+    Tree () = delete;
+
+    Tree(const MPICommEnsemble comm): comm_(comm)
     {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
-        MPI_Comm_size(MPI_COMM_WORLD, &num_procs_);
         memType_ = MemType::Managed;
 
         allocate_stNodeValArray(0);
@@ -71,11 +76,16 @@ public:
         delete_stNodeValArray();
     }
 
+    Tree fork() {
+        return Tree(comm_);
+    }
+
 public:
+    MPICommEnsemble comm() const { return comm_; }
     const std::vector<Node>& nodes() const { return nodes_; }
 
-          Node*  nodes(const int  id)        { return  ( id>=0 && id<nodes_.size() ) ? &nodes_[id] : &invalid_node_; }
-    const Node*  nodes(const int  id)  const { return  ( id>=0 && id<nodes_.size() ) ? &nodes_[id] : &invalid_node_; }
+          Node*  nodes(const int  id)        { return  ( id>=0 && id<(int)nodes_.size() ) ? &nodes_[id] : &invalid_node_; }
+    const Node*  nodes(const int  id)  const { return  ( id>=0 && id<(int)nodes_.size() ) ? &nodes_[id] : &invalid_node_; }
 
     // dammy nodes (flags) //
           Node*  root_node()                      { return  &root_node_; }
@@ -153,10 +163,11 @@ private:
     void  error_msg (const std::string  str)  const { std::cout << str << std::endl; }
 
 public:
-    void  preset_tree_data(const Grid*  grids);
+    void  preset_tree_data(const Grid*  grids) = delete;
 
     // initialize //
-    void  init_tree_data(const Grid*  grids);
+    void  init_tree_data(const Grid*  grids) = delete;
+    void  init_tree_data_with_map(const Grid* grids, const MapData& map);
 
     // IO //
     std::vector<IONode>  make_vectorIONode()  const;
@@ -174,14 +185,15 @@ public:
 
     IONode  makeIONode(const Node&  node) const;
 
-    void  copyMPIPutGetInfo(const std::vector<MPIPutGetInfo>& mpiPutGetInfo);
-    void  copy_stNodeValArray(int n, const stNodeValArray& stnodeValArray);
+    void  copyMPIPutGetInfo(const std::vector<MPIPutGetInfo>& mpiPutGetInfo, const bool  is_reset);
+    void  copy_stNodeValArray(int n, const stNodeValArray& stnodeValArray, const bool  is_reset = false);
 
     std::string  filename(const int rank, const int step) const ;
 
     void createMPIPutInformations();
 
     void  set_num_nodes_lv();
+    void  init_meshoffset2id_nodes();
 
 private:
     void  init_stNodeValArray();
@@ -195,15 +207,14 @@ private:
     void  set_node_i       (const int  i, const IONode&  data);
     void  check_node_index (const int  i, const IONode&  data)  const;
 
-    void
-    createMPIPutInfoSrcDst_lv(
+    void createMPIPutInfoSrcDst_lv(
               std::vector<MPIPutInfo>&    mpiPutInfo,
         const int                         lv,
         const std::vector<MPIPutGetInfo>& mpiPutGetInfo
         );
 
-    void
-    createMPIDataypeInfoSrcDst_lv(
+    template <int NX_LEAF>
+    void createMPIDataypeInfoSrcDst_lv(
               std::vector<MPIDatatypeInfoSrcDst>&   mpiDatatypeInfoSrcDst,
         const int                                   lv,
         const std::vector<MPIPutInfo>&              mpiPutInfo,
@@ -211,13 +222,29 @@ private:
         );
 
 
-    void
-    createMPIPackUnpack_lv(
+    template<int NX_LEAF>
+    void createMPIPackUnpack_lv(
               MPIPackUnpackInfo&                    mpiPackUnpackInfo,
         const int                                   lv,
         const std::vector<MPIDatatypeInfoSrcDst>&   valDatatypeInfoSrcDst
         );
 
+
+    template<int NX_LEAF>
+    void createMPISliceVal_lv(
+              PackUnpackVal&                        packUnpackVal,
+        const int                                   nlayer,
+        const std::vector<MPIPackUnpackCommInfo>&   sendPackUnpackCommInfo,
+        const std::vector<MPIPackUnpackCommInfo>&   recvPackUnpackCommInfo
+        );
+
+    template<int NX_LEAF>
+    void createMPISliceLBM_lv(
+              PackUnpackVal&                        packUnpackVal,
+        const int                                   nlayer,
+        const std::vector<MPIPackUnpackCommInfo>&   sendPackUnpackCommInfo,
+        const std::vector<MPIPackUnpackCommInfo>&   recvPackUnpackCommInfo
+        );
 
     void
     allocate_MPIPackUnpackInfo(

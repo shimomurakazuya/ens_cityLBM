@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#if [ "`git checkout`" != "" ]; then
+#  echo "fatal: need 'git commit' before './remote'" 1>&2
+#  exit 1
+#fi
+
+## parsing options
+excludes__="--exclude \*.o --exclude bindiff"
+
+## parsing targets
+for remote_host__ in $@; do
+    if [ "${remote_host__::1}" != "-" ]; then
+        echo "remote host: $remote_host__"
+        remote_dir__=code/bindiff/
+
+        rsync -auvz --no-t \
+          $excludes__ \
+          --no-p --no-g \
+          ./ ${remote_host__}:~/${remote_dir__} 2>&1
+    fi
+
+done

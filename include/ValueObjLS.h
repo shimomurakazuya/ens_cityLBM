@@ -19,6 +19,8 @@ private:
     // solid wall //
     real*   lv_obj_  = nullptr;
 
+    real*   pad_obj_ = nullptr;
+
     real*   rho_obj_      = nullptr;
     real*   u_obj_        = nullptr;
     real*   v_obj_        = nullptr;
@@ -33,14 +35,16 @@ private:
     real*   Tn_obj_        = nullptr;
     real*   scalarn_obj_   = nullptr;
 
+    real*   hflux_z_obj_   = nullptr;
+    real*   hfluxn_z_obj_  = nullptr;
+
     real    time_obj_ { 0.0 };
     real    timen_obj_{ 1.0 };
 
     // inflow & outflow bc //
 //    int*  bcTypes_scaler_;
 //    int*  bcTypes_vector_;
-    int*  bcTypes_f_;
-    int*  bcTypes_T_;
+    int*  bcTypes_f_ = nullptr;
 
 //    real*     bc_rho_ = nullptr;
 //    real*     bc_u_   = nullptr;
@@ -49,18 +53,13 @@ private:
 //    real*     bc_weight_ = nullptr; // weight factor of bc values : 1 is the same as the bc value //
 
     real*     dirichlet_weight_ = nullptr; // weight factor of bc values : 1 is the same as the bc value //
-    real*     viscosity_weight_ = nullptr; // weight factor of bc values : 1 is the same as the bc value //
 
     // source & diffuse //
-    real*     sc_scalar_ = nullptr;
+    real*     sc_scalar_  = nullptr;
 
 public:
-    ValueObjLS () {
-    }
-
-    ~ValueObjLS () {
-        release();
-    }
+     ValueObjLS () { }
+    ~ValueObjLS () { release(); }
 
 public:
     MemType  memType() const { return memType_; }
@@ -68,6 +67,9 @@ public:
     // solid wall //
           real*  lv_obj()        { return  lv_obj_; }
     const real*  lv_obj()  const { return  lv_obj_; }
+
+          real*  pad_obj()        { return  pad_obj_; }
+    const real*  pad_obj()  const { return  pad_obj_; }
 
           real*  rho_obj()        { return  rho_obj_; }
     const real*  rho_obj()  const { return  rho_obj_; }
@@ -100,6 +102,13 @@ public:
           real*  Tn_obj()        { return  Tn_obj_; }
     const real*  Tn_obj()  const { return  Tn_obj_; }
 
+          real*  hflux_z_obj()        { return  hflux_z_obj_; }
+    const real*  hflux_z_obj()  const { return  hflux_z_obj_; }
+
+          real*  hfluxn_z_obj()        { return  hfluxn_z_obj_; }
+    const real*  hfluxn_z_obj()  const { return  hfluxn_z_obj_; }
+
+
     // inflow & outflow bc //
 //          int*  bcTypes_scaler()        { return  bcTypes_scaler_; }
 //          int*  bcTypes_vector()        { return  bcTypes_vector_; }
@@ -108,9 +117,6 @@ public:
 
           int*  bcTypes_f()        { return  bcTypes_f_; }
     const int*  bcTypes_f()  const { return  bcTypes_f_; }
-
-          int*  bcTypes_T()        { return  bcTypes_T_; }
-    const int*  bcTypes_T()  const { return  bcTypes_T_; }
 
 //          real*  bc_rho()        { return  bc_rho_; }
 //    const real*  bc_rho()  const { return  bc_rho_; }
@@ -128,23 +134,20 @@ public:
           real*  dirichlet_weight()        { return  dirichlet_weight_; }
     const real*  dirichlet_weight()  const { return  dirichlet_weight_; }
 
-          real*  viscosity_weight()        { return  viscosity_weight_; }
-    const real*  viscosity_weight()  const { return  viscosity_weight_; }
-
     // source //
-          real*  sc_scalar()        { return  sc_scalar_; }
-    const real*  sc_scalar()  const { return  sc_scalar_; }
+          real*  sc_scalar ()        { return  sc_scalar_ ; }
+    const real*  sc_scalar ()  const { return  sc_scalar_ ; }
 
 
 public:
-    void  init(const int  nn_max, const enum MemType  memType);
-    void  copy(const int  nn_max, const ValueObjLS&  other);
+    void  init(const int  nn_max, const int n_scalars, const enum MemType  memType);
+    void  copy(const int  nn_max, const int n_scalars, const ValueObjLS&  other);
 
-    void  reallocate(const MemType  memType, const int  nn_max)
+    void  reallocate(const MemType  memType, const int  nn_max, const int n_scalars)
     {
         release();
         memType_ = memType;
-        allocate(nn_max);
+        allocate(nn_max, n_scalars);
     }
 
 
@@ -166,10 +169,10 @@ public:
 
 
 private:
-    void  allocate(const int nn_max);
+    void  allocate(const int nn_max, const int n_scalars);
     void  release ();
 
-    void  fill(const int nn_max);
+    void  fill(const int nn_max, const int n_scalars);
 
 };
 

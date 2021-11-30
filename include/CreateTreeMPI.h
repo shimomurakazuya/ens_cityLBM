@@ -9,8 +9,8 @@
 namespace CreateTreeMPI {
 
 
-void  create_tree_data(int argc, char* argv[]);
-void read_tree_data(int argc, char* argv[]);
+void  create_tree_data(int argc, char* argv[]) = delete;
+void read_tree_data(int argc, char* argv[]) = delete;
 
 
 };

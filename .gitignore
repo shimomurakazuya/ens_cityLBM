@@ -1,3 +1,5 @@
-paraview_scripts/
-python_scripts/
-jupyter_notebook/
+.DS_Store
+.*.un~
+tags
+__pycache__
+.ipynb_checkpoints

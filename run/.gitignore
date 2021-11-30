@@ -1,0 +1,3 @@
+# ignore symlink to calc dir made by job_submission_helper
+*_Nodes*_MPI*
+

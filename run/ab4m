@@ -1,0 +1,56 @@
+#!/bin/sh
+#$ -cwd
+#$ -l rt_F=4
+#$ -l h_rt=24:0:0
+#$ -N oklahoma4m
+#$ -e ../log/e
+#$ -o ../log/o
+
+# env
+source /etc/profile.d/modules.sh
+module load cuda/9.2/9.2.88.1
+module load openmpi
+module list 2>&1
+
+export OMP_NUM_THREADS=14
+export TMPDIR=/tmp
+export PSM2_MQ_RNDV_HFI_THRESH=128000
+echo $PE_HOSTFILE
+cp $PE_HOSTFILE hostfile.txt
+
+# make
+addopt="EXPECT_DX_MESH=4"
+(cd ..; 
+make clean;
+make -j ARCH=sm_70 CITYLBM_DEFINES="$addopt"
+)
+
+rm run.exe
+ln -s ../bin/run.exe
+chmod 777 run.exe
+
+# citylbm setting
+mx=4
+my=4
+Lxy=4096 # origin 4096 # Lxy%32 == 0
+nz=40 # 160 for dx=1, 80 for dx=2
+
+mpirun  \
+    -x PSM2_CUDA=1 -x PSM2_GPUDIRECT=1 -x CUDA_VISIBLE_DEVICES=0,1,2,3\
+    -mca orte_tmpdir_base /tmp \
+    -mca coll_tuned_use_dynamic_rules 1 -mca coll_tuned_allgather_algorithm 2 \
+    -mca btl_openib_cuda_rdma_limit 1000000 -mca mtl psm  --mca mpi_common_cuda_event_max 1000000 \
+    -npernode 4 \
+    -n $((mx*my))  --bind-to board   ../bin/run.exe \
+    -gpu_per_node              4 \
+    -time_end                  36000.0 \
+    -velocity_lbm              10.0  0.075 \
+    -number_of_grid_point      $nz   2 \
+    -domain_min                -$((Lxy/2))  -$((Lxy/2))    -8.0  \
+    -domain_length              $((Lxy  ))   $((Lxy  ))  2560.0  \
+    -cfr_steps                 750  750 \
+    -cfr_flags                 1  1 \
+    -restart_flags_and_step    0 99999 \
+2>&1 | tee -a ../log/logfile.txt
+
+

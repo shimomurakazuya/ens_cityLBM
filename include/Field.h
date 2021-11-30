@@ -17,16 +17,23 @@
 #include "Tree.h"
 #include "Parameters.h"
 #include "MeshValue.h"
+#include "ValueBuff.h"
+#include "ValueStat.h"
+#include "ValueTimeAverage.h"
+#include "ValuePBVR.h"
 #include "TaskID.h"
 #include "ElapsedTimeInfo.h"
 #include "TimerSimple.h"
-#include "PostprocessMonitor.h"
+#include "FuncMapData.h"
+#include "MPICommEnsemble.h"
+#include "mpi_wrapper.hpp"
 
+#include "FastPostprocess.h"
 
 class  Field {
 private:
-    const OptionParser* optionParser_;
-    int  rank_;
+    const OptionParser& optionParser_;
+    const MPICommEnsemble comm_;
 
     // grid information //
     Grid        grids_[DefAMR::LV_MAX];
@@ -44,6 +51,15 @@ private:
     MeshValue   meshValues1_[DefAMR::LV_MAX];
     MeshValue*  meshValues_ptr_[2][DefAMR::LV_MAX];
 
+    ValueBuff   valueBuff_;
+
+    ValueStat valueStat_[DefAMR::LV_MAX];
+
+    ValuePBVR valuePBVR_;
+
+    ValueTimeAverage valueTimeAverage1min_ [DefAMR::LV_MAX];
+//    ValueTimeAverage valueTimeAverage15min_[DefAMR::LV_MAX];
+
     // other //
     TimerSimple     timerSimple_;
     ElapsedTimeInfo allTimeInfo_;
@@ -52,13 +68,17 @@ private:
     TaskID          taskID_;
 
     // io //
+    #ifndef NO_FIELD_WRITEDAT
     Parameters  parameters_io_;
     Grid        grids_io_[DefAMR::LV_MAX];
     Tree        tree_io_;
     TaskID      taskID_io_;
     MeshValue   meshValues_io_[DefAMR::LV_MAX];
+    ValueStat   valueStat_io_[DefAMR::LV_MAX];
+    ValueTimeAverage valueTimeAverage1min_io_ [DefAMR::LV_MAX];
+    #endif
 
-    PostprocessMonitor postprocessmonitor_;
+    FastPostprocess postprocessmonitor_;
 
 private: // swap counter //
     int   itp_meshval_ [DefAMR::LV_MAX];
@@ -67,37 +87,31 @@ private: // swap counter //
     int   itp_mesh_val(int lv) const { return itp_meshval_ [lv]; }
     int   itpn_meshval(int lv) const { return itpn_meshval_[lv]; }
 
-private:
-    Field () : optionParser_(nullptr) {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
-        init_ptrs();
-
-        PostprocessMonitor postprocessmonitor_();
-    }
-
 public:
-    Field (const OptionParser*  optionParser) :
-        optionParser_(optionParser)
+
+    Field() = delete;
+
+    Field (const OptionParser&  optionParser, const MPICommEnsemble comm) :
+        optionParser_(optionParser),
+        comm_(comm),
+        // 
+        tree0_(comm), tree1_(comm), 
+        parameters_(comm), 
+        allTimeInfo_(comm), funcTimeInfo_(comm), mpiTimeInfo_(comm),
+        postprocessmonitor_(comm),
+        timerSimple_(comm)
+        #ifndef NO_FIELD_WRITEDAT
+        , tree_io_(comm), parameters_io_(comm)
+        #endif
     {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
         init_ptrs();
-
-        PostprocessMonitor postprocessmonitor_();
-    }
-
-    Field (const OptionParser*  optionParser, const MPI_Comm mpi_comm) :
-        optionParser_(optionParser)
-    {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
-        init_ptrs();
-
-        PostprocessMonitor postprocessmonitor_(mpi_comm);
+        init_parameters(parameters_);
     }
 
     ~Field () {}
 
 public:
-    const OptionParser* optionParser() const { return optionParser_; }
+    const OptionParser& optionParser() const { return optionParser_; }
 
     // grid information //
     const Grid&  grid_i(const int i)  const { return grids_[i]; }
@@ -117,14 +131,34 @@ public:
     const MeshValue* meshValues0()  const { return  meshValues0_; }
           MeshValue* meshValues1()        { return  meshValues1_; }
     const MeshValue* meshValues1()  const { return  meshValues1_; }
+    #ifndef NO_FIELD_WRITEDAT
           MeshValue* meshValues_io()        { return  meshValues_io_; }
     const MeshValue* meshValues_io()  const { return  meshValues_io_; }
+    #endif
 
           MeshValue& meshValue(const int lv)        { return  *meshValues_ptr_[itp_meshval_[lv]][lv]; }
     const MeshValue& meshValue(const int lv)  const { return  *meshValues_ptr_[itp_meshval_[lv]][lv]; }
 
+          ValueBuff& valueBuff()        { return valueBuff_; }
+    const ValueBuff& valueBuff()  const { return valueBuff_; }
+
           MeshValue& meshValue_new(const int lv)        { return  *meshValues_ptr_[itpn_meshval_[lv]][lv]; }
     const MeshValue& meshValue_new(const int lv)  const { return  *meshValues_ptr_[itpn_meshval_[lv]][lv]; }
+
+          ValueStat& valueStat   (const int lv)        { return  valueStat_   [lv]; }
+    const ValueStat& valueStat   (const int lv)  const { return  valueStat_   [lv]; }
+    #ifndef NO_FIELD_WRITEDAT
+          ValueStat& valueStat_io(const int lv)        { return  valueStat_io_[lv]; }
+    const ValueStat& valueStat_io(const int lv)  const { return  valueStat_io_[lv]; }
+    #endif
+
+          ValuePBVR& valuePBVR()        { return valuePBVR_; }
+    const ValuePBVR& valuePBVR()  const { return valuePBVR_; }
+
+          ValueTimeAverage* valueTimeAverage1min   ()        { return  valueTimeAverage1min_; }
+    const ValueTimeAverage* valueTimeAverage1min   ()  const { return  valueTimeAverage1min_; }
+          ValueTimeAverage& valueTimeAverage1min   (const int lv)        { return  valueTimeAverage1min_[lv]; }
+    const ValueTimeAverage& valueTimeAverage1min   (const int lv)  const { return  valueTimeAverage1min_[lv]; }
 
     // other //
           TaskID& taskID()       { return taskID_; }
@@ -137,12 +171,11 @@ public:
     ElapsedTimeInfo& mpiTimeInfo()  { return mpiTimeInfo_; }
 
 public:
-    void preset_field();
-    void init_field();
-
-    void read_field (const int step);
-    void write_field(const int step) const;
-    void write_monitor(const int step) const;
+    void read_field_full (const int step);
+    void read_field_params (const int step);
+    void read_field_meshval (const int step);
+    void write_field(const int step);
+    void write_monitor(const int step);
     void copy_io_field();
 
     void swap_meshValue(const int lv);
@@ -160,9 +193,18 @@ public:
         const bool          is_reset = false
         );
 
+    void copy_valueStat_io();
+    void copy_valueTimeAverage_io();
+
     void update_meshValues(
         const Grid*         grids,
         const Tree&         tree
+        ) = delete;
+
+    void update_meshValues_io(
+        const Grid*         grids,
+        const Tree&         tree,
+        const bool          is_reset
         );
 
     void init_taskID_opt     (TaskID& taskID, const Tree& tree, const MeshValue* meshValues);
@@ -171,16 +213,29 @@ private:
     void  init_ptrs();
 
     // preset //
-    void preset_tree         (Tree&   tree);
+    void preset_field() = delete;
+    void init_field() = delete;
+    void preset_tree(Tree&) = delete;
+    public: void init_field_wo_map();
 
-    // init //
-    void init_grid           (Grid*   grid);
-    void init_tree           (Tree&   tree);
+    // init with Oklahoma or other map //
+    public: void init_field_with_map(const MapData& map);
+private:
+    void init_tree_with_map  (Tree&   tree, const MapData& map);
+
+    // init (maybe enable to reuse) //
+    void init_others(); // after init_tree_*()
+    void init_grid           (Grid*   grid); // init grid for level 0 tree_roots
+    void init_tree           (Tree&   tree) = delete;
     void init_parameters     (Parameters& parameters);
     void init_taskID         (TaskID& taskID, const Tree& tree);
 
     void init_elapsedTimeInfo(const Parameters& parameter);
     void init_meshValues     (const Grid* grids, const Tree& tree, MeshValue*  meshValues);
+    void init_ValueStat      (const Tree& tree);
+    void init_valueBuff     (const Grid* grids, const Tree& tree, ValueBuff& valueBuff);
+    void init_valuePBVR     (ValuePBVR& valuePBVR);
+    void init_ValueTimeAverage(const Tree& tree, const MeshValue* meshValues);
 
     // read //
     int  read_latest_step    (const int step);
@@ -195,6 +250,7 @@ private:
         const Grid*         grids,
         const Tree&         tree,
               MeshValue*    meshValues,
+              ValueTimeAverage* valueTimeAverage,
         const int           rank
         )
     const;
@@ -216,9 +272,11 @@ private:
         )
     const;
 
-public:
-    PostprocessMonitor& monitor(){ return postprocessmonitor_; }
 
+public:
+    auto& monitor(){ return postprocessmonitor_; }
+
+    void write_ValueStatCsv(int step);
 };
 
 

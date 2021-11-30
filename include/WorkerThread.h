@@ -15,7 +15,7 @@ private:
     std::string  wname_ = "none";
 
 public:
-    WorkerThread () {}
+     WorkerThread () {}
     ~WorkerThread () {}
 
 public:

@@ -12,17 +12,19 @@
 //#include "stHDF5Values.h"
 #include "Array3D.h"
 #include "ParaviewVTU.h"
+#include "MPICommEnsemble.h"
+#include "mpi_wrapper.hpp"
 
 
 class  IOData {
 private:
-    const int  rank_;
+    const MPICommEnsemble comm_;
     const int  step_;
 
-    const std::string  hdf5_grid_name_ = "hdf5-rank" + std::to_string(rank_) + "-grid";
+    const std::string  hdf5_grid_name_ = "hdf5-rank" + std::to_string(comm_.world().rank()) + "-grid";
 
 public:
-    IOData (const int rank, const int step) : rank_(rank), step_(step) {}
+    IOData (const MPICommEnsemble comm, const int step) : comm_(comm), step_(step) {}
     ~IOData () {}
 
 public:
@@ -42,6 +44,23 @@ public:
 //              MeshValue*    meshValues
 //        )
 //    const;
+//
+
+    void writeBinaries(
+        const Grid*          grids,
+        const Tree&          tree,
+        const MeshValue*     meshValues0,
+        const MeshValue*     meshValues1,
+        const ValueTimeAverage* valueTimeAverage
+    ) const;
+
+    void readBinaries(
+        const Grid*          grids,
+        const Tree&          tree,
+              MeshValue*     meshValues0,
+              MeshValue*     meshValues1,
+              ValueTimeAverage* valueTimeAverage
+    ) const;
 
 
 #if 0
@@ -60,10 +79,22 @@ public:
         const Tree&          tree,
         const Parameters&    parameters,
         const MeshValue*     meshValues,
-        const VTKOutputScale vtkOutputScale = VTKOutputScale::Full
+        const ValueStat*     valueStats,
+        const VTKOutputScale vtkOutputScale = VTKOutputScale::Full,
+        const int            filter_bits = 8,
+        const std::vector<real>& zSlices = std::vector<real>(),
+        const std::vector<real>& ySlices = std::vector<real>(),
+        const std::vector<real>& xSlices = std::vector<real>()
         )
     const;
 
+    void writeCsv_valueStat_integral_dtdxdy(
+        const Tree& tree,
+        const Parameters& parameters,
+        const MeshValue* meshValues,
+        const ValueStat* valueStats
+        )
+    const;
 
 private:
 //    stHDF5Values

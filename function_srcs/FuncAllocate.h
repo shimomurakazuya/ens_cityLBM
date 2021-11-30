@@ -9,9 +9,34 @@
 #include "defineCal.h"
 #include "defineCUDA.h"
 #include "defineMemory.h"
+#include "bytes_type.hpp"
+#include "FuncMath.h"
 
+#ifdef GPU_CALCULATION__
+#include <cuda_runtime_api.h>
+#include "cuda_safe_call.hpp"
+#endif
 
 namespace  FuncAllocate {
+
+template <typename  T>
+void  fill_value(
+          T*        val,
+    const T         ini,
+    const int       n,
+    const MemType   memType
+    )
+{
+    if      (memType == MemType::Host || memType == MemType::Managed) {
+        std::fill(val, val+n, ini);
+    }
+    else if (memType == MemType::Device) {
+        #ifdef GPU_CALCULATION__
+        #endif
+    }
+    else {
+    }
+}
 
 
 template <typename  T>
@@ -25,29 +50,34 @@ void  allocate_value(
         *val = (T *) malloc (sizeof(T) * n);
     }
     else if (memType == MemType::Device) {
-#ifdef GPU_CALCULATION__
+        #ifdef GPU_CALCULATION__
         cudaMalloc(val, sizeof(T) * n);
-#endif
+        #endif
     }
     else if (memType == MemType::Pinned) {
-#ifdef CPU_CALCULATION__
+        #ifdef CPU_CALCULATION__
         *val = (T *) malloc (sizeof(T) * n);
-#endif
-#ifdef GPU_CALCULATION__
+        #endif
+        #ifdef GPU_CALCULATION__
         cudaMallocHost(val, sizeof(T) * n);
-#endif
+        #endif
     }
     else if (memType == MemType::Managed) {
-#ifdef CPU_CALCULATION__
+        #ifdef CPU_CALCULATION__
         *val = (T *) malloc (sizeof(T) * n);
-#endif
-#ifdef GPU_CALCULATION__
+        #endif
+        #ifdef GPU_CALCULATION__
         cudaMallocManaged(val, sizeof(T) * n);
-#endif
+        #endif
     }
     else {
         *val = nullptr;
     }
+    #ifdef REGRESSION_TEST
+    /// set uninitialized value = 0xffff...
+    util::bytes_union<T> tmp; tmp.b = -1;
+    fill_value( *val, tmp.value, n, memType);
+    #endif
 }
 
 
@@ -64,51 +94,49 @@ void  release_value(
         val = nullptr;
     }
     else if (memType == MemType::Device) {
-#ifdef GPU_CALCULATION__
+        #ifdef GPU_CALCULATION__
         cudaFree(val);
         val = nullptr;
-#endif
+        #endif
     }
     else if (memType == MemType::Pinned) {
-#ifdef CPU_CALCULATION__
+        #ifdef CPU_CALCULATION__
         free(val); val = nullptr;
-#endif
-#ifdef GPU_CALCULATION__
+        #endif
+        #ifdef GPU_CALCULATION__
         cudaFree(val); val = nullptr;
-#endif
+        #endif
     }
     else if (memType == MemType::Managed) {
-#ifdef CPU_CALCULATION__
+        #ifdef CPU_CALCULATION__
         free(val); val = nullptr;
-#endif
-#ifdef GPU_CALCULATION__
+        #endif
+        #ifdef GPU_CALCULATION__
         cudaFree(val); val = nullptr;
-#endif
+        #endif
     }
     else {
     }
 }
 
-
-template <typename  T>
-void  fill_value(
-          T*        val,
-    const T         ini,
+template<typename T>
+void copy_values(
+          T*        dst,
+    const T*        src,
     const int       n,
     const MemType   memType
-    )
+)
 {
-    if      (memType == MemType::Host || memType == MemType::Managed) {
-        std::fill(val, val+n, ini);
-    }
-    else if (memType == MemType::Device) {
-#ifdef GPU_CALCULATION__
-#endif
-    }
-    else {
+    if(memType == MemType::Host || memType == MemType::Pinned) {
+        FuncMath::copy_array(dst, src, n);
+    } else if(memType == MemType::Device || memType == MemType::Managed) {
+        #ifdef GPU_CALCULATION__
+        CUDA_SAFE_CALL(cudaMemcpy(dst, src, sizeof(T)*n, cudaMemcpyDefault));
+        #else
+        FuncMath::copy_array(dst, src, n);
+        #endif
     }
 }
-
 
 };
 

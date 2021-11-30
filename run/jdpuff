@@ -1,0 +1,63 @@
+#!/bin/bash
+#SBATCH --job-name      21:00start
+#SBATCH --begin         21:00
+#SBATCH --partition     large
+#SBATCH --ntasks        16
+#SBATCH --cpus-per-task 4
+#SBATCH --gres          gpu:16
+#SBATCH --output        log/logfile.txt
+echo start citylbm
+export citylbm_dx=4
+export citylbm_n_ens=1 # number of ensemble members
+export citylbm_ofs_ens=0 # index offset of ensemble members
+
+# module
+. /etc/profile.d/modules.sh 
+module purge 
+#module load cuda/10.0 mvapich2/2.3/gcc-7.3.0.lp gdrcopy/1.3/cuda10.0-mvapich2.3 enable-mvapich2-gdr
+#module load cuda/10.1-update2 compiler/intel-19.0.2 openmpi/4.0.2/intel-19.0.2
+module load cuda/10.1-update2 compiler/gcc-7.3.0 openmpi/4.0.2/gcc-7.4.0
+module list 2>&1 
+export OMP_NUM_THREADS=4
+
+# regression test by binary check. 
+# 1: terminate after init
+# 2: terminate after init (with restart write/read/write at the end of init)
+# 3: t = endtime
+# 4: t = endtime (with restart write/read/write at the end of init)
+[[ "$@" =~ "--debug" ]] && export citylbm_addopt+="REGRESSION_TEST=3 " 
+
+make -C .. -j DEVICE=v100
+
+# mpi
+export citylbm_mx=$((8/citylbm_dx))
+export citylbm_my=$((8/citylbm_dx))
+export citylbm_lxy=4096 # origin 4096 # lxy%32 == 0
+export citylbm_nz=$((160/citylbm_dx)) # 160 for dx=1, 80 for dx=2
+export citylbm_crft=$((2000/citylbm_dx)) # 60 sec; see --velocity_lbm
+
+env
+
+ulimit -c unlimited && \
+mpirun \
+    -n $((citylbm_mx * citylbm_my* citylbm_ens)) \
+    -x UCX_MEMTYPE_CACHE=n \
+    --mca shmem_mmap_reallocate_backing_file 1 \
+    --mca btl_vader_single_copy_mechanism none \
+    --output-filename ../log/mpiranks \
+    --merge-stderr-to-stdout \
+  ../bin/citylbm.v100_cuda \
+   -n_ensemble_members        $citylbm_n_ens \
+   -ofs_ensemble_idx          $citylbm_ofs_ens \
+   -gpu_per_node              16 \
+   -time_end                  21600 \
+   -wrf_start                 720 \
+   -velocity_lbm              16.0  0.100 \
+   -number_of_grid_point      $citylbm_nz   2 \
+   -domain_min                -$((citylbm_lxy/2))  -$((citylbm_lxy/2))    -8.0  \
+   -domain_length              $((citylbm_lxy  ))   $((citylbm_lxy  ))  2560.0  \
+   -cfr_steps                 $citylbm_crft $citylbm_crft \
+   -cfr_flags                 1  1 \
+   -restart_flags_and_step    0 99999 \
+   -iofield_freq              1 \
+

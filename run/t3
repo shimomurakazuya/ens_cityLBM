@@ -1,0 +1,117 @@
+#!/bin/bash -ue
+#$ -cwd
+#$ -l f_node=2
+#$ -l h_rt=12:0:0
+#$ -N oklahoma4m
+#$ -e ../log/e
+#$ -o ../log/o
+
+echo "start citylbm: with options: $@"
+
+export citylbm_dx=4
+export citylbm_n_ens=1 # number of ensemble members
+export citylbm_ofs_ens=0 # index offset of ensemble members
+
+# accepting citylbm/ or citylbm/run/
+# but starting with citylbm/ anyway
+cd run >& /dev/null || true
+cd ..
+
+# arch
+. ./arch/t3.sh
+
+# citylbm options
+export citylbm_addopt="EXPECT_DX_MESH=$citylbm_dx "
+if [[ "$@" =~ "--debug" ]]; then
+    export citylbm_addopt+="NO_POSTPROCESS_MONITOR "
+    export citylbm_addopt+="NO_IODATA_PARAVIEW "
+    #export citylbm_addopt+="NO_IOTHREAD "
+    #export citylbm_addopt+="NO_INIT_DECOBOCO "
+    #export citylbm_addopt+="NO_IODATA_GZBIN "
+fi
+export citylbm_addopt+="NO_CITYBOX "
+#export citylbm_addopt+="ENSEMBLE_NUDGING "
+#export citylbm_addopt+="ENSEMBLE_UVWT "
+export citylbm_addopt+="ENSEMBLE_SPIKE "
+export citylbm_addopt+="SCALAR_UNIQ "
+
+# regression test by binary check. 
+# 1: terminate after init
+# 2: terminate after init (with restart write/read/write at the end of init)
+# 3: t = endtime
+# 4: t = endtime (with restart write/read/write at the end of init)
+[[ "$@" =~ "--debug" ]] && export citylbm_addopt+="REGRESSION_TEST=3 " 
+
+# make
+make clean
+[[ "$@" =~ "--debug" ]] && (make resultclean || true)
+make -k -j8 CITYLBM_DEFINES="$citylbm_addopt" 2>&1
+rm run/run.exe || true
+ln -snf bin/run.exe run/run.exe || true
+
+# mpi
+export citylbm_ngpu_factor=2 # TSUBAME
+export citylbm_mx=$((8/citylbm_dx))
+export citylbm_my=$((8/citylbm_dx))
+export citylbm_lxy=4096 # origin 4096 # lxy%32 == 0
+export citylbm_nz=$((160/citylbm_dx)) # 160 for dx=1, 80 for dx=2
+export citylbm_crft=$((2000/citylbm_dx)) # 60 sec; see --velocity_lbm
+
+cd run 
+
+env
+
+run_citylbm () {
+    endtime=$1
+    restart=${2:-0}
+    restart_t=${3:-99999}
+
+    echo && echo && echo "run citylbm endtime=$endtime restart={$restart, $restart_t}" && echo
+
+    # workaround 
+    mkdir -p io/iofiles/restart io/output
+
+    $arch_mpirun_w_opt \
+        -n $((citylbm_mx * citylbm_my* citylbm_n_ens * citylbm_ngpu_factor)) \
+      ../bin/run.exe \
+        -n_ensemble_members        $citylbm_n_ens \
+        -ofs_ensemble_idx          $citylbm_ofs_ens \
+        -gpu_per_node              $arch_gpu_per_node \
+        -time_end                  $endtime \
+        -velocity_lbm              10.0  0.100 \
+        -number_of_grid_point      $citylbm_nz   2 \
+        -domain_min                -$((citylbm_lxy/2))  -$((citylbm_lxy/2))    -8.0  \
+        -domain_length              $((citylbm_lxy  ))   $((citylbm_lxy  ))  2560.0  \
+        -cfr_steps                 $citylbm_crft $citylbm_crft \
+        -cfr_flags                 1  1 \
+        -restart_flags_and_step    $restart $restart_t \
+        -iofield_freq              1 \
+     2>&1 | tee ../log/logfile.txt
+
+    ret=$?
+
+    lns=../bindiff/symlink/$endtime
+    [ -L $lns ] && rm $lns
+    ln -s $(readlink -m ../io/iofiles/restart/$((endtime/60))) $lns
+
+    return $ret
+}
+
+if [[ "$@" =~ "--debug" ]]; then
+    #run_citylbm 1 
+    #run_citylbm 61 
+    run_citylbm 121
+    run_citylbm 301 1 2
+    #run_citylbm 301
+else
+    [[ "$@" =~ "--delete" ]] && rm ../io/iofiles/restart -rv; mkdir -p ../io/iofiles/restart
+    rest="$(ls -v ../io/iofiles/restart/ | tail -n2 | head -n1)"
+    echo 'rest = ' $rest
+    if [ -n "$rest" ] && [[ ! "$@" =~ "--no-restart" ]]; then
+        run_citylbm 24300 1 $rest
+    else
+        run_citylbm 24300
+    fi
+fi
+
+

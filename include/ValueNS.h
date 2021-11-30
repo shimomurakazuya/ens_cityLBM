@@ -15,6 +15,8 @@ class  ValueNS {
 private:
     MemType memType_{MemType::NullPtr};
 
+    int nn_max_;
+
     // veloctiy //
     real*   u_ = nullptr;
     real*   v_ = nullptr;
@@ -24,7 +26,7 @@ private:
     real*   rho_ = nullptr;
 
     // scalar values //
-    real*   scalar_ = nullptr;
+    real*   scalar_  = nullptr;
 
     // temperature //
     real*   T_ = nullptr;
@@ -52,8 +54,10 @@ public:
           real*  rho()        { return  rho_; }
     const real*  rho()  const { return  rho_; }
 
-          real*  scalar()        { return  scalar_; }
-    const real*  scalar()  const { return  scalar_; }
+          real*  scalar ()        { return  scalar_ ; }
+    const real*  scalar ()  const { return  scalar_ ; }
+          real*  scalar (const int n)        { return  &(scalar_[n*nn_max_]) ; }
+    const real*  scalar (const int n)  const { return  &(scalar_[n*nn_max_]) ; }
 
           real*  T()        { return  T_; }
     const real*  T()  const { return  T_; }
@@ -69,21 +73,22 @@ public:
     real  T  (const int i)  const { return  T  ()[i]; }
 
 public:
-    void  init(const int  nn_max, const enum MemType  memType);
-    void  copy(const int  nn_max, const ValueNS&  other);
+    void  init(const int  nn_max, const int n_scalars, const enum MemType  memType);
+    void  copy(const int  nn_max, const int n_scalars, const ValueNS&  other);
 
-    void  reallocate(const MemType  memType, const int  nn_max)
+    void  reallocate(const MemType  memType, const int  nn_max, const int n_scalars)
     {
         release();
         memType_ = memType;
-        allocate(nn_max);
+        nn_max_  = nn_max;
+        allocate(nn_max, n_scalars);
     }
 
 private:
-    void  allocate(const int nn_max);
+    void  allocate(const int nn_max, const int n_scalars);
     void  release();
 
-    void  fill(const int nn_max);
+    void  fill(const int nn_max, const int n_scalars);
 
 };
 

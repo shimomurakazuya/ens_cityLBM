@@ -1,0 +1,11 @@
+# Intel Broadwell on Tsubame3.0 (Tokyo Tech, Japan)
+COMPILER = mpiicpc
+CXXFLAGS = -O3 -std=c++14 -qopenmp -xCORE-AVX2
+CXXFLAGS += -D NO_IOTHREAD
+LDFLAGS = -lm -lstdc++ -lz -qopenmp
+TARGET = $(OUT_DIR)/citylbm.bdw_omp
+
+# Linker
+# Before compiling, export OMPI_CXX=icpc
+LINKER = mpiicpc
+

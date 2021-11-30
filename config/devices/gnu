@@ -1,0 +1,6 @@
+# General CPU compilation with gcc + openmpi
+COMPILER = mpicxx
+CXXFLAGS := -O3 -Wall -Wextra -std=c++14 -fopenmp 
+TARGET = $(OUT_DIR)/citylbm.gnu
+LDFLAGS = -lm -lstdc++ -lz -fopenmp
+LINKER = mpicxx

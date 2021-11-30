@@ -8,6 +8,7 @@
 #include "MPIDatatypeInfo.h"
 #include <mpi.h>
 #include <vector>
+#include "MPICommEnsemble.h"
 
 
 struct  LocalNode {
@@ -43,14 +44,15 @@ struct  _MPIGetInfo {
 
 class InitTree_for_MPI {
 private:
-    int     rank_;
+    const MPICommEnsemble comm_;
     int     num_allocated_localNode_;
     std::vector<LocalNode>  localNode_;
 
 public:
-    InitTree_for_MPI()
+    InitTree_for_MPI() = delete;
+
+    InitTree_for_MPI( const MPICommEnsemble comm): comm_(comm)
     {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
     }
     ~InitTree_for_MPI() {}
 
@@ -61,7 +63,15 @@ public:
               Tree& tree,
         const Grid* grids,
         const int   lv_max
+        ) = delete;
+
+    void init_tree_mpi_with_map(
+              Tree& tree,
+        const Grid* grids,
+        const int   lv_max,
+        const MapData& map
         );
+              
 
 
 private:
@@ -87,7 +97,9 @@ private:
     void set_cal_rank_div2d(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids);
     void set_cal_rank_div3d(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids);
     void set_cal_rank_div_nc3d(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids);
+    void set_cal_rank_div_citybox(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids);
     void set_cal_rank_div_channel(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids);
+    void set_cal_rank_div_2d_block(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids, int bx=2, int by=2);
     void set_flags   (std::vector<LocalNode>& localNode, const Tree& tree_global);
 
     bool node_is_cal(const int cal_rank, const int rank);

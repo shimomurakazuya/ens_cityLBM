@@ -15,7 +15,8 @@ class  TestNaturalConvection3D {
 public:
     int rank_;
     TestNaturalConvection3D() { 
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_); 
+        //MPI_Comm_rank_(MPI_COMM_WORLD, &rank_); 
+        rank_ = -1;
 
         // heated: 420.0 K //
         TemperatureInit_     = 323.0;

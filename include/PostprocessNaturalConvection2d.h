@@ -24,7 +24,10 @@ private:
     int    rank_;
 
 public:
-    PostprocessNaturalConvection2d () { MPI_Comm_rank(MPI_COMM_WORLD, &rank_); }
+    PostprocessNaturalConvection2d () { 
+        //MPI_Comm_rank_(MPI_COMM_WORLD, &rank_); 
+        rank_ = -1;
+    }
     ~PostprocessNaturalConvection2d () {}
 
 public:
@@ -38,7 +41,7 @@ private:
         const int        lv,
         const Field&     field,
         const MeshValue* meshValues,
-        const std::vector<int>& id_tasks
+        const TaskID::vector_type& id_tasks
         );
 
     void  output_values(int step);

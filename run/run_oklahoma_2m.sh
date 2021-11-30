@@ -1,6 +1,6 @@
 #!/bin/sh
 #$ -cwd
-#$ -l rt_F=9
+#$ -l f_node=9
 #$ -l h_rt=00:10:00
 #$ -N oklahoma2m
 
@@ -9,7 +9,7 @@ rm run.exe
 ln -s ../bin/run.exe
 chmod 777 run.exe
 
-source /etc/profile.d/modules.sh
+. /etc/profile.d/modules.sh
 module load cuda/9.2/9.2.88.1
 module load openmpi
 

@@ -17,6 +17,7 @@
 #include "stElapsedTimeInfo.h"
 #include "Parameters.h"
 #include "Timer.h"
+#include "MPICommEnsemble.h"
 
 
 class  ElapsedTimeInfo {
@@ -24,7 +25,6 @@ private:
     const bool  flag_measure_;
 
     int   output_period_ = 1;
-    int   rank_{0};
     bool  is_ios_base_app_{false};
 
     std::string  fname_;
@@ -34,12 +34,16 @@ private:
 
     std::vector<stElapsedTimeInfo>  st_elapsedTimeInfo_;
 
+    const MPICommEnsemble comm_;
+
 public:
-    ElapsedTimeInfo () :
+    ElapsedTimeInfo() = delete;
+
+    ElapsedTimeInfo (const MPICommEnsemble comm) :
         flag_measure_(true),
-        output_period_(1)
+        output_period_(1),
+        comm_(comm)
     {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
     }
 
     ~ElapsedTimeInfo () {}

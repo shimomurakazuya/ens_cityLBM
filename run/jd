@@ -1,0 +1,62 @@
+#!/bin/bash
+#SBATCH --job-name      city
+#SBATCH --ntasks        16
+#SBATCH --cpus-per-task 3
+#SBATCH --gres          gpu:16
+#SBATCH --output        log/logfile.txt
+echo start citylbm
+dx=2
+
+# env
+. /etc/profile.d/modules.sh 
+module purge 
+#module load cuda/10.0 mvapich2/2.3/gcc-7.3.0.lp gdrcopy/1.3/cuda10.0-mvapich2.3 enable-mvapich2-gdr
+module load cuda/10.1-update2 compiler/intel-19.0.2 openmpi/4.0.2/intel-19.0.2
+module list 2>&1 
+export OMP_NUM_THREADS=6
+
+## backup old output
+#if ls io/iofiles/restart/*.dat >/dev/null 2>&1
+#then
+#    echo backup auto
+#    backdir=backup-output/auto/$(date +%Y/%m/%d/%H%M%S)
+#    mkdir -p $backdir $backdir/iofiles $backdir/output
+#    mv io/iofiles/* $backdir/iofiles/
+#    mv io/output/* $backdir/output/
+#fi
+mkdir -p io/iofiles/restart io/output
+
+# start make
+addopt="EXPECT_DX_MESH=$dx "
+#addopt+="NO_POSTPROCESS_MONITOR "
+#addopt+="REGRESSION_TEST=3 " # regression test by binary check. 1: t=0, 2: t=750, 3: t=inf (only InitMonirotLevelset)
+#addopt+="NO_IODATA_PARAVIEW " 
+make clean 
+make resultclean
+make -j8 CITYLBM_DEFINES="$addopt" 2>&1
+rm run/run.exe 
+ln -snf bin/run.exe run/run.exe
+
+# mpi
+mx=4
+my=4
+Lxy=4096 # origin 4096 # Lxy%32 == 0
+nz=$((160/dx)) # 160 for dx=1, 80 for dx=2
+
+cd run 
+mpirun \
+    -n $((mx*my)) \
+    -x UCX_MEMTYPE_CACHE=n \
+    --mca btl_vader_single_copy_mechanism none \
+../bin/run.exe \
+    -gpu_per_node              16 \
+    -time_end                  24300.0 \
+    -velocity_lbm              10.0  0.100 \
+    -number_of_grid_point      $nz   2 \
+    -domain_min                -$((Lxy/2))  -$((Lxy/2))    -8.0  \
+    -domain_length              $((Lxy  ))   $((Lxy  ))  2560.0  \
+    -cfr_steps                 750  750 \
+    -cfr_flags                 1  1 \
+    -restart_flags_and_step    0 99999 \
+2>&1
+

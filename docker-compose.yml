@@ -1,0 +1,19 @@
+version: '3'
+services:
+    cuda:
+        container_name: citylbm_cuda_maker
+        image: nvcr.io/nvidia/tensorflow:21.03-tf1-py3
+        volumes:
+            - "${PWD}/:/root/work/"
+        #runtime: nvidia
+        environment:
+            - DEVICE=v100
+        working_dir: /root/work/
+    gnu:
+        container_name: citylbm_gnu_maker
+        image: nvcr.io/nvidia/tensorflow:21.03-tf1-py3
+        volumes:
+            - "${PWD}/:/root/work/"
+        environment:
+            - DEVICE=gnu
+        working_dir: /root/work/

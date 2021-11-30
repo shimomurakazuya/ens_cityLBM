@@ -1,0 +1,83 @@
+#!/bin/bash -ue
+#PBS -q pg9
+#PBS -l select=9:ncpus=48:mpiprocs=4:ompthreads=12:ngpus=4
+#PBS -l walltime=24:0:0
+#PBS -P CityLBM
+#PBS -N citylbm_js
+#PBS -o ../log/
+#PBS -j oe
+echo start citylbm
+if [ -n "${PBS_O_WORKDIR}" ]; then
+    cd ${PBS_O_WORKDIR}
+fi
+
+# problem size
+export citylbm_dx=4
+export citylbm_n_ens=9 # number of ensemble members;; should be 2*n_ens == f_node
+export citylbm_ofs_ens=36 # index offset of ensemble members
+
+# check args
+while getopts i: OPT
+do
+    case $OPT in 
+        "i") export citylbm_ofs_ens=$OPTARG ;;
+    esac
+done
+
+# env
+. /etc/profile.d/modules.sh 
+module purge 
+#module load mpt/2.23-ga cuda/10.1; export MPI_USE_CUDA=1
+module load mvapich2/2.3.4_gdr_cuda11.0_pgi pgi/20.9 cuda/11.0
+
+module list 2>&1 
+export OMP_NUM_THREADS=12
+export DEVICE=v100
+
+# start make
+(cd ..;
+mkdir -p io/iofiles/restart io/output || true ;
+make -j8 2>&1
+)
+
+if [[ "$@" =~ "--make-only" ]]; then
+    exit 0
+fi
+
+env
+
+# mpi
+export citylbm_ngpu_factor=1 # TSUBAME
+export citylbm_mx=$((8/citylbm_dx))
+export citylbm_my=$((8/citylbm_dx))
+export citylbm_lxy=4096 # origin 4096 # lxy%32 == 0
+export citylbm_nz=$((160/citylbm_dx)) # 160 for dx=1, 80 for dx=2
+export citylbm_crft=$((2000/citylbm_dx)) # 60 sec; see --velocity_lbm
+
+#ulimit -c unlimited
+
+export MV2_USE_CUDA=1
+export MV2_USE_GPUDIRECT_RDMA=1
+export MV2_USE_GPUDIRECT_GDRCOPY=1
+export MV2_GPUDIRECT_GDRCOPY_LIB=/home/app/gdrcopy/2.1/lib64/libgdrapi.so
+export MV2_SHOW_CPU_BINDING=1
+echo start mpi
+
+mpirun -np 36 \
+   ../bin/citylbm.v100_cuda \
+       -n_ensemble_members        $citylbm_n_ens \
+       -ofs_ensemble_idx          $citylbm_ofs_ens \
+       -gpu_per_node              4 \
+       -time_end                  24300.0 \
+       -velocity_lbm              10.0  0.100 \
+       -number_of_grid_point      $citylbm_nz   2 \
+       -domain_min                -$((citylbm_lxy/2))  -$((citylbm_lxy/2))    -8.0  \
+       -domain_length              $((citylbm_lxy  ))   $((citylbm_lxy  ))  2560.0  \
+       -cfr_steps                 $citylbm_crft $citylbm_crft \
+       -cfr_flags                 1  1 \
+       -restart_flags_and_step    0 99999 \
+       -iofield_freq              1 \
+|& tee ../log/logfile_${citylbm_ofs_ens}.txt
+
+echo finish mpi
+

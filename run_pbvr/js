@@ -1,0 +1,62 @@
+#!/bin/bash -ue
+
+#PBS -q pg9
+#PBS -l select=8:ncpus=24:mpiprocs=4:ompthreads=6:ngpus=4
+#PBS -l walltime=1:0:0
+#PBS -P CityLBM
+#PBS -N citylbm_js
+#PBS -o ../log/
+#PBS -j oe
+echo start citylbm
+if [ -n "${PBS_O_WORKDIR}" ]; then
+    cd ${PBS_O_WORKDIR}
+fi
+
+# env
+. /etc/profile.d/modules.sh 
+module load intel/cur gcc/cur
+module load cuda/11.0
+module load mpt/2.23-ga
+export MPICC_CC=icc
+export MPICXX_CXX=icpc 
+export MPI_USE_CUDA=1
+
+export OMP_NUM_THREADS=6
+
+module use --append $HOME/ulocal/modulefiles
+module load insitupbvr-dev
+
+module list 2>&1 
+
+export DEVICE="v100 intel_omp"
+export SUPERCOMPUTER=SGI8600
+
+# test make
+(cd ..;
+mkdir -p io/iofiles/restart io/output || true ;
+make -j8 2>&1
+)
+
+if [[ "$*" =~ "--make-only" ]]; then
+    exit 0
+fi
+
+env
+
+echo start mpi
+
+mpiexec_mpt -np 32 omplace -nt ${OMP_NUM_THREADS} \
+   ../bin/citylbm.v100_cuda \
+    -gpu_per_node              4 \
+    -time_end                  36000.0 \
+    -velocity_lbm              10.0  0.075 \
+    -number_of_grid_point      40   2 \
+    -domain_min                -2048  -2048 -8  \
+    -domain_length              4096   4096 2560  \
+    -cfr_steps                 75  75 \
+    -cfr_flags                 1  1 \
+    -restart_flags_and_step    0 99999 \
+2>&1 | tee -a ../log/logfile.txt
+
+echo finish mpi
+

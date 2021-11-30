@@ -12,7 +12,7 @@ class Timer {
 private:
     struct timeval  t_begin_;
     struct timeval  t_end_;
-    float  total_elapsed_time_;
+    double total_elapsed_time_;
 
     std::string message_;
 
@@ -31,22 +31,22 @@ public :
     ~Timer() {}
 
 public:
-    float  measure_func(const std::function<void()> func);
-    float  measure_func(const std::function<void()> func, const std::string  message);
+    double measure_func(const std::function<void()> func);
+    double measure_func(const std::function<void()> func, const std::string  message);
 
     void start();
     void stop ();
 
-    float clean();
+    double clean();
 
-    float get_total_elapsed_time_msec() const;
-    float get_elapsed_time_msec() const;
+    double get_total_elapsed_time_msec() const;
+    double get_elapsed_time_msec() const;
 
     void  print_total_elapsed_time_msec() const;
     void  print_elapsed_time_msec() const;
 
 
-    float  cal_elapsed_time_msec (
+    double cal_elapsed_time_msec (
         const struct timeval&   begin,
         const struct timeval&   end
         )

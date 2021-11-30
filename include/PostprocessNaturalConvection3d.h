@@ -52,7 +52,8 @@ public:
         z_min_nc3d_( 0.000),
         z_max_nc3d_( 0.800)
     {
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
+        //MPI_Comm_rank_(MPI_COMM_WORLD, &rank_);
+        rank_ = -1;
     }
     ~PostprocessNaturalConvection3d () {}
 
@@ -64,27 +65,27 @@ private:
         const int        lv,
         const Field&     field,
         const MeshValue* meshValues,
-        const std::vector<int>& id_tasks
+        const TaskID::vector_type& id_tasks
         );
 
     void  mean_values(
         const int        lv,
         const Field&     field,
         const MeshValue* meshValues,
-        const std::vector<int>& id_tasks
+        const TaskID::vector_type& id_tasks
         );
 
     void  rms_values(
         const int        lv,
         const Field&     field,
         const MeshValue* meshValues,
-        const std::vector<int>& id_tasks
+        const TaskID::vector_type& id_tasks
         );
 
     void  init_value_cf();
-    void  add_exist_flag (const int lv, const int idz, const real z_obs);
-    void  add_mean_values(const int lv, const int idz, const real z_obs, const real u, const real v, const real w, const real T);
-    void  add_rms_values (const int lv, const int idz, const real z_obs, const real u, const real v, const real w);
+    void  add_exist_flag (const int lv, const int idz, const real z_obj);
+    void  add_mean_values(const int lv, const int idz, const real z_obj, const real u, const real v, const real w, const real T);
+    void  add_rms_values (const int lv, const int idz, const real z_obj, const real u, const real v, const real w);
 
     void  reduce_exist_flag(const int lv);
     void  reduce_z         (const int lv);
@@ -94,7 +95,7 @@ private:
 
     void  output_values(int step);
 
-    void  get_idz_zobs_nc3d(int& idz, real& z_obs, const real z, const real dx, const real lv_obs);
+    void  get_idz_zobj_nc3d(int& idz, real& z_obj, const real z, const real dx, const real lv_obj);
 
     std::string filename(const int t){
         return  Foldernames::output_folder + "/" + Filenames::NaturalConvection3d_statics + "_step" + std::to_string(t) + ".csv";

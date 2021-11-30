@@ -1,0 +1,22 @@
+#!/bin/bash
+
+shopt -s expand_aliases
+
+log=run/recent
+rm -f $log
+touch $log
+
+hostname           | tee -a $log
+
+echo               | tee -a $log
+echo "$@"          | tee -a $log
+
+echo               >> $log
+git status -sb     >> $log
+echo               >> $log
+git rev-parse HEAD >> $log
+echo               >> $log
+git diff           >> $log
+
+echo               | tee -a $log
+$@                 | tee -a $log

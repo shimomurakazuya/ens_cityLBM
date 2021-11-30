@@ -15,7 +15,8 @@ class  TestChannelFlow_with_HF {
 public:
     int rank_;
     TestChannelFlow_with_HF() { 
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank_); 
+        //MPI_Comm_rank_(MPI_COMM_WORLD, &rank_); 
+        rank  = -1;
 
         // heated: 420.0 K //
         TemperatureInit_     = 0.5;

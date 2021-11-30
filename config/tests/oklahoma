@@ -1,0 +1,59 @@
+
+## VVTARGET
+VVTARGET := TestOklahoma
+citylbm_addopt += VVTARGET_$(VVTARGET)
+
+## error or warning on defines
+citylbm_addopt += CHECK_DEFINES # library_srcs/check_citylbm_defines.h
+citylbm_addopt += CHECK_DEFINES_INFO # library_srcs/check_citylbm_defines.h
+
+## mesh resolution on oklahoma
+citylbm_addopt += EXPECT_DX_MESH=4
+
+## cal option
+#citylbm_addopt += NO_SGS
+#citylbm_addopt += NO_BUOYANCY
+
+## io
+#citylbm_addopt += NO_FIELD_WRITEDAT
+#citylbm_addopt += NO_POSTPROCESS_MONITOR 
+citylbm_addopt += NO_IODATA_RESTART
+#citylbm_addopt += NO_IOTHREAD
+#citylbm_addopt += COUT_MONITOR_PRECISION=16
+
+## io paraview
+#citylbm_addopt += NO_IODATA_PARAVIEW
+#citylbm_addopt += PARAVIEW_FULL
+#citylbm_addopt += PARAVIEW_DOWNSIZE_2
+citylbm_addopt += PARAVIEW_DOWNSIZE_4
+#citylbm_addopt += PARAVIEW_SLICE
+#citylbm_addopt += USE_VALUE_STAT
+#citylbm_addopt += PARAVIEW_CELLDATA
+citylbm_addopt += PARAVIEW_ENS0
+
+## feature/bindiff_wo_halo
+#citylbm_addopt += MESHVALUES_IO_MASK_HALO
+#citylbm_addopt += SC_SCALAR_ALWAYS
+
+## debug r.i.p.
+citylbm_addopt += NO_CITYBOX
+citylbm_addopt += SCALAR_NON_PRIODIC
+
+#citylbm_addopt += USE_WRF0 # for debug
+
+## ensemble series
+citylbm_addopt += ENSEMBLE_SPIKE
+#citylbm_addopt += ENSEMBLE_PLANT_TEST
+#citylbm_addopt += ENSEMBLE_HEIGHT_PLANT_TEST
+#citylbm_addopt += ENSEMBLE_BB_SPIKE_TEST
+
+## pbvr
+#@PBVR citylbm_addopt += USE_PBVR  # need `module load insitupbvr-dev`
+#@PBVR citylbm_addopt += USE_VALUE_STAT USE_WRF0 SC_SCALAR_ALWAYS
+#@PBVR citylbm_addopt := $(patsubst EXPECT_DX_MESH=%,EXPECT_DX_MESH=4,$(citylbm_addopt))
+#@PBVR citylbm_addopt := $(filter-out NO_IODATA_PARAVIEW NO_FIELD_WRITEDAT,$(citylbm_addopt))
+#@PBVR LDFLAGS += -lInSituPBVR
+#@PBVR LDFLAGS += -lpbvrFunc
+#@PBVR LDFLAGS += -lkvsCore
+#@PBVR EXTRA += install_pbvr_files
+

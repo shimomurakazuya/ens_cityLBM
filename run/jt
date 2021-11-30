@@ -1,0 +1,60 @@
+#!/bin/bash
+#PBS -q gp56
+#PBS -l select=1:ncpus=28:mpiprocs=4:ompthreads=7
+#PBS -l walltime=24:0:0
+#PBS -P jt
+#PBS -N jt
+#PBS -o ./log/o
+#PBS -e ./log/e
+log=./log/logfile.txt
+echo start citylbm > $log
+
+[ -z "$PBS_O_WORKDIR" ] || cd $PBS_O_WORKDIR
+
+. /etc/profile.d/modules.sh 
+module purge 
+module load cuda/8.0 
+#module load mvapich2/2.2-gdr-cuda8.0/gnu 
+module load openmpi/3.0.0/gnu 
+module list 2>&1 | tee -a $log
+
+## ond
+#export PATH=/home/g5/a170085/software/opt/mvapich2/gdr/2.3a/mcast/no-openacc/cuda8.0/mofed4.0/pbs/gnu4.8.5/bin:$PATH
+#export LD_LIBRARY_PATH=/home/g5/a170085/software/opt/mvapich2/gdr/2.3a/mcast/no-openacc/cuda8.0/mofed4.0/pbs/gnu4.8.5/lib64:$LD_LIBRARY_PATH
+
+# mvapich + gdrcopy
+# export MV2_GPUDIRECT_GDRCOPY_LIB=/home/app/mvapich2/2.2-gdr-cuda8.0/gnu/gdrcopy-master/libgdrapi.so
+# export MV2_USE_CUDA=1
+# export MV2_USE_GPUDIRECT=1
+# export MV2_GPUDIRECT_GDRCOPY=1
+# export MV2_USE_GPUDIRECT_GDRCOPY=1
+# export MV2_CUDA_IPC=1
+# export MV2_CUDA_ENABLE_MANAGED=1   # this flag must be set of managed memory is used otherwise it fails
+# export MV2_CUDA_MANAGED_IPC=1
+
+# start make
+make clean 
+(make -j ARCH=sm_60 CITYLBM_DEFINES="USE_VALUE_STAT" 2>&1 || exit 1) | tee -a $log
+rm run/run.exe 
+ln -snf bin/run.exe run/run.exe
+
+# mpi
+mx=2
+my=2
+Lxy=4096 # origin 4096 # Lxy%32 == 0
+nz=40 # 160 for dx=1, 80 for dx=2
+
+cd run 
+mpiexec  \
+    -n $((mx*my))  --bind-to board   ../bin/run.exe \
+    -gpu_per_node              4 \
+    -time_end                  24300.0 \
+    -velocity_lbm              10.0  0.100 \
+    -number_of_grid_point      $nz   2 \
+    -domain_min                -$((Lxy/2))  -$((Lxy/2))    -8.0  \
+    -domain_length              $((Lxy  ))   $((Lxy  ))  2560.0  \
+    -cfr_steps                 750  750 \
+    -cfr_flags                 1  1 \
+    -restart_flags_and_step    0 99999 \
+2>&1 | tee -a ../$log
+
