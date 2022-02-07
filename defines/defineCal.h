@@ -6,6 +6,8 @@
 #ifdef USE_NVCC
   #define GPU_CALCULATION__
   #define USE_SHARED_MEMORY__
+#elif ENABLE_HIP
+  #define GPU_CALCULATION__
 #else
   #define CPU_CALCULATION__
 #endif
@@ -29,6 +31,8 @@
 //    constexpr int  opt_comm_send_recv_size      = 33554432; // KB // slow //
 
 //    constexpr int  opt_comm_send_recv_size      = 1073741824; // KB //
+#elif ENABLE_HIP
+    constexpr int  opt_comm_send_recv_size      = 8388608; // KB //
 #else
     // CPU //
     constexpr int  opt_comm_send_recv_size      = 1073741824; // KB //
@@ -37,6 +41,10 @@
 
 // cuda //
 #ifdef USE_NVCC
+  #define __GLOBAL__  __global__
+  #define __HOST__    __host__
+  #define __DEVICE__  __device__
+#elif ENABLE_HIP
   #define __GLOBAL__  __global__
   #define __HOST__    __host__
   #define __DEVICE__  __device__

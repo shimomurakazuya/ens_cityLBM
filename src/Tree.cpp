@@ -12,43 +12,11 @@
 
 #include <algorithm>
 
-
 //// public //
-//void  Tree::
-//preset_tree_data(const Grid*  grids)
-//{
-//    InitTree_for_MPI  initTree_for_MPI;
-//    initTree_for_MPI.init_tree_uniform3d_div(*this, grids, DefAMR::LV_MAX);
-//
-//    // offset //
-//    init_stNodeValArray();
-//
-//    set_num_nodes_lv();
-//
-//    // put get info //
-////    std::cout << __PRETTY_FUNCTION__ << "--------------------------------------" << std::endl;
-//    createMPIPutInformations();
-//}
-
-
-//void  Tree::
-//init_tree_data(const Grid*  grids)
-//{
-////    InitTree::init_tree_uniform3d(*this, grids, DefAMR::LV_MAX);
-//    InitTree::init_tree_amr(*this, grids, DefAMR::LV_MAX);
-//
-//    // offset //
-//    init_stNodeValArray();
-//
-//    set_num_nodes_lv();
-////    std::cout << __PRETTY_FUNCTION__ << "--------------------------------------" << std::endl;
-//    createMPIPutInformations();
-//}
-
 void Tree::
-init_tree_data_with_map(const Grid* grids, const MapData& map) {
+init_tree_data(const Grid* grids, const OptionParser& optionParser, const MapData& map) {
     InitTree_for_MPI  initTree_for_MPI(comm_);
-    initTree_for_MPI.init_tree_mpi_with_map(*this, grids, DefAMR::LV_MAX, map);
+    initTree_for_MPI.init_tree_mpi(*this, grids, DefAMR::LV_MAX, optionParser, map);
 
     // offset //
     init_stNodeValArray();

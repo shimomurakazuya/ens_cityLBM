@@ -1,0 +1,3 @@
+echo start mpi
+{0[MPI_COMMAND]}{0[MPI_OPTIONS]}{0[CITYLBM]}{0[CITYLBM_OPTIONS]}{0[REDIRECTION_COMMAND]}
+echo finish mpi

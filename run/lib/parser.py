@@ -64,8 +64,8 @@ def sanity_check(json_data, filename):
 
     citylbm_default_dict = {
                             'gpu_per_node': 99999, # some large number, set as correct number if USE_GPUs is True
-                            'cfr_flags': [1, 1],
-                            'cfr_steps': [50, 50],
+                            'cfrm_flags': [1, 1, 1, 1],
+                            'cfrm_steps': [50, 50, 50, 50],
                             'n_ensemble_members': 1,
                             'ofs_ensemble_idx': 0,
                             'restart_flags_and_step': [0, 99999],

@@ -42,23 +42,35 @@ struct  CoefTime {
 struct  CoefCFROutput {
     int  cout_step = 1;
     int  fout_step = 1;
+    int  rout_step = 1;
+    int  mout_step = 1;
 
     bool  cout_flag;
     bool  fout_flag;
+    bool  rout_flag;
+    bool  mout_flag;
 
 
     // func //
     int   t_cout(int t) const { return  t/cout_step; }
     int   t_fout(int t) const { return  t/fout_step; }
+    int   t_rout(int t) const { return  t/rout_step; }
+    int   t_mout(int t) const { return  t/mout_step; }
 
     bool  is_cout_step       (int t) const { return  (t%cout_step        == 0); }
     bool  is_fout_step       (int t) const { return  (t%fout_step        == 0); }
+    bool  is_rout_step       (int t) const { return  (t%rout_step        == 0); }
+    bool  is_mout_step       (int t) const { return  (t%mout_step        == 0); }
 
     bool  is_cout_step(int t, int step_end) const { return ( (t%cout_step == 0) || (t == step_end) ); }
     bool  is_fout_step(int t, int step_end) const { return ( (t%fout_step == 0) || (t == step_end) ); }
+    bool  is_rout_step(int t, int step_end) const { return ( (t%rout_step == 0) || (t == step_end) ); }
+    bool  is_mout_step(int t, int step_end) const { return ( (t%mout_step == 0) || (t == step_end) ); }
 
     bool  is_just_before_cout_step       (int t) const { return  (t%cout_step        == cout_step       -1); }
     bool  is_just_before_fout_step       (int t) const { return  (t%fout_step        == fout_step       -1); }
+    bool  is_just_before_rout_step       (int t) const { return  (t%rout_step        == rout_step       -1); }
+    bool  is_just_before_mout_step       (int t) const { return  (t%mout_step        == mout_step       -1); }
 };
 
 

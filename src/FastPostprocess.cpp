@@ -22,6 +22,7 @@ if(comm_.is_rank0()) { std::cout << __PRETTY_FUNCTION__ << ": skiped within -D N
 return;
 #endif
 
+    time_minutes_now_ = -1;
     heads_input.clear();
     x.clear();
     y.clear();
@@ -93,17 +94,12 @@ return;
     scalars.resize(nn * n_scalars);
     T.resize(nn);
 
-#ifdef USE_VALUE_STAT
-    u_stat.resize(nn);
-    v_stat.resize(nn); 
-    w_stat.resize(nn);
-    sc_stat.resize(nn * n_scalars);
-    T_stat.resize(nn);
-    uu_stat.resize(nn);
-    vv_stat.resize(nn); 
-    ww_stat.resize(nn);
-    TT_stat.resize(nn);
-#endif // USE_VALUE_STAT
+    u_ave.resize(nn);
+    v_ave.resize(nn); 
+    w_ave.resize(nn);
+    vel2_fluc_ave.resize(nn);
+    T_ave.resize(nn);
+
 
     for(auto&& ii: ids) { 
         ii.i = ii.j = ii.k = ii.l = ii.lv = -1;
@@ -306,12 +302,11 @@ return;
 void FastPostprocess::
 OutputMonitorData(
 int step,
+int time_minutes,
 const Tree& tree,
 const Parameters& parameters, 
 const MeshValue* meshValues_ptr[]
-#ifdef USE_VALUE_STAT
-, const ValueStat* valueStat
-#endif // USE_VALUE_STAT
+,const ValueTimeAverage* valueTimeAverage1min
 )
 {
 #ifdef NO_POSTPROCESS_MONITOR
@@ -321,6 +316,35 @@ return;
     if(comm_.is_rank0()) { std::cout << __PRETTY_FUNCTION__ << std::endl; }
     if(comm_.is_rank0()) { std::cout << " monitor count: " << monitorcount() << std::endl; }
 
+    updateMonitorData(tree, parameters, meshValues_ptr
+            ,valueTimeAverage1min
+            );
+
+    // unique file output
+    for(auto&& fileno: util::irange(heads_input.size())) {
+        const std::string filename = out_filename_(-1, fileno);
+        const bool trancate = (step <= 0);
+        writeMonitorData(fileno, filename, step, trancate, meshValues_ptr);
+    }
+
+    // 1min-chunk output
+    for(auto&& fileno: util::irange(heads_input.size())) {
+        const std::string filename = out_filename_(time_minutes, fileno);
+        const bool trancate = (time_minutes_now_ < time_minutes);
+        writeMonitorData(fileno, filename, step, trancate, meshValues_ptr);
+    }
+
+    if(comm_.is_rank0()) { std::cout << __PRETTY_FUNCTION__ << "finished." << std::endl; }
+    time_minutes_now_ = time_minutes;
+}
+
+void FastPostprocess::
+updateMonitorData(
+const Tree& tree,
+const Parameters& parameters, 
+const MeshValue* meshValues_ptr[],
+const ValueTimeAverage* valueTimeAverage1min
+) {
     // scan monitor data
     const auto n_monitor = this->x.size();
     const int n_scalars = meshValues_ptr[0]->n_scalars();
@@ -337,17 +361,12 @@ return;
     float* scalar = this->scalars.data();
     float* T = this->T.data();
 
-#ifdef USE_VALUE_STAT
-    float* u_stat  = this->u_stat.data();
-    float* v_stat  = this->v_stat.data();
-    float* w_stat  = this->w_stat.data();
-    float* sc_stat = this->sc_stat.data();
-    float* T_stat  = this->T_stat.data();
-    float* uu_stat = this->uu_stat.data();
-    float* vv_stat = this->vv_stat.data();
-    float* ww_stat = this->ww_stat.data();
-    float* TT_stat = this->TT_stat.data();
-#endif // USE_VALUE_STAT
+    float* u_ave  = this->u_ave.data();
+    float* v_ave  = this->v_ave.data();
+    float* w_ave  = this->w_ave.data();
+    float* vel2_fluc_ave = this->vel2_fluc_ave.data();
+    float* T_ave  = this->T_ave.data();
+
 
     const float* x = this->x.data();
     const float* y = this->y.data();
@@ -365,20 +384,11 @@ return;
         const auto* scalar_mesh = meshValue.valueNS().scalar();
         const auto* T_mesh = meshValue.valueNS().T();
 
-#ifdef USE_VALUE_STAT
-        const auto  stat_count = valueStat[lv].t_count();
-        const auto  inv_stat_count = 1.f/stat_count;
-
-        const auto* u_sum  = valueStat[lv].u_sum();
-        const auto* v_sum  = valueStat[lv].v_sum();
-        const auto* w_sum  = valueStat[lv].w_sum();
-        const auto* sc_sum = valueStat[lv].sc_sum();
-        const auto* T_sum  = valueStat[lv].T_sum();
-        const auto* uu_sum = valueStat[lv].uu_sum();
-        const auto* vv_sum = valueStat[lv].vv_sum();
-        const auto* ww_sum = valueStat[lv].ww_sum();
-        const auto* TT_sum = valueStat[lv].TT_sum();
-#endif // USE_VALUE_STAT
+        const auto* u_mean  = valueTimeAverage1min[lv].u_mean();
+        const auto* v_mean  = valueTimeAverage1min[lv].v_mean();
+        const auto* w_mean  = valueTimeAverage1min[lv].w_mean();
+        const auto* vel2_fluc = valueTimeAverage1min[lv].vel2_fluc();
+        const auto* T_mean  = valueTimeAverage1min[lv].T_mean();
 
         const auto c_ref = parameters.c_ref_lbm();
 
@@ -399,10 +409,7 @@ return;
 
                     // interpolate val
                     float _u=0, _v=0, _w=0, _xitp=0, _yitp=0, _zitp=0, _l=0, _T=0;
-#ifdef USE_VALUE_STAT
-                    float _u_sum=0, _v_sum=0, _w_sum=0, _T_sum=0;
-                    float _uu_sum=0, _vv_sum=0, _ww_sum=0, _TT_sum=0;
-#endif // USE_VALUE_STAT
+                    float _u_mean=0, _v_mean=0, _w_mean=0, _T_mean=0, _vel2_fluc=0;
                     for(int kku=0; kku<2; kku++) {
                     for(int jju=0; jju<2; jju++) {
                     for(int iiu=0; iiu<2; iiu++) { // iiu == 0: this cell, iiu == 1: neighbor cell
@@ -425,24 +432,17 @@ return;
                         _l += weight * lv_obj_mesh[id_mesh];
                         _T += weight * T_mesh[id_mesh];
 
-#ifdef USE_VALUE_STAT
-                        _u_sum  += weight * u_sum[id_mesh];
-                        _v_sum  += weight * v_sum[id_mesh];
-                        _w_sum  += weight * w_sum[id_mesh];
-                        _T_sum  += weight * T_sum[id_mesh];
-                        _uu_sum += weight * uu_sum[id_mesh];
-                        _vv_sum += weight * vv_sum[id_mesh];
-                        _ww_sum += weight * ww_sum[id_mesh];
-                        _TT_sum += weight * TT_sum[id_mesh];
-#endif // USE_VALUE_STAT
+                        _u_mean += weight * u_mean[id_mesh]; 
+                        _v_mean += weight * v_mean[id_mesh]; 
+                        _w_mean += weight * w_mean[id_mesh]; 
+                        _T_mean += weight * T_mean[id_mesh]; 
+                        _vel2_fluc += weight * vel2_fluc[id_mesh];
+
                     }}}
 
                     // scalar vars separated
                     for(int n=0; n<n_scalars; n++) {
                         float _s=0;
-#ifdef USE_VALUE_STAT
-                        float _sc_sum=0;
-#endif // USE_VALUE_STAT
                         for(int kk=0; kk<2; kk++) {
                         for(int jj=0; jj<2; jj++) {
                         for(int ii=0; ii<2; ii++) {
@@ -454,14 +454,8 @@ return;
                             const auto id_mesh = nn_max * n + Index::id(id.i+ii, id.j+jj, id.k+kk, offset3d); // to compute 2D index
                             _s += weight * scalar_mesh[id_mesh];
 
-#ifdef USE_VALUE_STAT
-                            _sc_sum += weight * sc_sum[id_mesh];
-#endif // USE_VALUE_STAT
                         }}}
                         scalar[n_monitor * n + im] = _s;
-#ifdef USE_VALUE_STAT
-                        sc_stat[n_monitor * n + im] = (inv_stat_count) * _sc_sum;
-#endif // USE_VALUE_STAT
                     }
 
                     // write final
@@ -474,101 +468,75 @@ return;
                     levelset_obj[im] = _l;
                     T[im] = _T;
 
-#ifdef USE_VALUE_STAT
-                    u_stat[im]  = (inv_stat_count) * _u_sum * c_ref;
-                    v_stat[im]  = (inv_stat_count) * _v_sum * c_ref;
-                    w_stat[im]  = (inv_stat_count) * _w_sum * c_ref;
-                    T_stat[im]  = (inv_stat_count) * _T_sum;
-                    uu_stat[im] = (inv_stat_count) * _uu_sum * c_ref * c_ref;
-                    vv_stat[im] = (inv_stat_count) * _vv_sum * c_ref * c_ref;
-                    ww_stat[im] = (inv_stat_count) * _ww_sum * c_ref * c_ref;
-                    TT_stat[im] = (inv_stat_count) * _TT_sum;
-#endif // USE_VALUE_STAT
+                    u_ave[im]  =  _u_mean * c_ref;
+                    v_ave[im]  =  _v_mean * c_ref;
+                    w_ave[im]  =  _w_mean * c_ref;
+                    vel2_fluc_ave[im] =  _vel2_fluc * c_ref * c_ref;
+                    T_ave[im]  =  _T_mean;
+
                 } // FOR_EACH1D_XX
             } // [=] __HD__ ()
         ); // foeach::exec_1d
     } // for lv
+}
 
-    /// fprintf
-    for(auto&& fileno: util::irange(heads_input.size())) {
-        const auto filename = out_filename_(-1, fileno);
-        if(step == 0) { // make new
-            std::ofstream fout(filename, std::ios::trunc);
-            std::stringstream ss;
-            for(int i=0; i<n_scalars; i++) {
-                ss << "scalar" + std::to_string(i) << ',';
-            } 
-#ifdef USE_VALUE_STAT
-            std::stringstream ss2;
-            for(int i=0; i<n_scalars; i++) {
-                ss2 << "scalar_stat" + std::to_string(i) << ',';
-            } 
-#endif // USE_VALUE_STAT
 
-            runtime_assert(fout, "FileIOError");
-            fout << "step" << ','
-                 << "calcflg" << ','
-                 << "d_rank"  << ','
-                 << "u" << ',' << "v" << ',' << "w" << ','
-                 << "xitp" << ',' << "yitp" << ',' << "zitp" << ','
-                 << "levelset_obj" << ','
-                 << ss.str()
-                 << "T" << ','
-#ifdef USE_VALUE_STAT
-                 << "u_stat" << ',' << "v_stat" << ',' << "w_stat" << ','
-                 << ss2.str()
-                 << "T_stat" << ','
-                 << "uu_stat" << ',' << "vv_stat" << ',' << "ww_stat" << ','
-                 << "TT_stat" << ','
-#endif // USE_VALUE_STAT
-                 << "x" << ',' << "y" << ',' << "z" << std::endl;
-            fout.close();
-        }
-        std::ofstream fout(filename, std::ios::app | std::ios::ate);
+void FastPostprocess::
+writeMonitorData(int fileno, std::string filename, int step, bool trancate, const MeshValue* meshValues_ptr[]) {
+    const auto n_monitor = this->x.size();
+    const int n_scalars = meshValues_ptr[0]->n_scalars();
+    if(trancate) { // make new
+        std::ofstream fout(filename, std::ios::trunc);
+        std::stringstream ss;
+        for(int i=0; i<n_scalars; i++) {
+            ss << "scalar" + std::to_string(i) << ',';
+        } 
+
         runtime_assert(fout, "FileIOError");
-        const auto im_start = heads_input.at(fileno);
-        const auto im_end = (fileno+1 == heads_input.size()) ? n_monitor : heads_input.at(fileno+1);
-        for(auto&& im: util::irange(im_start, im_end)) {
-            if(!calcflg[im]) { continue; } // will be on other rank
-            std::stringstream ss;
-            for(int i=0; i<n_scalars; i++) {
-                ss << scalar[n_monitor * i + im] << ',';
-            } 
-#ifdef USE_VALUE_STAT
-            std::stringstream ss2;
-            for(int i=0; i<n_scalars; i++) {
-                ss2 << sc_stat[n_monitor * i + im] << ',';
-            } 
-#endif // USE_VALUE_STAT
-            fout << step << ','
-                << int(calcflg[im]) << ','
-                << d_rank[im] << ','
-                << u[im] << ','
-                << v[im] << ','
-                << w[im] << ','
-                << xitp[im] << ','
-                << yitp[im] << ','
-                << zitp[im] << ','
-                << levelset_obj[im] << ','
-                << ss.str()
-                << T[im] << ','
-#ifdef USE_VALUE_STAT
-                << u_stat[im] << ','
-                << v_stat[im] << ','
-                << w_stat[im] << ','
-                << ss2.str()
-                << T_stat[im] << ','
-                << uu_stat[im] << ','
-                << vv_stat[im] << ','
-                << ww_stat[im] << ','
-                << TT_stat[im] << ','
-#endif // USE_VALUE_STAT
-                << x[im] << ','
-                << y[im] << ','
-                << z[im] << std::endl;
-        }
-
+        fout << "step" << ','
+             << "calcflg" << ','
+             << "d_rank"  << ','
+             << "u" << ',' << "v" << ',' << "w" << ','
+             << "xitp" << ',' << "yitp" << ',' << "zitp" << ','
+             << "levelset_obj" << ','
+             << ss.str()
+             << "T" << ','
+             << "u_mean" << ',' << "v_mean" << ',' << "w_mean" << ','
+             << "vel2_fluc" << ',' 
+             << "T_mean" << ',' 
+             << "x" << ',' << "y" << ',' << "z" << std::endl;
         fout.close();
     }
-    if(comm_.is_rank0()) { std::cout << __PRETTY_FUNCTION__ << "finished." << std::endl; }
+    std::ofstream fout(filename, std::ios::app | std::ios::ate);
+    runtime_assert(fout, "FileIOError");
+    const auto im_start = heads_input.at(fileno);
+    const auto im_end = (fileno+1 == heads_input.size()) ? n_monitor : heads_input.at(fileno+1);
+    for(auto&& im: util::irange(im_start, im_end)) {
+        if(!calcflg[im]) { continue; } // will be on other rank
+        std::stringstream ss;
+        for(int i=0; i<n_scalars; i++) {
+            ss << scalars[n_monitor * i + im] << ',';
+        } 
+        fout << step << ','
+            << int(calcflg[im]) << ','
+            << d_rank[im] << ','
+            << u[im] << ','
+            << v[im] << ','
+            << w[im] << ','
+            << xitp[im] << ','
+            << yitp[im] << ','
+            << zitp[im] << ','
+            << levelset_obj[im] << ','
+            << ss.str()
+            << T[im] << ','
+            << u_ave[im] << ','
+            << v_ave[im] << ','
+            << w_ave[im] << ','
+            << vel2_fluc_ave[im] << ','
+            << T_ave[im] << ','
+            << x[im] << ','
+            << y[im] << ','
+            << z[im] << std::endl;
+    }
+    fout.close();
 }

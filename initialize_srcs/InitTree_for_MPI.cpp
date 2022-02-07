@@ -12,50 +12,17 @@
 #include "runtime_error.hpp"
 
 
-//void  InitTree_for_MPI::
-//init_tree_uniform3d_div(
-//          Tree& tree,
-//    const Grid* grids,
-//    const int   lv_max
-//    )
-//{
-//    int  rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-//
-//    Tree  tree_global;
-//    InitTree::init_tree_amr(tree_global, grids, lv_max);
-////    InitTree::init_tree_cavity2d(tree_global, grids, lv_max);
-////    InitTree::init_tree_flow_around_cube(tree_global, grids, lv_max);
-//    MPI_Barrier(MPI_COMM_WORLD);
-//
-//
-//    // allocate //
-//    const int  nsize = tree_global.nodes().size();
-////    std::cout << rank << " : " << nsize << std::endl;
-//    localNode_.resize(nsize);
-//
-//    // set rank //
-//    set_LocalNode(tree_global, grids);
-//
-//    // tree //
-//    set_LocalTree(tree, tree_global, grids); // not check yet
-//
-//
-//    // MPI information //
-//    std::vector<MPIPutGetInfo>  tmp_mpiPutGetInfo;
-//    createMPIPutGetInfo(tree_global, tmp_mpiPutGetInfo);
-//    tree.copyMPIPutGetInfo(tmp_mpiPutGetInfo, true);
-//}
-
 void  InitTree_for_MPI::
-init_tree_mpi_with_map(
+init_tree_mpi(
           Tree& tree,
     const Grid* grids,
     const int   lv_max,
+    const OptionParser& optionParser,
     const MapData& map
     )
 {
     Tree  tree_global(tree.comm());
-    InitTree::init_tree_amr_with_map(tree_global, grids, lv_max, map);
+    InitTree::init_tree_amr(tree_global, grids, lv_max, map);
     MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -64,7 +31,7 @@ init_tree_mpi_with_map(
     localNode_.resize(nsize);
 
     // set rank //
-    set_LocalNode(tree_global, grids);
+    set_LocalNode(tree_global, grids, optionParser);
 
     // tree //
     set_LocalTree(tree, tree_global, grids); // not check yet
@@ -80,13 +47,14 @@ init_tree_mpi_with_map(
 void  InitTree_for_MPI::
 set_LocalNode(
     const Tree& tree_global,
-    const Grid* grids
+    const Grid* grids,
+    const OptionParser& optionParser
     )
 {
     if(comm_.is_rank0()) { std::cout << __PRETTY_FUNCTION__ << std::endl; }
     // basic information //
     set_lv          (localNode_, tree_global);
-    set_cal_rank_div(localNode_, tree_global, grids);
+    set_cal_rank_div(localNode_, tree_global, grids, optionParser);
     set_flags       (localNode_, tree_global);
 
     set_LocalNode_index(localNode_, num_allocated_localNode_); // write localNode_.id  and  num_allocated_localNode_ //
@@ -273,22 +241,29 @@ set_lv(std::vector<LocalNode>& localNode, const Tree& tree_global)
 
 
 void  InitTree_for_MPI::
-set_cal_rank_div(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids)
+set_cal_rank_div(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids, const OptionParser& optionParser)
 {
-//    set_cal_rank_div1d(localNode, tree_global, grids);
-//    set_cal_rank_div2d(localNode, tree_global, grids);
-//    set_cal_rank_div3d(localNode, tree_global, grids);
-
-//    set_cal_rank_div_nc3d(localNode, tree_global, grids);
-//    set_cal_rank_div_channel(localNode, tree_global, grids);
-//    set_cal_rank_div_citybox(localNode, tree_global, grids);
-
-//    set_cal_rank_div_2d_block(localNode, tree_global, grids, 1, 1);
-    set_cal_rank_div_2d_block(localNode, tree_global, grids, 2, 2);
+    const std::string algo = optionParser.cal_rank_div_algo();
+    if(util::mpi(MPI_COMM_WORLD).rank() == 0) {
+        std::cout << __PRETTY_FUNCTION__ << ": cal_rank_div_algo = " << algo << std::endl;
+    }
+    if(algo == "1d") {
+        set_cal_rank_div1d(localNode, tree_global, grids);
+    } else if(algo == "2d") {
+        set_cal_rank_div2d(localNode, tree_global, grids);
+    } else if(algo == "3d") {
+        set_cal_rank_div3d(localNode, tree_global, grids);
+    } else if(algo == "2d_block") {
+        const int bx = optionParser.cal_rank_div_2d_block(0);
+        const int by = optionParser.cal_rank_div_2d_block(1);
+        set_cal_rank_div_2d_block(localNode, tree_global, grids, bx, by);
+    } else {
+        runtime_assert(false, "InvalidArgument");
+    }
 }
 
 
-#if 0
+#if 1
 void  InitTree_for_MPI::
 set_cal_rank_div1d(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids)
 {
@@ -416,7 +391,7 @@ set_cal_rank_div_2d_block(std::vector<LocalNode>& localNode, const Tree& tree_gl
     const int nb_y = ncpu_y / by;
 
     if(util::mpi(MPI_COMM_WORLD).rank() == 0) {
-        std::cout << "cal_rank_div = " << ncpu_x << ", " << ncpu_y << std::endl;
+        std::cout << __PRETTY_FUNCTION__ << ": cal_rank_div = " << ncpu_x << ", " << ncpu_y << std::endl;
         std::cout << " with block =  " << bx << ", " << by << std::endl;
     }
 

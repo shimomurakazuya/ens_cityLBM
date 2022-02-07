@@ -14,7 +14,7 @@ jobs:
       - name: Run docker-compose
         shell: bash
         run: |
-            docker-compose run gnu make -j8
+            docker-compose run gnu make build -j4
   gpubuild:
     name: gpubuild
     runs-on: ubuntu-latest
@@ -24,5 +24,5 @@ jobs:
       - name: Run docker-compose
         shell: bash
         run: |
-            docker-compose run cuda make -j8
+            docker-compose run cuda make build -j4
 

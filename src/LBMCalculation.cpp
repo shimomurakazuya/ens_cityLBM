@@ -1,3 +1,4 @@
+#include <climits>
 #include "LBMCalculation.h"
 #include "defineCal.h"
 #include "defineAMR.h"
@@ -38,20 +39,34 @@ LBM_data_assimilation(int t, Field& field)
         time_minutes_now = time_minutes;
 
         // particle filter
-        if (time_minutes_now%15 == 0) { // test
-            const float coef_mean_nudging_old = particleFilterSt_.coef_mean_nudging();
-//            particleFilterSt_.UpdateCoef(time_minutes_now, field.grids(), field.tree(), field.parameters(), field.meshValues0(), field.valueTimeAverage1min());
-            particleFilterSt_.UpdateCoef(time_minutes_now, field.grids(), field.tree(), field.parameters(), field.meshValues0(), field.valueTimeAverage1min(), false);
-            const float coef_mean_nudging     = particleFilterSt_.coef_mean_nudging();
+        #if defined(USE_PF_NUD5)
+        constexpr int pf_time_minutes = 5;
+        #elif defined(USE_PF_NUD15)
+        constexpr int pf_time_minutes = 15;
+        #else
+        constexpr int pf_time_minutes = INT_MAX;
+        #endif
+
+        auto& nudgingCoefAdaptation = field.nudgingCoefAdaptation();
+        if (time_minutes_now%pf_time_minutes == 0) { // default
+            const float coef_ave_nudging_old = nudgingCoefAdaptation.coef_ave_nudging();
+            const float coef_min_nudging_old = nudgingCoefAdaptation.coef_min_nudging();
+            const float coef_max_nudging_old = nudgingCoefAdaptation.coef_max_nudging();
+            nudgingCoefAdaptation.UpdateCoef(time_minutes_now, field.grids(), field.tree(), field.parameters(), field.meshValues0(), field.valueTimeAverage1min(), true); // meshValues0 ?????
+            const float coef_ave_nudging = nudgingCoefAdaptation.coef_ave_nudging();
+            const float coef_min_nudging = nudgingCoefAdaptation.coef_min_nudging();
+            const float coef_max_nudging = nudgingCoefAdaptation.coef_max_nudging();
 
             if (comm_.is_rank0()) {
-                std::cout << t << " : Particle filter ( new <- old ) : " << coef_mean_nudging << " <- " << coef_mean_nudging_old << std::endl;
+                std::cout << t << " : Particle filter (ave, min, max) (new <- old) : " << ", "
+                    << coef_ave_nudging     << ", "  << coef_min_nudging     << ", "  << coef_max_nudging     << ", " << " <- " << ", "
+                    << coef_ave_nudging_old << ", "  << coef_min_nudging_old << ", "  << coef_max_nudging_old << std::endl;
             }
         }
 
         // read: rho_obj, u_obj, ... etc. //
         BoundaryConditions  boundaryConditions(comm_);
-        boundaryConditions.ReadWRFData   (time_minutes_now+1, field.grids(), field.tree(), field.parameters(), field.meshValues0(), particleFilterSt_.coef_nudging());
+        boundaryConditions.ReadWRFData   (time_minutes_now+1, field.grids(), field.tree(), field.parameters(), field.meshValues0(), nudgingCoefAdaptation.coef_nudging());
         boundaryConditions.ReadGroundData(time_minutes_now+1, field.grids(), field.tree(), field.parameters(), field.meshValues0());
 
         // swap: rho_obj <-> rhon_obj, .. etc //
@@ -70,14 +85,6 @@ LBM_incompressible_flow(int t, Field& field)
     LBM_incompressible_flow_wo_tb (t, field);
 }
 
-
-void LBMCalculation::
-LBM_value_stat(int /*t*/, Field& field)
-{
-    for(int lv=0; lv<DefAMR::LV_MAX; lv++) {
-        field.valueStat(lv).sumup(field.meshValue(lv));
-    }
-}
 
 
 void  LBMCalculation::
@@ -619,6 +626,18 @@ NSUpdate(const int lv, Field& field, const int*  id_tasks, const int  num_tasks)
     foreach::exec_block_amr< foreach::opti, NX_LEAF >(
         num_tasks,
         [=] __HD__ () {
+            #if defined(SCALAR_WENO5)
+            NSKernel::ScalarConvectionweno<NX_LEAF>(
+                id_tasks, num_tasks, mesh_offsets3x3x3,
+                nn_max, n_scalars,
+                scalar_n,
+                scalar,
+                u,v,w,
+                lv_obj,
+                sc_scalar, flag_source,
+                dx, dt
+                );
+            #else
             NSKernel::ScalarConvectionorg<NX_LEAF>(
                 id_tasks, num_tasks, mesh_offsets3x3x3,
                 nn_max, n_scalars,
@@ -629,6 +648,7 @@ NSUpdate(const int lv, Field& field, const int*  id_tasks, const int  num_tasks)
                 sc_scalar, flag_source,
                 dx, dt
                 );
+            #endif
         }
     );
 
@@ -983,7 +1003,8 @@ boundary_conditions(const int lv, Field& field, const int*  id_tasks, const int 
     // inflow & outflow bc //
     const int*   bcTypes_f = field.meshValue(lv).valueObjLS().bcTypes_f();
 
-    const real*  dirichlet_weight = field.meshValue(lv).valueObjLS().dirichlet_weight();
+//    const real*  dirichlet_weight = field.meshValue(lv).valueObjLS().dirichlet_weight(); // bug???
+    const real*  dirichlet_weight = field.meshValues0()[lv].valueObjLS().dirichlet_weight();
 
 //    // solid wall //
 //    const real*  lv_obj  = field.meshValue(lv).valueObjLS().lv_obj();
@@ -1143,14 +1164,21 @@ ScalarCommunications(const int lv, Field& field)
         vals.push_back( &(field.meshValue_new(lv).valueNS().scalar()[idx]) );
     }
 
+    #if defined(SCALAR_WENO5)
     mpiCommunicationMG_.ValCommPackUnpackMG<NX_LEAF>(
         mpiPackUnpackInfo.sendPackUnpackCommInfo, 
         mpiPackUnpackInfo.recvPackUnpackCommInfo, 
-//        mpiPackUnpackInfo.all, 
-//        mpiPackUnpackInfo.slice3, 
+        mpiPackUnpackInfo.slice3, 
+        vals, valueBuff
+        );
+    #else
+    mpiCommunicationMG_.ValCommPackUnpackMG<NX_LEAF>(
+        mpiPackUnpackInfo.sendPackUnpackCommInfo, 
+        mpiPackUnpackInfo.recvPackUnpackCommInfo, 
         mpiPackUnpackInfo.slice1, 
         vals, valueBuff
         );
+    #endif
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
 }

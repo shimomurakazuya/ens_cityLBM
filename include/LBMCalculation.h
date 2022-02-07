@@ -13,7 +13,6 @@
 #include "MPICommunication.h"
 #include "MPICommunicationMG.h"
 #include "MPICommEnsemble.h"
-#include "ParticleFilterSt.h"
 
 
 class  LBMCalculation {
@@ -22,16 +21,13 @@ private:
     MPICommunicationMG  mpiCommunicationMG_;
     MPICommunication    mpiCommunication_;
 
-    ParticleFilterSt particleFilterSt_;
-
 public:
     LBMCalculation() = delete;
 
     LBMCalculation(const MPICommEnsemble comm): 
     comm_(comm),
     mpiCommunicationMG_(comm),
-    mpiCommunication_(comm),
-    particleFilterSt_(comm)
+    mpiCommunication_(comm)
     {}
 
     ~LBMCalculation(){}
@@ -39,7 +35,6 @@ public:
 public:
     void LBM_data_assimilation(int t, Field& field);
     void LBM_incompressible_flow(int t, Field& field);
-    void LBM_value_stat(int t, Field& field);
 
 public: // trick for __device__ lambda
     void NSUpdate(const int lv, Field& field, const int*  id_tasks, const int  num_tasks);

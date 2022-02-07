@@ -79,20 +79,11 @@ public:
         const Tree&          tree,
         const Parameters&    parameters,
         const MeshValue*     meshValues,
-        const ValueStat*     valueStats,
         const VTKOutputScale vtkOutputScale = VTKOutputScale::Full,
         const int            filter_bits = 8,
         const std::vector<real>& zSlices = std::vector<real>(),
         const std::vector<real>& ySlices = std::vector<real>(),
         const std::vector<real>& xSlices = std::vector<real>()
-        )
-    const;
-
-    void writeCsv_valueStat_integral_dtdxdy(
-        const Tree& tree,
-        const Parameters& parameters,
-        const MeshValue* meshValues,
-        const ValueStat* valueStats
         )
     const;
 

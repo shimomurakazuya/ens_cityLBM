@@ -7,7 +7,7 @@ import subprocess
 import pathlib
 import shutil
 from ..parser import parse_from_file
-from ..utils import str2num
+from ..utils import list2str, dict2str, str2num
 
 class AbstractSupercomputer:
     def __init__(self, **kwargs):
@@ -49,6 +49,9 @@ class AbstractSupercomputer:
             if verbose:
                 print(f'submitting {node} nodes job at {exec_dir}')
             subprocess.run(args=self.args)
+
+    def _set_submission_command(self):
+        args = []
 
     def __to_time_format(self, time_str, separator=':'):
         """
@@ -314,3 +317,75 @@ class AbstractSupercomputer:
             tmp_citylbm_dict['domain_min']    = [x_min, y_min, z_min]
  
         return tmp_citylbm_dict
+
+    def _set_job_parameters(self, parameters, job_dict, default_job_dict, options_dict, indent):
+        # To set values based on the given job dict
+        def get_values(dict, key, default_value):
+            return dict.get(key, default_value)
+
+        temp_dict = {}
+        for key, value in default_job_dict.items():
+            temp_dict[key] = get_values(job_dict, key, value)
+
+        parameters['MODULE_SETTINGS'] = list2str(temp_dict['modules'], prefix='module load')
+        parameters['ENV_SETTINGS']    = list2str(temp_dict['envs'], prefix='export')
+
+        def get_python_env_str():
+            python_settings = job_dict['python_settings']
+
+            PYTHON_PATH = python_settings['PYTHON_PATH']
+            platform = python_settings['platform']
+            virtual_env = python_settings['virtual_env']
+
+            python_str = ''
+            if platform == 'conda':
+                activate_command = 'conda activate'
+                anaconda_command = f'{PYTHON_PATH}/etc/profile.d/conda.sh'
+                python_str = list2str(anaconda_command, prefix='source')
+            elif platform == 'pip':
+                activate_command = 'source'
+
+            python_str += list2str(virtual_env, prefix=f'{activate_command}')
+            return python_str
+
+        
+        executable = str(pathlib.Path(job_dict["EXECUTABLE_DIR"]) / temp_dict["app"])
+        separator = '-'
+        if 'python_settings' in job_dict:
+            parameters['PYTHON_SETTINGS'] = get_python_env_str()
+            separator = '--'
+
+            parameters['EXEC_COMMANDS'] = list2str(executable, prefix=f"{temp_dict['exec_command']}", suffix=' \\\n')
+            parameters['EXEC_COMMANDS'] += dict2str(options_dict, indent, separator)
+        elif 'citylbm_settings' in job_dict:
+            # CityLBM job settings
+            citylbm_parameters = job_dict['citylbm_settings']
+            citylbm_parameters['CITYLBM'] = f' {executable} \\\n'
+            citylbm_parameters['CITYLBM_OPTIONS'] = dict2str(dict=options_dict,
+                                                             indent=indent,
+                                                             separator=separator,
+                                                             add_new_line_in_the_end=True)
+
+            # Construct the execute command using the template
+            run_template = f'templates/citylbm_run.txt'
+            with open(run_template, 'r') as f:
+                template = f.read()
+
+            template = template.format(citylbm_parameters)
+            # Update Exec commands
+            parameters['EXEC_COMMANDS'] = template
+            
+            # Empty string for 'PYTHON_SETTINGS'
+            parameters['PYTHON_SETTINGS'] = ''
+
+        return parameters
+
+    def _generate_job_script(self, template_file, parameters):
+        with open(template_file, 'r') as f:
+            template = f.read()
+
+        template = template.format(parameters)
+
+        job_script = self.exec_dir / 'job.sh'
+        with open(job_script, 'w') as f:
+            f.write(template)

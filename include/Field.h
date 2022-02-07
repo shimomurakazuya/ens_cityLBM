@@ -18,7 +18,6 @@
 #include "Parameters.h"
 #include "MeshValue.h"
 #include "ValueBuff.h"
-#include "ValueStat.h"
 #include "ValueTimeAverage.h"
 #include "ValuePBVR.h"
 #include "TaskID.h"
@@ -27,6 +26,7 @@
 #include "FuncMapData.h"
 #include "MPICommEnsemble.h"
 #include "mpi_wrapper.hpp"
+#include "NudgingCoefAdaptation.h"
 
 #include "FastPostprocess.h"
 
@@ -53,8 +53,6 @@ private:
 
     ValueBuff   valueBuff_;
 
-    ValueStat valueStat_[DefAMR::LV_MAX];
-
     ValuePBVR valuePBVR_;
 
     ValueTimeAverage valueTimeAverage1min_ [DefAMR::LV_MAX];
@@ -74,11 +72,14 @@ private:
     Tree        tree_io_;
     TaskID      taskID_io_;
     MeshValue   meshValues_io_[DefAMR::LV_MAX];
-    ValueStat   valueStat_io_[DefAMR::LV_MAX];
     ValueTimeAverage valueTimeAverage1min_io_ [DefAMR::LV_MAX];
     #endif
 
     FastPostprocess postprocessmonitor_;
+
+    // data assimilation //
+    NudgingCoefAdaptation nudgingCoefAdaptation_;
+
 
 private: // swap counter //
     int   itp_meshval_ [DefAMR::LV_MAX];
@@ -99,6 +100,7 @@ public:
         parameters_(comm), 
         allTimeInfo_(comm), funcTimeInfo_(comm), mpiTimeInfo_(comm),
         postprocessmonitor_(comm),
+        nudgingCoefAdaptation_(comm),
         timerSimple_(comm)
         #ifndef NO_FIELD_WRITEDAT
         , tree_io_(comm), parameters_io_(comm)
@@ -145,13 +147,6 @@ public:
           MeshValue& meshValue_new(const int lv)        { return  *meshValues_ptr_[itpn_meshval_[lv]][lv]; }
     const MeshValue& meshValue_new(const int lv)  const { return  *meshValues_ptr_[itpn_meshval_[lv]][lv]; }
 
-          ValueStat& valueStat   (const int lv)        { return  valueStat_   [lv]; }
-    const ValueStat& valueStat   (const int lv)  const { return  valueStat_   [lv]; }
-    #ifndef NO_FIELD_WRITEDAT
-          ValueStat& valueStat_io(const int lv)        { return  valueStat_io_[lv]; }
-    const ValueStat& valueStat_io(const int lv)  const { return  valueStat_io_[lv]; }
-    #endif
-
           ValuePBVR& valuePBVR()        { return valuePBVR_; }
     const ValuePBVR& valuePBVR()  const { return valuePBVR_; }
 
@@ -164,6 +159,9 @@ public:
           TaskID& taskID()       { return taskID_; }
     const TaskID& taskID() const { return taskID_; }
 
+          NudgingCoefAdaptation& nudgingCoefAdaptation()       { return nudgingCoefAdaptation_; }
+    const NudgingCoefAdaptation& nudgingCoefAdaptation() const { return nudgingCoefAdaptation_; }
+
     TimerSimple& timerSimple()  { return timerSimple_; }
 
     ElapsedTimeInfo& allTimeInfo()  { return allTimeInfo_; }
@@ -171,10 +169,10 @@ public:
     ElapsedTimeInfo& mpiTimeInfo()  { return mpiTimeInfo_; }
 
 public:
-    void read_field_full (const int step);
     void read_field_params (const int step);
     void read_field_meshval (const int step);
-    void write_field(const int step);
+    void write_field(const int step); // rout : output restart files //
+    void write_field_vtk(const int step); // fout : output vtk files //
     void write_monitor(const int step);
     void copy_io_field();
 
@@ -193,7 +191,6 @@ public:
         const bool          is_reset = false
         );
 
-    void copy_valueStat_io();
     void copy_valueTimeAverage_io();
 
     void update_meshValues(
@@ -212,27 +209,21 @@ public:
 private:
     void  init_ptrs();
 
-    // preset //
-    void preset_field() = delete;
-    void init_field() = delete;
-    void preset_tree(Tree&) = delete;
-    public: void init_field_wo_map();
-
-    // init with Oklahoma or other map //
-    public: void init_field_with_map(const MapData& map);
+public: 
+    // init with/without map //
+    void init_field_with_map(const MapData& map);
+    void init_field_wo_map();
 private:
-    void init_tree_with_map  (Tree&   tree, const MapData& map);
 
     // init (maybe enable to reuse) //
     void init_others(); // after init_tree_*()
     void init_grid           (Grid*   grid); // init grid for level 0 tree_roots
-    void init_tree           (Tree&   tree) = delete;
+    void init_tree           (Tree&   tree, const OptionParser& optionParser, const MapData& map);
     void init_parameters     (Parameters& parameters);
     void init_taskID         (TaskID& taskID, const Tree& tree);
 
     void init_elapsedTimeInfo(const Parameters& parameter);
     void init_meshValues     (const Grid* grids, const Tree& tree, MeshValue*  meshValues);
-    void init_ValueStat      (const Tree& tree);
     void init_valueBuff     (const Grid* grids, const Tree& tree, ValueBuff& valueBuff);
     void init_valuePBVR     (ValuePBVR& valuePBVR);
     void init_ValueTimeAverage(const Tree& tree, const MeshValue* meshValues);
@@ -255,6 +246,8 @@ private:
         )
     const;
 
+    void read_NudgingCoefAdaptation(const int step, NudgingCoefAdaptation& nudgingCoefAdaptation);
+
     // write //
     void write_latest_step(const int step, const int rank)  const;
     void write_parameters (const int step, const Parameters&  parameters, const int rank)  const;
@@ -272,11 +265,22 @@ private:
         )
     const;
 
+    void write_meshValues_vtk(
+        const int           step,
+        const Grid*         grids,
+        const Tree&         tree,
+        const Parameters&   parameters,
+        const MeshValue*    meshValues,
+        const int           rank
+        )
+    const;
+
+    void write_NudgingCoefAdaptation (const int step, const NudgingCoefAdaptation& nudgingCoefAdaptation)  const;
+
 
 public:
     auto& monitor(){ return postprocessmonitor_; }
 
-    void write_ValueStatCsv(int step);
 };
 
 

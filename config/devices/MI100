@@ -1,0 +1,9 @@
+# AMD MI100 on FX700 (Univ. Tokyo, Japan)
+COMPILER  = mpic++
+CXXFLAGS  = -O3 -std=c++14
+CXXFLAGS += -DENABLE_HIP
+LDFLAGS = -lm -lstdc++ -lz --hip-link
+TARGET = $(OUT_DIR)/citylbm.MI100_hip
+
+# Linker
+LINKER = $(COMPILER)

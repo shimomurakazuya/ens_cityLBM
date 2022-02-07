@@ -6,6 +6,7 @@
 #include "Tree.h"
 #include "Grid.h"
 #include "MPIDatatypeInfo.h"
+#include "option_parser.h"
 #include <mpi.h>
 #include <vector>
 #include "MPICommEnsemble.h"
@@ -58,17 +59,11 @@ public:
 
 
 public:
-    void
-    init_tree_uniform3d_div(
-              Tree& tree,
-        const Grid* grids,
-        const int   lv_max
-        ) = delete;
-
-    void init_tree_mpi_with_map(
+    void init_tree_mpi(
               Tree& tree,
         const Grid* grids,
         const int   lv_max,
+        const OptionParser& optionParser,
         const MapData& map
         );
               
@@ -78,7 +73,8 @@ private:
     void
     set_LocalNode(
         const Tree& tree_global,
-        const Grid* grids
+        const Grid* grids,
+        const OptionParser& optionParser
         );
 
     void
@@ -92,7 +88,7 @@ private:
 
 private:
     void set_lv(std::vector<LocalNode>& localNode, const Tree& tree_global);
-    void set_cal_rank_div(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids);
+    void set_cal_rank_div(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids, const OptionParser& optionParser);
     void set_cal_rank_div1d(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids);
     void set_cal_rank_div2d(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids);
     void set_cal_rank_div3d(std::vector<LocalNode>& localNode, const Tree& tree_global, const Grid* grids);

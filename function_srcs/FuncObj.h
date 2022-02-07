@@ -81,13 +81,14 @@ length_from_plane(
 }
 
 
+template<class T>
 inline
 __HOST__ __DEVICE__
 double
 length_from_box(
-    const real  x[],    /* x,y,z */
-    const real  box_min[],
-    const real  box_max[]
+    const T  x[],    /* x,y,z */
+    const T  box_min[],
+    const T  box_max[]
     )
 {
     const double  tmp_large_val = 1.0e7;

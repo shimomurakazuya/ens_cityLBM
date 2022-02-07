@@ -7,7 +7,11 @@
 
 
 #ifdef GPU_CALCULATION__
-#include <cuda.h>
+  #if defined(USE_NVCC)
+    #include <cuda.h>
+  #elif defined(ENABLE_HIP)
+    #include <hip/hip_runtime.h>
+  #endif
 #endif
 
 

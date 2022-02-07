@@ -13,7 +13,6 @@
 
 #include "TimeEvolutionLoop.h"
 #include "LBMCalculation.h"
-#include "ParticleFilterSt.h"
 
 #include "IndexLBM.h"
 #include "BoundaryConditions.h"
@@ -53,7 +52,9 @@ void  TestOklahoma::Flow()
     Init( field.grids(),
           field.tree(),
           field.parameters(),
-          field.meshValues0() );
+          field.meshValues0(),
+          field.nudgingCoefAdaptation()
+          );
 
     field.
     copy_meshValues(
@@ -75,12 +76,16 @@ void  TestOklahoma::Flow()
           field.grids(),
           field.tree(),
           field.parameters(),
-          field.meshValues0() );
+          field.meshValues0(),
+          field.nudgingCoefAdaptation()
+          );
     InitObservationDataOklahoma(
           field.grids(),
           field.tree(),
           field.parameters(),
-          field.meshValues1() );
+          field.meshValues1(),
+          field.nudgingCoefAdaptation()
+          );
 
     if (comm_.is_rank0()) { std::cout << "init_taskID_opt\n"; }
     field.init_taskID_opt(field.taskID(), field.tree(), field.meshValues0() );
@@ -109,10 +114,11 @@ void  TestOklahoma::Flow()
 
 
 void  TestOklahoma::Init(
-    const Grid*         grids,
-    const Tree&         tree,
-    const Parameters&   parameters,
-          MeshValue*    meshValues
+    const Grid*                  grids,
+    const Tree&                  tree,
+    const Parameters&            parameters,
+          MeshValue*             meshValues,
+    const NudgingCoefAdaptation& nudgingCoefAdaptation
     )
 {
     // object //
@@ -134,7 +140,7 @@ void  TestOklahoma::Init(
     InitValueOklahoma (grids, tree, parameters, meshValues);
 
 
-    InitObservationDataOklahoma (grids, tree, parameters, meshValues);
+    InitObservationDataOklahoma (grids, tree, parameters, meshValues, nudgingCoefAdaptation);
     InitSource (grids, tree, parameters, meshValues);
 
     // debug : not use (heatflux is initialized in the InitObservationDataOklahoma function) //
@@ -471,35 +477,36 @@ void  TestOklahoma::InitDecoBoco(
     if (comm_.is_rank0()) { std::cout << __PRETTY_FUNCTION__ << std::endl; }
     const int  n_leaf  = tree.number_of_nodes();
     const int  nn_cell = DefAMR::NN_LEAF;
-    const real c_ref   = parameters.c_ref_lbm();
 
-    const real dxc = meshValues[0].coordinates().dx();
-    const real dxf = meshValues[DefAMR::LV_MAX-1].coordinates().dx();
+    const double dxc = meshValues[0].coordinates().dx();
+    const double dxf = meshValues[DefAMR::LV_MAX-1].coordinates().dx();
 
 #if EXPECT_DX_MESH == 2 || EXPECT_DX_MESH == 1
     // /data/g5/a170085/research/citylbm/validation/2m_v0
-    const real width_decoboco[3] = { 8.0, 8.0, 24.0 };
-//    const real pitch_decoboco[3] = { width_decoboco[0]*8, width_decoboco[1]*8, width_decoboco[2]*4 };
-    const real pitch_decoboco[3] = { width_decoboco[0]*6, width_decoboco[1]*6, width_decoboco[2]*4 };
+    const double width_decoboco[3] = { 8.0, 8.0, 24.0 };
+//    const double pitch_decoboco[3] = { width_decoboco[0]*8, width_decoboco[1]*8, width_decoboco[2]*4 };
+//    const double pitch_decoboco[3] = { width_decoboco[0]*6, width_decoboco[1]*6, width_decoboco[2]*4 };
+    const double pitch_decoboco[3] = { width_decoboco[0]*4, width_decoboco[1]*4, width_decoboco[2]*4 };
 #elif EXPECT_DX_MESH == 4
     // 4m //
-//    const real width_decoboco[3] = { 16.0, 16.0, 8.0 };
-//    const real pitch_decoboco[3] = { width_decoboco[0]*8, width_decoboco[1]*8, width_decoboco[2]*4 };
+//    const double width_decoboco[3] = { 16.0, 16.0, 8.0 };
+//    const double pitch_decoboco[3] = { width_decoboco[0]*8, width_decoboco[1]*8, width_decoboco[2]*4 };
 
-//    const real width_decoboco[3] = { 8.0, 8.0, 8.0 };
-//    const real pitch_decoboco[3] = { width_decoboco[0]*4, width_decoboco[1]*4, width_decoboco[2]*4 };
+//    const double width_decoboco[3] = { 8.0, 8.0, 8.0 };
+//    const double pitch_decoboco[3] = { width_decoboco[0]*4, width_decoboco[1]*4, width_decoboco[2]*4 };
 
-//    const real width_decoboco[3] = { 12.0, 12.0, 12.0 };
-//    const real pitch_decoboco[3] = { width_decoboco[0]*(real)3.5, width_decoboco[1]*(real)3.5, width_decoboco[2]*(real)3.5 };
+//    const double width_decoboco[3] = { 12.0, 12.0, 12.0 };
+//    const double pitch_decoboco[3] = { width_decoboco[0]*3.5, width_decoboco[1]*3.5, width_decoboco[2]*3.5 };
 
     // /data/g5/a170085/research/citylbm/validation/4m_v0
-    const real width_decoboco[3] = { 8.0, 8.0, 24.0 };
-//    const real pitch_decoboco[3] = { width_decoboco[0]*8, width_decoboco[1]*8, width_decoboco[2]*4 };
-    const real pitch_decoboco[3] = { width_decoboco[0]*6, width_decoboco[1]*6, width_decoboco[2]*4 };
+    const double width_decoboco[3] = { 8.0, 8.0, 24.0 };
+//    const double pitch_decoboco[3] = { width_decoboco[0]*8, width_decoboco[1]*8, width_decoboco[2]*4 };
+//    const double pitch_decoboco[3] = { width_decoboco[0]*6, width_decoboco[1]*6, width_decoboco[2]*4 };
+    const double pitch_decoboco[3] = { width_decoboco[0]*4, width_decoboco[1]*4, width_decoboco[2]*4 };
 
 //    // /data/g5/a170085/research/citylbm/validation/4m_v1
-//    const real width_decoboco[3] = { 16.0, 16.0, 16.0 };
-//    const real pitch_decoboco[3] = { width_decoboco[0]*4, width_decoboco[1]*4, width_decoboco[2]*4 };
+//    const double width_decoboco[3] = { 16.0, 16.0, 16.0 };
+//    const double pitch_decoboco[3] = { width_decoboco[0]*4, width_decoboco[1]*4, width_decoboco[2]*4 };
 #else
 #error decoboco not defined on this EXPECT_DX_MESH
 #endif
@@ -507,149 +514,110 @@ void  TestOklahoma::InitDecoBoco(
     const int nx_deco = fabs(parameters.coefDomain().x_global_domain_max - parameters.coefDomain().x_global_domain_min)/pitch_decoboco[0];
     const int ny_deco = fabs(parameters.coefDomain().y_global_domain_max - parameters.coefDomain().y_global_domain_min)/pitch_decoboco[1];
 
-
-//#pragma omp parallel for collapse(2)
-#pragma omp parallel for collapse(2) schedule(dynamic)
     for (int jj=0; jj<ny_deco; jj++) {
     for (int ii=0; ii<nx_deco; ii++) {
+        // deco boco //
+        double _di = 0;
+        double _dj = 0.5 * (ii%2);
+        #ifdef ENSEMBLE_SPIKE
+        if(comm_.ensemble_id() != 0) {
+            constexpr int ens_mv_count = 1;
+            constexpr double mv_di = 0.25;
+            const auto ens_seed = ii + jj*nx_deco + comm_.ensemble_id()*nx_deco*ny_deco;
+            auto&& engine = std::mt19937(ens_seed);
+            auto&& dist = std::uniform_int_distribution<int>(-ens_mv_count, ens_mv_count);
+
+            volatile const double mv0 = dist(engine) * mv_di;
+            volatile const double mv1 = dist(engine) * mv_di;
+            _di += mv0;
+            _dj += mv1;
+        }
+        #endif
+        const double _ii = double(ii) + _di;
+        const double _jj = double(jj) + _dj;
+        const double box_min[3] = { parameters.coefDomain().x_global_domain_min + _ii*pitch_decoboco[0],
+                                    parameters.coefDomain().y_global_domain_min + _jj*pitch_decoboco[1],
+                                    parameters.coefDomain().z_global_domain_min - 1.0   };
+        const double box_max[3] = { box_min[0] + width_decoboco[0],
+                                    box_min[1] + width_decoboco[1],
+                                                 width_decoboco[2]  };
+        #pragma omp parallel for 
         for (int l=0; l<n_leaf; l++) {
             // deco boco //
-            const real _ii = ii;
-            const real _jj = (ii%2==0) ? jj : jj+0.5;
-//            const real _jj =  (ii%4==0) ? jj        :
-//                              (ii%4==1) ? jj + (real)0.25 :
-//                              (ii%4==2) ? jj + (real)0.50 :
-//                                          jj + (real)0.75;
-
-            const real box_min[3] = { parameters.coefDomain().x_global_domain_min + _ii*pitch_decoboco[0],
-                                      parameters.coefDomain().y_global_domain_min + _jj*pitch_decoboco[1],
-                                      parameters.coefDomain().z_global_domain_min - (real)1.0   };
-
-            const real box_max[3] = { box_min[0] + width_decoboco[0],
-                                      box_min[1] + width_decoboco[1],
-                                                   width_decoboco[2]  };
-            // deco boco //
-
             const int  lv     = tree.nodes(l)->level();
             const int  offset = tree.nodes(l)->mesh_offset();
             const auto& coordinates = meshValues[lv].coordinates();
 
-            const real   dx = meshValues[lv].coordinates().dx();
+            const double dx = meshValues[lv].coordinates().dx();
 
-            const real _x_tmp = coordinates.xnode(offset);
-            const real _y_tmp = coordinates.ynode(offset);
-            const real _z_tmp = coordinates.znode(offset);
-//            if ( _x_tmp < box_min[0] - width_decoboco[0]*1.5 || _x_tmp + dx*DefAMR::NX_LEAF > box_max[0] + width_decoboco[0]*1.5 ) { continue; }
-//            if ( _y_tmp < box_min[1] - width_decoboco[1]*1.5 || _y_tmp + dx*DefAMR::NX_LEAF > box_max[1] + width_decoboco[1]*1.5 ) { continue; }
-//            if ( _z_tmp < box_min[2] - width_decoboco[2]*1.5 || _z_tmp + dx*DefAMR::NX_LEAF > box_max[2] + width_decoboco[2]*1.5 ) { continue; }
+            const double _x_tmp = coordinates.xnode(offset);
+            const double _y_tmp = coordinates.ynode(offset);
+            const double _z_tmp = coordinates.znode(offset);
 
-            if ( _z_tmp < box_min[2] - dx*(real)2.5 || _z_tmp + dx*DefAMR::NX_LEAF > box_max[2] + dx*(real)2.5 ) { continue; }
+            if ( _z_tmp < box_min[2] - dx*2.5 || _z_tmp + dx*DefAMR::NX_LEAF > box_max[2] + dx*2.5 ) { continue; }
             if ( _x_tmp < box_min[0] - dx*(real)2.5 || _x_tmp + dx*DefAMR::NX_LEAF > box_max[0] + dx*(real)2.5 ) { continue; }
             if ( _y_tmp < box_min[1] - dx*(real)2.5 || _y_tmp + dx*DefAMR::NX_LEAF > box_max[1] + dx*(real)2.5 ) { continue; }
 
             // initialize //
-            real*  lv_obj   = &meshValues[lv].valueObjLS().lv_obj() [offset];
-            real*  rho_obj  = &meshValues[lv].valueObjLS().rho_obj()[offset];
-            real*  u_obj    = &meshValues[lv].valueObjLS().u_obj()  [offset];
-            real*  v_obj    = &meshValues[lv].valueObjLS().v_obj()  [offset];
-            real*  w_obj    = &meshValues[lv].valueObjLS().w_obj()  [offset];
+            auto*  lv_obj   = &meshValues[lv].valueObjLS().lv_obj() [offset];
+            auto*  rho_obj  = &meshValues[lv].valueObjLS().rho_obj()[offset];
+            auto*  u_obj    = &meshValues[lv].valueObjLS().u_obj()  [offset];
+            auto*  v_obj    = &meshValues[lv].valueObjLS().v_obj()  [offset];
+            auto*  w_obj    = &meshValues[lv].valueObjLS().w_obj()  [offset];
 
             for (int id=0; id<nn_cell; id++) {
                 // lv //
-                const real x_tmp = coordinates.xcell(offset + id);
-                const real y_tmp = coordinates.ycell(offset + id);
-                const real z_tmp = coordinates.zcell(offset + id);
+                const double x_tmp = coordinates.xcell(offset + id);
+                const double y_tmp = coordinates.ycell(offset + id);
+                const double z_tmp = coordinates.zcell(offset + id);
 
-                const real xyz[3] = { x_tmp, y_tmp, z_tmp };
+                const double xyz[3] = { x_tmp, y_tmp, z_tmp };
 
-                const real  cal_min_x1 = parameters.coefDomain().x_global_domain_min + dxc*(real)4.0 + bc_layer_min_[0];
-                const real  cal_max_x1 = parameters.coefDomain().x_global_domain_max - dxc*(real)4.0 - bc_layer_max_[0];
+                const double  cal_min_x1 = parameters.coefDomain().x_global_domain_min + dxc*4.0 + bc_layer_min_[0];
+                const double  cal_max_x1 = parameters.coefDomain().x_global_domain_max - dxc*4.0 - bc_layer_max_[0];
 
-                const real  cal_min_y1 = parameters.coefDomain().y_global_domain_min + dxc*(real)4.0 + bc_layer_min_[1];
-                const real  cal_max_y1 = parameters.coefDomain().y_global_domain_max - dxc*(real)4.0 - bc_layer_max_[1];
+                const double  cal_min_y1 = parameters.coefDomain().y_global_domain_min + dxc*4.0 + bc_layer_min_[1];
+                const double  cal_max_y1 = parameters.coefDomain().y_global_domain_max - dxc*4.0 - bc_layer_max_[1];
 
-                const real  cal_min_x2 = parameters.coefDomain().x_global_domain_min + dxc*(real)4.0 + bc_layer_min_[0] + 128.0;
-                const real  cal_max_x2 = parameters.coefDomain().x_global_domain_max - dxc*(real)4.0 - bc_layer_max_[0] - 128.0;
+                const double  cal_min_x2 = parameters.coefDomain().x_global_domain_min + dxc*4.0 + bc_layer_min_[0] + 128.0;
+                const double  cal_max_x2 = parameters.coefDomain().x_global_domain_max - dxc*4.0 - bc_layer_max_[0] - 128.0;
 
-                const real  cal_min_y2 = parameters.coefDomain().y_global_domain_min + dxc*(real)4.0 + bc_layer_min_[1] + 128.0;
-                const real  cal_max_y2 = parameters.coefDomain().y_global_domain_max - dxc*(real)4.0 - bc_layer_max_[1] - 128.0;
+                const double  cal_min_y2 = parameters.coefDomain().y_global_domain_min + dxc*4.0 + bc_layer_min_[1] + 128.0;
+                const double  cal_max_y2 = parameters.coefDomain().y_global_domain_max - dxc*4.0 - bc_layer_max_[1] - 128.0;
 
-//                real tmp_lv_obj = lv_obj[id];
-//                const real box_lv_obj = FuncObj::length_from_box(xyz, box_min, box_max);
-//                lv_obj[id] = FuncObj::overlap_objects(tmp_lv_obj, box_lv_obj);
-
+                // search no spike region //
+                /// 1: outer boundary ///
                 if ( x_tmp<cal_min_x1 || x_tmp>cal_max_x1 || y_tmp<cal_min_y1 || y_tmp>cal_max_y1 ) {
                     continue;
                 }
-                else {
-                    real  bbox_min[3] = { box_min[0], box_min[1], box_min[2] };
-                    real  bbox_max[3] = { box_max[0], box_max[1], box_max[2] };
-
-                    // outer region //
-                    #ifdef ENSEMBLE_SPIKE
-                    if (fabs(x_tmp + (real)10.0) > (real)1000.0 && fabs(y_tmp - (real)60.0) > (real)1000.0) {
-                        if(comm_.ensemble_id() != 0) {
-                            constexpr real ens_mv_dx = EXPECT_DX_MESH;
-                            constexpr int ens_mv_count = 1;
-                            const auto ens_seed = int(x_tmp/dxf + 10000*y_tmp/dxf);
-                            const auto ens_seed2 = std::mt19937(comm_.ensemble_id())();
-                            auto&& engine = std::mt19937(std::mt19937(ens_seed)() + std::mt19937(ens_seed2)());
-                            auto&& dist = std::uniform_int_distribution<int>(-ens_mv_count, ens_mv_count);
-                            volatile const auto mv0 = dist(engine) * ens_mv_dx;
-                            volatile const auto mv1 = dist(engine) * ens_mv_dx;
-                            bbox_min[0] = bbox_min[0] + mv0;
-                            bbox_min[1] = bbox_min[1] + mv1;
-
-                            bbox_max[0] = bbox_max[0] + mv0;
-                            bbox_max[1] = bbox_max[1] + mv1;
-                        }
-                    }
-                    #endif
-
-                    // case1:square flat field //
-                    constexpr real xw_bb0 = 320;
-                    constexpr real yw_bb0 = 620;
-                    #ifndef ENSEMBLE_BB_SPIKE_TEST
-                    constexpr real xw_bb = xw_bb0;
-                    constexpr real yw_bb = yw_bb0;
-                    #else
-                    #warning enabling ENSEMBLE_BB_SPIKE_TEST
-                    constexpr real dxbb = 40;
-                    const int seed = comm_.color_ens_offseted();
-                    const real xw_bb = xw_bb0 + seed*dxbb;
-                    const real yw_bb = yw_bb0 + seed*dxbb;
-                    #endif
-                    if (fabs(x_tmp + (real)10.0) < xw_bb && fabs(y_tmp - (real)60.0) < yw_bb) { bbox_max[2] = (real)0.0; }
-
-                    // case2:deco boco //
-//                    if (sqrt(pow(x_tmp, 2) + pow(y_tmp-50.0, 2)) < (real)750.0) {
-//                        bbox_max[2] = (real)4.0;
-//                    }
-//
-//                    if (fabs(x_tmp + (real)10.0) < (real)320.0 && fabs(y_tmp - (real)60.0) < (real)620.0) {
-//                        if ( (fabs(x_tmp + (real)220.0) < (real)110.0 && fabs(y_tmp + (real)260.0) < (real)300.0)
-//                          || (fabs(x_tmp - (real)110.0) < (real)220.0 && fabs(y_tmp + (real)400.0) < (real)160.0)
-//                          || (fabs(x_tmp - (real)  0.0) < (real)330.0 && fabs(y_tmp - (real)580.0) < (real)100.0)
-//                          || (fabs(x_tmp - (real)240.0) < (real) 90.0 && fabs(y_tmp - (real)400.0) < (real) 80.0) ) {
-//                            bbox_max[2] = (real)4.0;
-//                        }
-//                        else {
-//                            continue;
-//                        }
-//                    }
-
-                    const real box_lv_obj = FuncObj::length_from_box(xyz, bbox_min, bbox_max);
-
-                    real tmp_lv_obj = lv_obj[id];
-                    lv_obj[id] = FuncObj::overlap_objects(tmp_lv_obj, box_lv_obj);
+                /// 2: city centre ///
+                constexpr double xw_bb0 = 320;
+                constexpr double yw_bb0 = 620;
+                constexpr double x0_bb = -10;
+                constexpr double y0_bb = 60;
+                #ifndef ENSEMBLE_BB_SPIKE_TEST
+                constexpr double xw_bb = xw_bb0;
+                constexpr double yw_bb = yw_bb0;
+                #else
+                #warning enabling ENSEMBLE_BB_SPIKE_TEST
+                constexpr double dxbb = 40;
+                const int seed = comm_.color_ens_offseted();
+                const double xw_bb = xw_bb0 + seed*dxbb;
+                const double yw_bb = yw_bb0 + seed*dxbb;
+                #endif
+                if (fabs(x_tmp - x0_bb) < xw_bb && fabs(y_tmp - y0_bb) < yw_bb) { 
+                    continue;
                 }
 
-            }
-        }
+                // set spike on reamined region
+                const double box_lv_obj = FuncObj::length_from_box(xyz, box_min, box_max);
 
+                double tmp_lv_obj = lv_obj[id];
+                lv_obj[id] = FuncObj::overlap_objects(tmp_lv_obj, box_lv_obj);
+            } // foreach cell
+        } // foreach leaf
     }
-    }
-
+    } // foreach decoboco
 }
 
 
@@ -735,7 +703,6 @@ void  TestOklahoma::InitSource(
         std::cout << comm_.world().rank() << " : scalar id, num_source, num_source_global = " << n << ", " << num_source.at(n) << ", " << num_source_g.at(n) << std::endl;
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
     if (comm_.is_rank0()) { 
         for(int n=0; n<n_scalars; n++) {
             std::cout << "0" << " : " << 0 << " : scalar id, num_source_global = " << n << ", " << num_source_g.at(n) << std::endl; 
@@ -770,24 +737,23 @@ void  TestOklahoma::InitSource(
 
 
 void  TestOklahoma::InitObservationDataOklahoma(
-    const Grid*         grids,
-    const Tree&         tree,
-    const Parameters&   parameters,
-          MeshValue*    meshValues
+    const Grid*                  grids,
+    const Tree&                  tree,
+    const Parameters&            parameters,
+          MeshValue*             meshValues,
+    const NudgingCoefAdaptation& nudgingCoefAdaptation
     )
 {
-    ParticleFilterSt particleFilterSt(comm_);
-
     const int time_minutes_now = start_minutes_restart_;
     BoundaryConditions  boundaryConditions(comm_);
-    boundaryConditions.ReadWRFData   (time_minutes_now, grids, tree, parameters, meshValues, particleFilterSt.coef_nudging());
+    boundaryConditions.ReadWRFData   (time_minutes_now, grids, tree, parameters, meshValues, nudgingCoefAdaptation.coef_nudging());
     boundaryConditions.ReadGroundData(time_minutes_now, grids, tree, parameters, meshValues);
 
     // swap: rho_obj <-> rhon_obj, .. etc //
     for (int lv=0; lv<DefAMR::LV_MAX; lv++) {
         meshValues[lv].valueObjLS().swap_objs();
     }
-    boundaryConditions.ReadWRFData   (time_minutes_now+1, grids, tree, parameters, meshValues, particleFilterSt.coef_nudging());
+    boundaryConditions.ReadWRFData   (time_minutes_now+1, grids, tree, parameters, meshValues, nudgingCoefAdaptation.coef_nudging());
     boundaryConditions.ReadGroundData(time_minutes_now+1, grids, tree, parameters, meshValues);
 
     // swap: rho_obj <-> rhon_obj, .. etc //

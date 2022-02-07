@@ -160,23 +160,23 @@ OPTION_PARSER_OPTARGS (
 
 
 OPTION_PARSER_OPTARGS (
-	cfr_steps,
-   	 "-cfr_steps",
-   	"--cfr_steps",
-	int, 2,
-	G({100, 200}),
-	G({"cout_step", "fout_step" }),
-	"Requires two arguments" )
+	cfrm_steps,
+   	 "-cfrm_steps",
+   	"--cfrm_steps",
+	int, 4,
+	G({100, 200, 200, 100}),
+	G({"cout_step", "fout_step", "rout_step", "mout_step" }),
+	"Requires four arguments" )
 
 
 OPTION_PARSER_OPTARGS (
-	cfr_flags,
-   	 "-cfr_flags",
-   	"--cfr_flags",
-	bool, 2,
-	G({1, 1}),
-	G({"cout_flag", "fout_flag" }),
-	"Requires two arguments" )
+	cfrm_flags,
+   	 "-cfrm_flags",
+   	"--cfrm_flags",
+	bool, 4,
+	G({1, 1, 1, 1}),
+	G({"cout_flag", "fout_flag", "rout_flag", "mout_flag" }),
+	"Requires four arguments" )
 
 
 OPTION_PARSER_OPTARGS (
@@ -197,3 +197,21 @@ OPTION_PARSER_OPTARG (
         1,
         "number_of_scalars",
         "Requires one argument" )
+
+OPTION_PARSER_OPTARG (
+        cal_rank_div_algo,
+        "-cal_rank_div_algo",
+        "--cal_rank_div_algo",
+        std::string,
+        "2d_block", // 1d, 2d, 2d_block, 3d
+        "cal_rank_div_algo",
+        "Requires one argument" )
+
+OPTION_PARSER_OPTARGS (
+        cal_rank_div_2d_block,
+        "-cal_rank_div_2d_block",
+        "--cal_rank_div_2d_block",
+        int, 2,
+        G({1, 1}),
+        G({"cal_rank_div_2d_block_x", "cal_rank_div_2d_block_y"}),
+        "Requires two arguments" )

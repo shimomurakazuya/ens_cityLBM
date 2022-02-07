@@ -9,6 +9,7 @@
 #include <map>
 #include <fstream>
 
+#include "option_parser.h"
 #include "defineAMR.h"
 #include "defineMemory.h"
 #include "Node.h"
@@ -163,11 +164,8 @@ private:
     void  error_msg (const std::string  str)  const { std::cout << str << std::endl; }
 
 public:
-    void  preset_tree_data(const Grid*  grids) = delete;
-
     // initialize //
-    void  init_tree_data(const Grid*  grids) = delete;
-    void  init_tree_data_with_map(const Grid* grids, const MapData& map);
+    void  init_tree_data(const Grid* grids, const OptionParser& optionParser, const MapData& map);
 
     // IO //
     std::vector<IONode>  make_vectorIONode()  const;

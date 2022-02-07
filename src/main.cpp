@@ -36,7 +36,11 @@ int main(int argc, char* argv[])
 
     // mpi init //
     #ifdef GPU_CALCULATION__ 
-    cudaSetDevice(0);
+      #if defined(USE_NVCC)
+        cudaSetDevice(0);
+      #elif defined(ENABLE_HIP)
+        hipSetDevice(0);
+      #endif
     #endif
     MPI_Init(&argc, &argv);
     auto&& comm = MPICommEnsemble(opt.n_ensemble_members(), opt.ofs_ensemble_idx());
@@ -49,7 +53,11 @@ int main(int argc, char* argv[])
 
     // distribute multi-gpus by rank_citylbm //
     #ifdef GPU_CALCULATION__ 
-    cudaSetDevice(comm.world().rank() % opt.gpu_per_node());
+      #if defined(USE_NVCC)
+        cudaSetDevice(comm.world().rank() % opt.gpu_per_node());
+      #elif defined(ENABLE_HIP)
+        hipSetDevice(comm.world().rank() % opt.gpu_per_node());
+      #endif
     #endif
 
 

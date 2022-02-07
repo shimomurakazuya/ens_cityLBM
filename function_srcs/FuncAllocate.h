@@ -13,8 +13,12 @@
 #include "FuncMath.h"
 
 #ifdef GPU_CALCULATION__
-#include <cuda_runtime_api.h>
-#include "cuda_safe_call.hpp"
+  #if defined(USE_NVCC)
+    #include <cuda_runtime_api.h>
+    #include "cuda_safe_call.hpp"
+  #elif defined(ENABLE_HIP)
+    #include "hip_safe_call.hpp"
+  #endif
 #endif
 
 namespace  FuncAllocate {
@@ -51,7 +55,11 @@ void  allocate_value(
     }
     else if (memType == MemType::Device) {
         #ifdef GPU_CALCULATION__
-        cudaMalloc(val, sizeof(T) * n);
+          #if defined(USE_NVCC)
+            cudaMalloc(val, sizeof(T) * n);
+          #elif defined(ENABLE_HIP)
+            hipMalloc(val, sizeof(T) * n);
+          #endif
         #endif
     }
     else if (memType == MemType::Pinned) {
@@ -59,7 +67,11 @@ void  allocate_value(
         *val = (T *) malloc (sizeof(T) * n);
         #endif
         #ifdef GPU_CALCULATION__
-        cudaMallocHost(val, sizeof(T) * n);
+          #if defined(USE_NVCC)
+            cudaMallocHost(val, sizeof(T) * n);
+          #elif defined(ENABLE_HIP)
+            hipHostMalloc(val, sizeof(T) * n);
+          #endif
         #endif
     }
     else if (memType == MemType::Managed) {
@@ -67,7 +79,16 @@ void  allocate_value(
         *val = (T *) malloc (sizeof(T) * n);
         #endif
         #ifdef GPU_CALCULATION__
-        cudaMallocManaged(val, sizeof(T) * n);
+          #if defined(USE_NVCC)
+            cudaMallocManaged(val, sizeof(T) * n);
+          #elif defined(ENABLE_HIP)
+            // [RK] Experimental 
+            // hip device memory serves as managed memory on AMD GPU
+            // so we use device memory in place of managed memory
+            // managed memory on AMD seems fairly slow
+            // hipMallocManaged(val, sizeof(T) * n);
+            hipMalloc(val, sizeof(T) * n);
+          #endif
         #endif
     }
     else {
@@ -95,7 +116,11 @@ void  release_value(
     }
     else if (memType == MemType::Device) {
         #ifdef GPU_CALCULATION__
-        cudaFree(val);
+          #if defined(USE_NVCC)
+            cudaFree(val);
+          #elif defined(ENABLE_HIP)
+            hipFree(val);
+          #endif
         val = nullptr;
         #endif
     }
@@ -104,7 +129,11 @@ void  release_value(
         free(val); val = nullptr;
         #endif
         #ifdef GPU_CALCULATION__
-        cudaFree(val); val = nullptr;
+          #if defined(USE_NVCC)
+            cudaFree(val); val = nullptr;
+          #elif defined(ENABLE_HIP)
+            hipFree(val); val = nullptr;
+          #endif
         #endif
     }
     else if (memType == MemType::Managed) {
@@ -112,7 +141,11 @@ void  release_value(
         free(val); val = nullptr;
         #endif
         #ifdef GPU_CALCULATION__
-        cudaFree(val); val = nullptr;
+          #if defined(USE_NVCC)
+            cudaFree(val); val = nullptr;
+          #elif defined(ENABLE_HIP)
+            hipFree(val); val = nullptr;
+          #endif
         #endif
     }
     else {
@@ -131,7 +164,11 @@ void copy_values(
         FuncMath::copy_array(dst, src, n);
     } else if(memType == MemType::Device || memType == MemType::Managed) {
         #ifdef GPU_CALCULATION__
-        CUDA_SAFE_CALL(cudaMemcpy(dst, src, sizeof(T)*n, cudaMemcpyDefault));
+          #if defined(USE_NVCC)
+            CUDA_SAFE_CALL(cudaMemcpy(dst, src, sizeof(T)*n, cudaMemcpyDefault));
+          #elif defined(ENABLE_HIP)
+            HIP_SAFE_CALL(hipMemcpy(dst, src, sizeof(T)*n, hipMemcpyDefault));
+          #endif
         #else
         FuncMath::copy_array(dst, src, n);
         #endif

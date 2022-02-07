@@ -10,11 +10,15 @@
         "SCALING": "Strong"
     },
     "citylbm_settings": {
-        "cfr_flags": [
+        "cfrm_flags": [
+            1,
+            1,
             1,
             1
         ],
-        "cfr_steps": [
+        "cfrm_steps": [
+            25,
+            25,
             25,
             25 
         ],

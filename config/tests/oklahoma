@@ -14,6 +14,9 @@ citylbm_addopt += EXPECT_DX_MESH=4
 #citylbm_addopt += NO_SGS
 #citylbm_addopt += NO_BUOYANCY
 
+##
+citylbm_addopt += FASTPOST_IGNORE_MISSING
+
 ## io
 #citylbm_addopt += NO_FIELD_WRITEDAT
 #citylbm_addopt += NO_POSTPROCESS_MONITOR 

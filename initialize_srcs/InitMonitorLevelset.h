@@ -38,8 +38,7 @@ public:
     ~InitMonitorLevelset () {}
 
 public:
-    std::vector<int> create_id_flags(const Grid* grids) = delete;
-    std::vector<int> create_id_flags_with_map(const Grid* grids, const MapData& map);
+    std::vector<int> create_id_flags(const Grid* grids, const MapData& map);
 
 //    std::vector<int> create_id_flags_cavity2d(const Grid* grids);
 //    std::vector<int> create_id_flags_flow_around_cube(const Grid* grids);
@@ -48,18 +47,6 @@ public:
 private:
     void
     init_amr_level(
-              int*  amr_lv,
-        const real  offset_x,
-        const real  offset_y,
-        const real  offset_z,
-        const real  dx,
-        const int   nx,
-        const int   ny,
-        const int   nz
-        ) = delete;
-
-    void
-    init_amr_level_with_map(
         std::vector<int>& amr_lv,
         const real  offset_x,
         const real  offset_y,
@@ -80,79 +67,6 @@ private:
         const int   nz
         );
 
-
-    void
-    _check_amr_level(
-              int*  amr_lv,
-        const int   nx,
-        const int   ny,
-        const int   nz
-        ) = delete;
-
-
-    real
-    func_monitor_levelset_cavity2d(
-        const real x,
-        const real y,
-        const real z
-        ) = delete;
-
-
-    real func_monitor_levelset_nc2d(
-        const real x,
-        const real y,
-        const real z
-        ) = delete;
-
-
-    real func_monitor_levelset_nc3d(
-        const real x,
-        const real y,
-        const real z
-        ) = delete;
-
-    int
-    func_monitor_levelset_to_amr_level_cavity2d(
-        const real  levelset,
-        const real  dx_fine
-        ) = delete;
-
-
-    int func_monitor_levelset_to_amr_level_nc2d(
-        const real  levelset,
-        const real  dx_fine
-        ) = delete;
-
-
-    int func_monitor_levelset_to_amr_level_nc3d(
-        const real  levelset,
-        const real  dx_fine
-        ) = delete;
-
-
-    real
-    func_amr_level_flow_cube(
-        const real x,
-        const real y,
-        const real z,
-        const real dx_fine
-        ) = delete;
-
-    real
-    func_amr_level_flow_map(
-        const real x,
-        const real y,
-        const real z,
-        const real dx_fine
-        ) = delete;
-
-    real
-    func_amr_level_channel_flow(
-        const real x,
-        const real y,
-        const real z,
-        const real dx_fine
-        ) = delete;
 
     int func_monitor_levelset_to_amr_level_mapfile(
         const real x,

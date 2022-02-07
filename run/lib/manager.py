@@ -2,6 +2,7 @@ from .supercomputers._tsubame import Tsubame3
 from .supercomputers._flow import Flow
 from .supercomputers._sgi8600 import SGI8600
 from .supercomputers._aquarius import Aquarius
+from .supercomputers._fx700 import FX700
 
 def get_job_manager(name):
     SUPERCOMPUTERS = {
@@ -10,6 +11,7 @@ def get_job_manager(name):
         'SGI8600': SGI8600,
         'Flow': Flow,
         'Aquarius': Aquarius,
+        'FX700': FX700,
         #'Odyssey': Odyssey,
     }
 

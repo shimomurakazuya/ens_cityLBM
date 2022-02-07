@@ -10,8 +10,8 @@ Step4. Then, the symbolic link to the execution directory will be created
 """
 
 __author__     = 'Yuuichi ASAHI'
-__date__       = '2021/05/26'
-__version__    = '1.1'
+__date__       = '2022/01/27'
+__version__    = '1.2'
 __maintainer__ = 'Yuuichi ASAHI'
 __email__      = 'asahi.yuichi@jaea.go.jp'
 __status__     = 'Production'

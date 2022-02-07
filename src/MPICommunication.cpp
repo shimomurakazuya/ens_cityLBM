@@ -494,9 +494,10 @@ cudaMemAdvise_val(
     )
 {
     #ifdef GPU_CALCULATION__
-    int device_id; cudaGetDevice(&device_id);
-
-    cudaMemAdvise(val, sizeof(real)*n, cudaMemAdviseSetReadMostly, device_id);
+      #if defined(USE_NVCC)
+        int device_id; cudaGetDevice(&device_id);
+        cudaMemAdvise(val, sizeof(real)*n, cudaMemAdviseSetReadMostly, device_id);
+      #endif
     #endif
 }
 

@@ -37,12 +37,16 @@ else
 ifneq (, $(findstring nvc++, $(MPICXX_CXX)))
 MPICXXFLAGS_EXTRA += -fopenmp
 else
+ifneq (, $(findstring hipcc, $(MPICXX_CXX)))
+MPICXXFLAGS_EXTRA += -fopenmp
+else
 ifneq (, $(findstring icpc,$(MPICXX_CXX)))
 MPICXXFLAGS_EXTRA += -qopenmp
 MPICXXFLAGS_EXTRA += -ipo -qopt-report=5
 #MPICXXFLAGS_EXTRA += -xHost
 else
 $(error "unknown compiler: $(MPICXX_CXX)")
+endif
 endif
 endif
 endif
@@ -58,6 +62,7 @@ endif
 # Finalize CXXFLAGS
 CXXFLAGS += $(addprefix -D,$(citylbm_addopt))
 CXXFLAGS += $(addprefix -I,$(SRC_DIRS))
+EXTRA += submodule
 
 # Disabled files
 NO_MAKE_LIST += $(filter-out $(VVTARGET), $(basename $(notdir $(wildcard validation_srcs/*.cpp))))
@@ -76,8 +81,12 @@ vpath %.cpp $(SRC_DIRS)
 vpath %.h   $(SRC_DIRS)
 vpath %.hpp $(SRC_DIRS)
 
+.PHONY: all build flaginfo clean tagfiles install_pbvr_files submodule
+
 # Targets
 all: $(TARGET) $(EXTRA)
+
+build: $(TARGET)
 
 $(TARGET): $(OBJS)
 	@mkdir -p $(OUT_DIR)
@@ -91,8 +100,6 @@ $(OBJ_DIR)/%.o : %.cpp
 $(OBJ_DIR)/%.o : %.cu
 	@[ -d $(OBJ_DIR) ]|| mkdir -p $(OBJ_DIR)
 	$(COMPILER) $(CXXFLAGS) -o $@ -c $<
-
-.PHONY: all flaginfo clean tagfiles install_pbvr_files
 
 clean:
 	find $(OUT_DIR) -name "*.exe"     | xargs -r rm -fv
@@ -121,4 +128,8 @@ resultclean:
 
 tagfiles:
 	ctags -R --langmap=c:+.hpp --langmap=c:+.cu $(SRC_DIRS)
+
+submodule:
+	git submodule init
+	git submodule update
 

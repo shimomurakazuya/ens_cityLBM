@@ -94,7 +94,7 @@ void  stream_collision_sgs(
     const real  kvis_lbm = FuncLBM::kvis_lbm(kvis, c_ref, dt);
 #ifndef NO_SGS
     const real  sgs_vis_lbm = FuncLBMSGS::sgs_viscosity_D3Q27(Fcs_sgs, Csgs, rhos, kvis_lbm, fs_deq);
-#elif NO_SGS
+#else
     const real  sgs_vis_lbm = 0.0;
 #endif
 
@@ -166,7 +166,7 @@ void  stream_collision_cumulant_sgs_wo_wall(
     const real drhog = -FuncThermalConvection::T_buoyancy( Ts ) * air_property::beta;
 #ifndef NO_BUOYANCY 
     const real gravity_force  = rhos * (fluid_property::GravitationalAcceleration/c_ref * drhog) * dt;
-#elif NO_BUOYANCY 
+#else 
     const real gravity_force  = 0.0;
 #endif
 //    const real gravity_force  = rhos * (fluid_property::GravitationalAcceleration/c_ref + fluid_property::GravitationalAcceleration/c_ref * drhog) * dt;
@@ -208,7 +208,7 @@ void  stream_collision_cumulant_sgs_wo_wall(
     const real  kvis_lbm = FuncLBM::kvis_lbm(kvis, c_ref, dt);
 #ifndef NO_SGS
     const real  sgs_vis_lbm = FuncLBMSGS::sgs_viscosity_D3Q27(Fcs_sgs, Csgs, rhos, kvis_lbm, fs_deq);
-#elif NO_SGS
+#else
         const real  sgs_vis_lbm = 0.0;
 #endif
 
@@ -296,10 +296,18 @@ void  stream_collision_cumulant_sgs(
     const real drhog = -FuncThermalConvection::T_buoyancy( Ts ) * air_property::beta;
 #ifndef NO_BUOYANCY 
     const real gravity_force  = rhos * (fluid_property::GravitationalAcceleration/c_ref * drhog) * dt;
-#elif NO_BUOYANCY 
+#else  
     const real gravity_force  = 0.0;
 #endif
 //    const real gravity_force  = rhos * (fluid_property::GravitationalAcceleration/c_ref + fluid_property::GravitationalAcceleration/c_ref * drhog) * dt;
+
+#if defined(CORIOLIS_FORCE)
+    const real coriolis_param = static_cast<real>(2.0) * world_property::Earths_rotation * sin(world_property::Geodetic_latitude);
+    const real coriolis_force = rhos * ( vs ) * coriolis_param * dt;
+#else 
+    constexpr real coriolis_force = 0.0;
+#endif
+
 
     const real vel_mag = sqrtf(us*us + vs*vs + ws*ws)*c_ref;
     const real Cd_pad  = air_property::Cd_pad;
@@ -308,7 +316,8 @@ void  stream_collision_cumulant_sgs(
 
 //    const real force_half[] = { 0.0, 0.0, gravity_force*(real)0.5 }; // z : gravity
 //    const real force_all[] = { 0.0, 0.0, gravity_force }; // z : gravity
-    const real force_all[] = { pad_force[0], pad_force[1], pad_force[2]+gravity_force }; // z : gravity
+//    const real force_all[] = { pad_force[0], pad_force[1], pad_force[2]+gravity_force }; // z : gravity
+    const real force_all[] = { pad_force[0]+coriolis_force, pad_force[1], pad_force[2]+gravity_force }; // z : gravity
     for (int kv=-1; kv<=1; kv++) {
         for (int jv=-1; jv<=1; jv++) {
             for (int iv=-1; iv<=1; iv++) {
@@ -338,7 +347,7 @@ void  stream_collision_cumulant_sgs(
     const real  kvis_lbm = FuncLBM::kvis_lbm(kvis, c_ref, dt);
 #ifndef NO_SGS
     const real  sgs_vis_lbm = FuncLBMSGS::sgs_viscosity_D3Q27(Fcs_sgs, Csgs, rhos, kvis_lbm, fs_deq);
-#elif NO_SGS
+#else
     const real  sgs_vis_lbm = 0.0;
 #endif
     

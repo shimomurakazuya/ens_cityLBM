@@ -1,6 +1,5 @@
 
 #include <string>
-#include <sys/stat.h>
 #include <zlib.h>
 
 #include "IOData.h"
@@ -178,9 +177,6 @@ writeBinaries(
     #else
     if(comm_.is_rank0()) { std::cout << __PRETTY_FUNCTION__ << ": write restarter t=" << step_ << std::endl; }
     const std::string& prefix = Foldernames::io_folder + "/restart/" + std::to_string(step_);
-
-    // ::mkdir for t = step_
-    ::mkdir(prefix.c_str(), 0755);
 
     // timestep
     if(comm_.is_rank0()) {
@@ -462,7 +458,6 @@ writeVTKFile (
     const Tree&          tree,
     const Parameters&    parameters,
     const MeshValue*     meshValues,
-    const ValueStat*     valueStats,
     const VTKOutputScale vtkOutputScale,
     const int            filter_bits,
     const std::vector<real>& zSlices,
@@ -518,13 +513,6 @@ const
     std::vector<float>    T_vtu;
     std::vector<float>    hflux_z_obj_vtu;
 
-#ifdef USE_VALUE_STAT
-    std::vector<float>    stat_u, stat_v, stat_w, stat_T, 
-        stat_uu, stat_vv, stat_ww, stat_uv, stat_vw, stat_wu,
-        stat_TT, stat_Tu, stat_Tv, stat_Tw, 
-        stat_uuu, stat_vvv, stat_www, stat_TTT,
-        stat_uuw, stat_vvw;
-#endif
 
     // CellData //
     std::vector<uint8_t>  amr_lv_vtu;
@@ -544,9 +532,7 @@ const
         const int  nz = DefAMR::NX_LEAF;
 
         const auto& meshValue = meshValues[lv];
-        const auto& valueStat = valueStats[lv];
         const auto& coordinates = meshValue.coordinates();
-        const auto stat_count = valueStat.t_count();
         const int nn_max    = meshValue.nn_max();
 
         const Array3D<int>  offsets     = tree.nodes(l)->neighbor_mesh_offsets();
@@ -650,39 +636,6 @@ const
             set_data(hflux_z_obj_vtu, meshValue.valueObjLS(). hflux_z_obj() );
 
             // stat //
-#ifdef USE_VALUE_STAT
-            auto&& set_data_stat = [&](std::vector<float>& v, const ValueStat::stat_type* p, const real& factor=1) -> float {
-                union { float val; std::uint32_t bitwise; } u;
-                #ifdef PARAVIEW_CELLDATA
-                u.val = factor * static_cast<float>(FuncAMRMesh::RawData( p, i,j,k, nx_leaf, offsets));
-                #else
-                u.val = factor * static_cast<float>(FuncAMRMesh::CellToNode( p, i,j,k, nx_leaf, offsets));
-                #endif
-                u.bitwise &= (0xffffffffu << filter_bits);
-                v.push_back(u.val);
-                return u.val;
-            };
-            set_data_stat(stat_u  , valueStat.u_sum  (), 1./stat_count * c_ref );
-            set_data_stat(stat_v  , valueStat.v_sum  (), 1./stat_count * c_ref );
-            set_data_stat(stat_w  , valueStat.w_sum  (), 1./stat_count * c_ref );
-            set_data_stat(stat_T  , valueStat.T_sum  (), 1./stat_count );
-            set_data_stat(stat_uu , valueStat.uu_sum (), 1./stat_count * c_ref * c_ref );
-            set_data_stat(stat_vv , valueStat.vv_sum (), 1./stat_count * c_ref * c_ref );
-            set_data_stat(stat_ww , valueStat.ww_sum (), 1./stat_count * c_ref * c_ref );
-            set_data_stat(stat_uv , valueStat.uv_sum (), 1./stat_count * c_ref * c_ref );
-            set_data_stat(stat_vw , valueStat.vw_sum (), 1./stat_count * c_ref * c_ref );
-            set_data_stat(stat_wu , valueStat.wu_sum (), 1./stat_count * c_ref * c_ref );
-            set_data_stat(stat_TT , valueStat.TT_sum (), 1./stat_count );
-            set_data_stat(stat_Tu , valueStat.Tu_sum (), 1./stat_count * c_ref * c_ref * c_ref );
-            set_data_stat(stat_Tv , valueStat.Tv_sum (), 1./stat_count * c_ref * c_ref * c_ref );
-            set_data_stat(stat_Tw , valueStat.Tw_sum (), 1./stat_count * c_ref * c_ref * c_ref );
-            set_data_stat(stat_uuu, valueStat.uuu_sum(), 1./stat_count * c_ref * c_ref * c_ref );
-            set_data_stat(stat_vvv, valueStat.vvv_sum(), 1./stat_count * c_ref * c_ref * c_ref );
-            set_data_stat(stat_www, valueStat.www_sum(), 1./stat_count * c_ref * c_ref * c_ref );
-            set_data_stat(stat_TTT, valueStat.TTT_sum(), 1./stat_count );
-            set_data_stat(stat_uuw, valueStat.uuw_sum(), 1./stat_count * c_ref * c_ref * c_ref );
-            set_data_stat(stat_vvw, valueStat.vvw_sum(), 1./stat_count * c_ref * c_ref * c_ref );
-#endif
 
         }
         }
@@ -752,29 +705,6 @@ const
     paraviewVTU.PUSH_BACK_PHYS("T",           (BYTE*)T_vtu.data(),           1, VTKDataType::Float32);
     paraviewVTU.PUSH_BACK_PHYS("hflux_z_obj", (BYTE*)hflux_z_obj_vtu.data(), 1, VTKDataType::Float32);
 
-#ifdef USE_VALUE_STAT
-    paraviewVTU.PUSH_BACK_PHYS("stat_u"  ,        (BYTE*)stat_u  .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_v"  ,        (BYTE*)stat_v  .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_w"  ,        (BYTE*)stat_w  .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_T"  ,        (BYTE*)stat_T  .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_uu" ,        (BYTE*)stat_uu .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_vv" ,        (BYTE*)stat_vv .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_ww" ,        (BYTE*)stat_ww .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_uv" ,        (BYTE*)stat_uv .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_vw" ,        (BYTE*)stat_vw .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_wu" ,        (BYTE*)stat_wu .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_TT" ,        (BYTE*)stat_TT .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_Tu" ,        (BYTE*)stat_Tu .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_Tv" ,        (BYTE*)stat_Tv .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_Tw" ,        (BYTE*)stat_Tw .data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_uuu",        (BYTE*)stat_uuu.data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_vvv",        (BYTE*)stat_vvv.data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_www",        (BYTE*)stat_www.data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_TTT",        (BYTE*)stat_TTT.data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_uuw",        (BYTE*)stat_uuw.data(),         1, VTKDataType::Float32);
-    paraviewVTU.PUSH_BACK_PHYS("stat_vvw",        (BYTE*)stat_vvw.data(),         1, VTKDataType::Float32);
-#endif
-
     paraviewVTU.push_back_CellData("amr_lv", (BYTE*)amr_lv_vtu.data(), 1,  VTKDataType::UInt8);
     paraviewVTU.push_back_CellData("rank",   (BYTE*)rank_vtu.data(),   1,  VTKDataType::UInt16);
 
@@ -782,185 +712,6 @@ const
     if (comm_.col_vector().rank() == 0) { paraviewVTU.OutputPVTUFiles(step_); }
 
 #endif
-}
-
-void IOData::
-writeCsv_valueStat_integral_dtdxdy(
-const Tree& tree,
-const Parameters& parameters,
-const MeshValue* meshValues,
-const ValueStat* valueStats
-) const 
-{
-#ifdef USE_VALUE_STAT
-#ifndef USE_VALUE_STAT_CSV
-    if(comm_.is_rank0()) { std::cout << __PRETTY_FUNCTION__ << ": skip (USE_VALUE_STAT_CSV is not defined)" << std::endl; }
-    return;;;
-#else
-#warning buggy function: IOData::writeCsv_valueStat_integral_dtdxdy(): will lead to dead-lock of MPI processes
-    if(comm_.is_rank0()) { std::cout << __PRETTY_FUNCTION__ << std::endl; }
-
-    struct stat_type { 
-        double sum=0; 
-        std::intptr_t count=0;
-        void operator +=(double d) { sum += d; ++ count; }
-    };
-    using map_type = std::map<real, stat_type>; // z, {sum, count}
-    map_type u, v, w, T, uu, vv, ww, uv, uw, vw, uT, vT, wT, TT, uuu, vvv, www, TTT, uuw, vvw;
-    const auto& c_ref = parameters.c_ref_lbm();
-    std::vector<std::intptr_t> t_count(DefAMR::LV_MAX);
-    for(int lv=0; lv<DefAMR::LV_MAX; lv++) {
-        t_count.at(lv) = valueStats[lv].t_count();
-    }
-    // for_aech z; integral xy //
-    const auto& n_leaf = tree.number_of_nodes();
-    const auto& nx = DefAMR::NX_LEAF;
-    const auto& ny = DefAMR::NX_LEAF;
-    const auto& nz = DefAMR::NX_LEAF;
-    for (std::intptr_t l=0; l<n_leaf; l++) {
-        const auto& node = *(tree.nodes(l));
-        if ( !node.nodeCalFlags().Cal() ) { continue; }
-        const auto& lv = node.level();
-
-        const auto& meshValue = meshValues[lv];
-        const auto& valueStat = valueStats[lv];
-        const auto& stat_count = valueStat.t_count();
-
-        const auto& offsets = node.neighbor_mesh_offsets();
-        const auto& offset0 = offsets.offset0();
-
-        const auto& dz0 = (meshValue.coordinates().z(offset0 + nx*ny) - meshValue.coordinates().z(offset0));
-        const auto& z0 = meshValue.coordinates().z(offset0) + dz0/2;
-
-        for(int k=0; k<nz; k++) for(int j=0; j<ny; j++) for(int i=0; i<nx; i++) {
-            const auto& z = z0 + k*dz0;
-            const auto&& select_from = [=](const ValueStat::stat_type* p) {
-                return FuncAMRMesh::RawData(p, i,j,k, DefAMR::NX_LEAF, offsets);
-            };
-            if(FuncObj::is_obj(FuncAMRMesh::RawData(meshValue.valueObjLS().lv_obj(), i,j,k, DefAMR::NX_LEAF, offsets))) { continue; }
-              u[z] += select_from(valueStat.  u_sum()) / t_count.at(lv);
-              v[z] += select_from(valueStat.  v_sum()) / t_count.at(lv);
-              w[z] += select_from(valueStat.  w_sum()) / t_count.at(lv);
-              T[z] += select_from(valueStat.  T_sum()) / t_count.at(lv);
-             uu[z] += select_from(valueStat. uu_sum()) / t_count.at(lv);
-             vv[z] += select_from(valueStat. vv_sum()) / t_count.at(lv);
-             ww[z] += select_from(valueStat. ww_sum()) / t_count.at(lv);
-             uv[z] += select_from(valueStat. uv_sum()) / t_count.at(lv);
-             uw[z] += select_from(valueStat. wu_sum()) / t_count.at(lv);
-             vw[z] += select_from(valueStat. vw_sum()) / t_count.at(lv);
-             uT[z] += select_from(valueStat. Tu_sum()) / t_count.at(lv);
-             vT[z] += select_from(valueStat. Tv_sum()) / t_count.at(lv);
-             wT[z] += select_from(valueStat. Tw_sum()) / t_count.at(lv);
-             TT[z] += select_from(valueStat. TT_sum()) / t_count.at(lv);
-            uuu[z] += select_from(valueStat.uuu_sum()) / t_count.at(lv);
-            vvv[z] += select_from(valueStat.vvv_sum()) / t_count.at(lv);
-            www[z] += select_from(valueStat.www_sum()) / t_count.at(lv);
-            TTT[z] += select_from(valueStat.TTT_sum()) / t_count.at(lv);
-            uuw[z] += select_from(valueStat.uuw_sum()) / t_count.at(lv);
-            vvw[z] += select_from(valueStat.vvw_sum()) / t_count.at(lv);
-        }
-    }
-
-    // output each gpu //
-    std::string fname = Foldernames::output_folder + "/"
-        + "stat_vertical_profile"
-        + "_rank" + std::to_string(comm_.world().rank())
-        + "_step" + std::to_string(step_)
-        + ".csv";
-    std::ofstream fout(fname, std::ios::trunc);
-    fout << "z,u,v,w,T,uu,vv,ww,uv,uw,vw,uT,vT,wT,TT,uuu,vvv,www,TTT,uuw,vvw," << std::endl;
-    for(const auto& tmp: u) {
-        const auto& z = tmp.first;
-        fout << z << ',';
-        fout <<   u[z].sum /   u[z].count * c_ref << ',';
-        fout <<   v[z].sum /   v[z].count * c_ref << ',';
-        fout <<   w[z].sum /   w[z].count * c_ref << ',';
-        fout <<   T[z].sum /   T[z].count << ',';
-        fout <<  uu[z].sum /  uu[z].count * c_ref * c_ref << ',';
-        fout <<  vv[z].sum /  vv[z].count * c_ref * c_ref << ',';
-        fout <<  ww[z].sum /  ww[z].count * c_ref * c_ref << ',';
-        fout <<  uv[z].sum /  uv[z].count * c_ref * c_ref << ',';
-        fout <<  uw[z].sum /  uw[z].count * c_ref * c_ref << ',';
-        fout <<  vw[z].sum /  vw[z].count * c_ref * c_ref << ',';
-        fout <<  uT[z].sum /  uT[z].count * c_ref << ',';
-        fout <<  vT[z].sum /  vT[z].count * c_ref << ',';
-        fout <<  wT[z].sum /  wT[z].count * c_ref << ',';
-        fout <<  TT[z].sum /  TT[z].count << ',';
-        fout << uuu[z].sum / uuu[z].count * c_ref * c_ref * c_ref << ',';
-        fout << vvv[z].sum / vvv[z].count * c_ref * c_ref * c_ref << ',';
-        fout << www[z].sum / www[z].count * c_ref * c_ref * c_ref << ',';
-        fout << TTT[z].sum / TTT[z].count << ',';
-        fout << uuw[z].sum / uuw[z].count * c_ref * c_ref * c_ref << ',';
-        fout << vvw[z].sum / vvw[z].count * c_ref * c_ref * c_ref << ',';
-        fout << std::endl;
-    }
-
-    // mpi: should xy-2D div; should not div z //
-    auto&& mpisum = [&](map_type& map) {
-        for(auto&& map_z: map) {
-            auto& stat = map_z.second;
-            stat.sum   = comm_.col_vector().reduce_sum(stat.sum  );
-            stat.count = comm_.col_vector().reduce_sum(stat.count);
-        }
-    };
-    mpisum(  u);
-    mpisum(  v);
-    mpisum(  w);
-    mpisum(  T);
-    mpisum( uu);
-    mpisum( vv);
-    mpisum( ww);
-    mpisum( uv);
-    mpisum( uw);
-    mpisum( vw);
-    mpisum( uT);
-    mpisum( vT);
-    mpisum( wT);
-    mpisum( TT);
-    mpisum(uuu);
-    mpisum(vvv);
-    mpisum(www);
-    mpisum(TTT);
-    mpisum(uuw);
-    mpisum(vvw);
-
-    // output mpi //
-    if(comm_.col_vector().rank() == 0) {
-        std::string fname = Foldernames::output_folder + "/"
-            + "full_stat_vertical_profile"
-            + "_ens" + std::to_string(comm_.color_ens_offseted())
-            + "_step" + std::to_string(step_)
-            + ".csv";
-        std::ofstream fout(fname, std::ios::trunc);
-        fout << "z,u,v,w,T,uu,vv,ww,uv,uw,vw,uT,vT,wT,TT,uuu,vvv,www,TTT,uuw,vvw," << std::endl;
-        for(const auto& tmp: u) {
-            const auto& z = tmp.first;
-            fout << z << ',';
-            fout <<   u[z].sum /   u[z].count * c_ref << ',';
-            fout <<   v[z].sum /   v[z].count * c_ref << ',';
-            fout <<   w[z].sum /   w[z].count * c_ref << ',';
-            fout <<   T[z].sum /   T[z].count << ',';
-            fout <<  uu[z].sum /  uu[z].count * c_ref * c_ref << ',';
-            fout <<  vv[z].sum /  vv[z].count * c_ref * c_ref << ',';
-            fout <<  ww[z].sum /  ww[z].count * c_ref * c_ref << ',';
-            fout <<  uv[z].sum /  uv[z].count * c_ref * c_ref << ',';
-            fout <<  uw[z].sum /  uw[z].count * c_ref * c_ref << ',';
-            fout <<  vw[z].sum /  vw[z].count * c_ref * c_ref << ',';
-            fout <<  uT[z].sum /  uT[z].count * c_ref << ',';
-            fout <<  vT[z].sum /  vT[z].count * c_ref << ',';
-            fout <<  wT[z].sum /  wT[z].count * c_ref << ',';
-            fout <<  TT[z].sum /  TT[z].count << ',';
-            fout << uuu[z].sum / uuu[z].count * c_ref * c_ref * c_ref << ',';
-            fout << vvv[z].sum / vvv[z].count * c_ref * c_ref * c_ref << ',';
-            fout << www[z].sum / www[z].count * c_ref * c_ref * c_ref << ',';
-            fout << TTT[z].sum / TTT[z].count << ',';
-            fout << uuw[z].sum / uuw[z].count * c_ref * c_ref * c_ref << ',';
-            fout << vvw[z].sum / vvw[z].count * c_ref * c_ref * c_ref << ',';
-            fout << std::endl;
-        }
-    }
-#endif // ifdef USE_VALUE_STAT_CSV
-#endif // ifdef USE_VALUE_STAT
 }
 
 

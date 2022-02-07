@@ -214,6 +214,8 @@ int  local_id(
 }
 
 
+inline
+__HOST__ __DEVICE__
 int  id_mesh(
     const int   ix,
     const int   iy,
@@ -250,6 +252,8 @@ int  id_mesh(
 }
 
 
+inline
+__HOST__ __DEVICE__
 int  id0_mesh(
     const int   ix,
     const int   iy,

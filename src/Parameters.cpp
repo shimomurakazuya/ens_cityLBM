@@ -215,13 +215,15 @@ copyCoefTime(const CoefTime& coefTime)
 void  Parameters::
 initCoefCFROutput(const OptionParser& optionParser)
 {
-    coefCFROutput_.cout_step        = optionParser.cfr_steps(0);
-    coefCFROutput_.fout_step        = optionParser.cfr_steps(1);
-//    coefCFROutput_.restart_out_step = optionParser.cfr_steps(2);
+    coefCFROutput_.cout_step        = optionParser.cfrm_steps(0);
+    coefCFROutput_.fout_step        = optionParser.cfrm_steps(1);
+    coefCFROutput_.rout_step        = optionParser.cfrm_steps(2);
+    coefCFROutput_.mout_step        = optionParser.cfrm_steps(3);
 
-    coefCFROutput_.cout_flag        = optionParser.cfr_flags(0);
-    coefCFROutput_.fout_flag        = optionParser.cfr_flags(1);
-//    coefCFROutput_.restart_out_flag = optionParser.cfr_flags(2);
+    coefCFROutput_.cout_flag        = optionParser.cfrm_flags(0);
+    coefCFROutput_.fout_flag        = optionParser.cfrm_flags(1);
+    coefCFROutput_.rout_flag        = optionParser.cfrm_flags(2);
+    coefCFROutput_.mout_flag        = optionParser.cfrm_flags(3);
 }
 
 
@@ -230,9 +232,13 @@ copyCoefCFROutput(const CoefCFROutput& coefCFROutput)
 {
     coefCFROutput_.cout_step        = coefCFROutput.cout_step;
     coefCFROutput_.fout_step        = coefCFROutput.fout_step;
+    coefCFROutput_.rout_step        = coefCFROutput.rout_step;
+    coefCFROutput_.mout_step        = coefCFROutput.mout_step;
 
     coefCFROutput_.cout_flag        = coefCFROutput.cout_flag;
     coefCFROutput_.fout_flag        = coefCFROutput.fout_flag;
+    coefCFROutput_.rout_flag        = coefCFROutput.rout_flag;
+    coefCFROutput_.mout_flag        = coefCFROutput.mout_flag;
 }
 
 

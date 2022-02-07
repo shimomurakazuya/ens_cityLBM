@@ -24,6 +24,22 @@
         },
         "batch_command": "pjsub"
     },
+    "FX700": {
+        "CPU_name": "EPYC",
+        "CPUs_per_node": 2,
+        "Cores_per_cpu": 64,
+        "GPU_name": "MI100",
+        "GPUs_per_node": 4,
+        "Job_classes": {
+            "amdrome": [
+                1,
+                1,
+                "1:00:00"
+            ]
+        },
+        "batch_command": "sbatch",
+        "mpi_command": "mpirun"
+    },
     "Flow": {
         "CPU_name": "A64FX",
         "CPUs_per_node": 4,

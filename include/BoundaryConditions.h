@@ -9,7 +9,6 @@
 #include "defineLBM.h"
 #include "Field.h"
 #include "MPICommEnsemble.h"
-#include "ParticleFilterSt.h"
 
 
 class  BoundaryConditions {

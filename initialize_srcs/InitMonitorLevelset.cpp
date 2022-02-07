@@ -7,7 +7,7 @@
 
 
 std::vector<int> InitMonitorLevelset::
-create_id_flags_with_map(
+create_id_flags(
     const Grid* grids,
     const MapData& map
     )
@@ -40,7 +40,7 @@ create_id_flags_with_map(
     int  nz_fine = nz.at(lv_max-1);
     std::vector<int> amr_lv(nx_fine * ny_fine * nz_fine);
 
-    init_amr_level_with_map(
+    init_amr_level(
         amr_lv,
         offset_x[lv_max-1] + 0.5*dx[lv_max-1],
         offset_y[lv_max-1] + 0.5*dx[lv_max-1],
@@ -92,7 +92,7 @@ create_id_flags_with_map(
 }
 
 void InitMonitorLevelset::
-init_amr_level_with_map(
+init_amr_level(
     std::vector<int>& amr_lv,
     const real  offset_x,
     const real  offset_y,

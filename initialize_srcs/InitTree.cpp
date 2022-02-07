@@ -55,7 +55,7 @@ init_tree_uniform3d(
 //}
 
 void
-init_tree_amr_with_map(
+init_tree_amr(
           Tree& tree,
     const Grid* grids,
     const int   lv_max,
@@ -69,7 +69,7 @@ init_tree_amr_with_map(
 
     // refinement condition //
     InitMonitorLevelset  initMonitorLevelset;
-    std::vector<int>  cal_flags = initMonitorLevelset.create_id_flags_with_map(grids, map);
+    std::vector<int>  cal_flags = initMonitorLevelset.create_id_flags(grids, map);
     MPI_Barrier(MPI_COMM_WORLD);
     // refinement condition //
 

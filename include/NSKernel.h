@@ -825,6 +825,108 @@ void  ScalarConvectionorg(
 }
 
 
+template<int NX_LEAF, typename T0, typename T1>
+__HD__
+void  ScalarConvectionweno(
+    const int*  id_tasks,
+    const int   num_tasks,
+    const int*  mesh_offsets3x3x3,
+    const int   nn_max,
+    const int   n_scalars,
+          T0*   scalar_n,
+    const T0*   scalar,
+    const T0*   u,
+    const T0*   v,
+    const T0*   w,
+    const T0*   lv_obj,
+    const T0*   sc_scalar,
+    const bool  flag_source,
+    const T1    dx,
+    const T1    dt
+    ) noexcept
+{
+    FOR_EACH1D_BLOCKIDX(l, num_tasks) {
+        const int  idl = id_tasks[l];
+    
+#ifndef __CUDA_ARCH__
+        int  offset3d[27];
+        for (int idv=0; idv<27; idv++) { offset3d[idv] = mesh_offsets3x3x3[idl*27 + idv]; }
+#else // shared_memory //
+        __shared__ int offset3d[27];
+        const int _bDim  = blockDim.x*blockDim.y*blockDim.z;
+        const int _tloop = int(27/_bDim) + 1;
+        for (int _t=0; _t<_tloop; _t++) {
+            const int _idx = threadIdx.x + blockDim.x*threadIdx.y + blockDim.x*blockDim.y*threadIdx.z + _bDim*_t;
+            if (_idx < 27) { offset3d[_idx] = mesh_offsets3x3x3[idl*27 + _idx]; }
+        }  __syncthreads();
+#endif
+    
+        FOR_EACH3D(i, j, k, NX_LEAF,NX_LEAF,NX_LEAF) {
+            // index
+            auto ID = [&](int _i, int _j, int _k) { return IndexMG::id<NX_LEAF>(i+_i, j+_j, k+_k, offset3d); };
+
+            if ( FuncObj::is_obj(lv_obj[ID(0,0,0)]) ) {
+                for(int n=0; n<n_scalars; n++) {
+                    int idx = n * nn_max;
+
+                    scalar_n[idx + ID(0, 0, 0)] = NSOperator::average_neighbor_w_obj<NX_LEAF>(offset3d, i,j,k, &scalar[idx], lv_obj);
+                }
+                SKIP_FOR();
+            }
+        
+            const T0  u3[] = { u[ID(-1,  0,  0)], u[ID(0,  0,  0)], u[ID( 1,  0,  0)] };
+            const T0  v3[] = { v[ID( 0, -1,  0)], v[ID(0,  0,  0)], v[ID( 0,  1,  0)] };
+            const T0  w3[] = { w[ID( 0,  0, -1)], w[ID(0,  0,  0)], w[ID( 0,  0,  1)] };
+
+            const T0  lv_obj3x[] = { lv_obj[ID(-1,  0,  0)], lv_obj[ID(0,  0,  0)], lv_obj[ID( 1,  0,  0)] };
+            const T0  lv_obj3y[] = { lv_obj[ID( 0, -1,  0)], lv_obj[ID(0,  0,  0)], lv_obj[ID( 0,  1,  0)] };
+            const T0  lv_obj3z[] = { lv_obj[ID( 0,  0, -1)], lv_obj[ID(0,  0,  0)], lv_obj[ID( 0,  0,  1)] };
+
+            auto fluxweno = [&](auto... args){ return FuncDifferentialOperator::flux_euler_weno(args..., 1.0, 1.0); };
+//            auto fluxweno = [&](T0 f0, T0 f1, T0 f2, T0 f3, T0 f4, T0 f5, T0 vel){ return FuncDifferentialOperator::flux_euler_weno(f0, f1, f2, f3, f4, f5, vel, 1.0, 1.0); };
+
+            auto advweno = [&](const T0 f7[], const T0 vel3[], const T0 lv_obj3[]){
+                const T0  us[] = { ( FuncObj::is_obj( lv_obj3[0] ) ) ? (T0)0.0 : (vel3[0] + vel3[1])*(T0)0.5,
+                                   ( FuncObj::is_obj( lv_obj3[2] ) ) ? (T0)0.0 : (vel3[1] + vel3[2])*(T0)0.5 };
+            
+                const T0 ufs[] = { fluxweno(f7[0], f7[1], f7[2], f7[3], f7[4], f7[5], us[0]),
+                                   fluxweno(f7[1], f7[2], f7[3], f7[4], f7[5], f7[6], us[1]) };
+            
+                const T0  dft  = - ( ufs[1] - ufs[0] );
+            
+                return  dft;
+            };
+
+            auto advection_f = [&](T0* fn, const T0* f, const T0* sc_f) {
+                const T0  f7x[] = { f[ID(-3,  0,  0)], f[ID(-2,  0,  0)], f[ID(-1,  0,  0)], f[ID(0,  0,  0)], f[ID( 1,  0,  0)], f[ID( 2,  0,  0)], f[ID( 3,  0,  0)] };
+                const T0  f7y[] = { f[ID( 0, -3,  0)], f[ID( 0, -2,  0)], f[ID( 0, -1,  0)], f[ID(0,  0,  0)], f[ID( 0,  1,  0)], f[ID( 0,  2,  0)], f[ID( 0,  3,  0)] };
+                const T0  f7z[] = { f[ID( 0,  0, -3)], f[ID( 0,  0, -2)], f[ID( 0,  0, -1)], f[ID(0,  0,  0)], f[ID( 0,  0,  1)], f[ID( 0,  0,  2)], f[ID( 0,  0,  3)] };
+
+
+                // convection //
+                const T0  df_conv =  advweno(f7x, u3, lv_obj3x) // c*uc*dt/dx = 1*uc*1/1
+                                   + advweno(f7y, v3, lv_obj3y)
+                                   + advweno(f7z, w3, lv_obj3z);
+
+                // source term
+                const T0  source  = flag_source ? (sc_f[ID(0,0,0)] * dt) : (T0)0.0;
+
+                const T0 _fn =  f[ID(0,0,0)] + df_conv + source;
+
+                fn[ID(0,0,0)] =  _fn;
+            };
+
+            // update
+            for(int n=0; n<n_scalars; n++) {
+                int idx = n * nn_max;
+
+                advection_f(&scalar_n[idx], &scalar[idx], &sc_scalar[idx]);
+            }
+        } // FOR_EACH3D
+    } // FOR_EACH1D_BLOCKIDX
+}
+
+
 } // namespace  NSKernel
 
 

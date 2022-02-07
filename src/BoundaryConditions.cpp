@@ -253,7 +253,7 @@ void  BoundaryConditions::InitializeByGroundData(
             // box //
             const real width_da[3] = { pitch_da[0],
                                        pitch_da[1],
-                                       fabs(parameters.coefDomain().z_global_domain_max - parameters.coefDomain().z_global_domain_min) };
+                                       static_cast<real>( fabs(parameters.coefDomain().z_global_domain_max - parameters.coefDomain().z_global_domain_min) ) };
 
             const real center_da[3] = { (i_da + (real)0.5)*pitch_da[0] + x_min_map,
                                         (j_da + (real)0.5)*pitch_da[1] + y_min_map,
@@ -660,7 +660,7 @@ void  BoundaryConditions::ReadGroundData(
             // box //
             const real width_da[3] = { pitch_da[0] + (real)2.5*dx,
                                        pitch_da[1] + (real)2.5*dx,
-                                       fabs(parameters.coefDomain().z_global_domain_max - parameters.coefDomain().z_global_domain_min) };
+                                       static_cast<real>( fabs(parameters.coefDomain().z_global_domain_max - parameters.coefDomain().z_global_domain_min) ) };
 
             const real center_da[3] = { (i_da + (real)0.5)*pitch_da[0] + x_min_map,
                                         (j_da + (real)0.5)*pitch_da[1] + y_min_map,
@@ -805,9 +805,9 @@ void  BoundaryConditions::ReadOklahoma_GroundTb(float* Tb, int nx, int ny,
     std::ostringstream sout;
     sout << std::setfill('0') << std::setw(4) << time_num;
 
-    const std::string fname = Foldernames::input_folder + "/msm/boundary_Tb/wrf_data_Tb_16_16_" + sout.str() + ".ssv";
+//    const std::string fname = Foldernames::input_folder + "/msm/boundary_Tb/wrf_data_Tb_16_16_" + sout.str() + ".ssv";
 //    const std::string fname = Foldernames::input_folder + "/msm/boundary_Tb_bias_correction/wrf_data_Tb_16_16_" + sout.str() + ".ssv";
-//    const std::string fname = Foldernames::input_folder + "/msm/boundary_Tb_bias_correction_2nd/wrf_data_Tb_16_16_" + sout.str() + ".ssv";
+    const std::string fname = Foldernames::input_folder + "/msm/boundary_Tb_bias_correction_2nd/wrf_data_Tb_16_16_" + sout.str() + ".ssv";
     std::ifstream  fin;
     fin.open(fname.c_str(), std::ios::in);
     if (!fin) { std::cout << __PRETTY_FUNCTION__ << " : error fin" << std::endl; exit(0); }

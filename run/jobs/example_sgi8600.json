@@ -9,11 +9,15 @@
         "USE_GPUs": true
     },
     "citylbm_settings": {
-        "cfr_flags": [
+        "cfrm_flags": [
+            1,
+            1,
             1,
             1
         ],
-        "cfr_steps": [
+        "cfrm_steps": [
+            375,
+            375,
             375,
             375
         ],

@@ -6,6 +6,17 @@
 #include "definePrecision.h"
 
 
+namespace  world_property {
+    constexpr float Earths_rotation = 7.292*1.0e-5;
+
+    #if defined(CORIOLIS_FORCE)
+    constexpr float Geodetic_latitude = (33.0 + 37.0/60.0)/180.0*M_PI; // oklahoama state
+    #else
+    constexpr float Geodetic_latitude = 0.0;
+    #endif
+}
+
+
 namespace  fluid_property {
     constexpr real  TemperatureSA = 298.15; // K //
     constexpr real  PressureSA    = 101325.0; // Pa //
@@ -50,8 +61,8 @@ namespace  air_property {
 //    constexpr real  beta = 1.0/273.15;
     constexpr real  beta = 1.0/fluid_property::Temperature0;
 
-//    constexpr real  Cd_pad = 0.125;
-    constexpr real  Cd_pad = 0.10;
+    constexpr real  Cd_pad = 0.125;
+//    constexpr real  Cd_pad = 0.10;
 };
 #endif
 

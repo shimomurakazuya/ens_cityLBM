@@ -18,7 +18,7 @@ OutputFluidData(int t, Field& field, WorkerThread& iothread)
 #if 1
     const Parameters& parameters = field.parameters();
     
-    // output //
+    // output (cout_step) //
     cout_step(t, parameters);
     cout_monitor(t, field);
     cout_timer(t, field);
@@ -35,10 +35,10 @@ OutputFluidData(int t, Field& field, WorkerThread& iothread)
 //    output_natural_convection3d_data(t, field);
 
 
-    // hdf, vtu //
+    // vtu, restart (fout_step, rout_step) //
     output_data(t, field, iothread);
 
-    // postprocess monitor //
+    // postprocess monitor (mout_step) //
     output_monitor_data(t, field);
 
 
@@ -381,39 +381,48 @@ const
 {
 //    if (rank_ == 0) { std::cout << __PRETTY_FUNCTION__ << std::endl; }
     const Parameters& parameters = field.parameters();
+    const auto& coefCFROutput = parameters.coefCFROutput();
+
+    const bool is_fout_step = coefCFROutput.is_fout_step(t);
+    const bool is_rout_step = coefCFROutput.is_rout_step(t);
 
 #if 0
     // w/o overlap //
-    if ( parameters.coefCFROutput().is_fout_step(t) ) {
-        const int  t_fout = parameters.coefCFROutput().t_fout(t);
-
+    if( is_fout_step || is_rout_step ) {
         // copy_io //
         field.copy_io_field();
-        field.write_field(t_fout);
+
+        const int  t_fout = coefCFROutput.t_fout(t);
+        const int  t_rout = coefCFROutput.t_rout(t);
+        if( is_fout_step ) { field.write_field_vtk(t_fout); }
+        if( is_rout_step ) { field.write_field(t_rout); }
     }
 #else // w overlap //
     // thread : work //
-    if ( parameters.coefCFROutput().is_fout_step(t) ) {
-        const int  t_fout = parameters.coefCFROutput().t_fout(t);
-
+    if( is_fout_step || is_rout_step ) {
         // copy_io //
         field.copy_io_field();
 
+        const int  t_fout = coefCFROutput.t_fout(t);
+        const int  t_rout = coefCFROutput.t_rout(t);
 
         // thread output //
-        if (comm_.is_rank0()) { std::cout << "io work : t fout = " << t_fout << std::endl; }
+        if(comm_.is_rank0()) { std::cout << "io work : t fout, rout = " << t_fout << ", " << t_rout << std::endl; }
 
 #ifndef NO_IOTHREAD
-        iothread.work(true, [t_fout, &parameters, &field](){ field.write_field(t_fout); } );
+        iothread.work(true, [is_fout_step, is_rout_step, t_fout, t_rout, &field](){
+            if( is_fout_step ) { field.write_field_vtk(t_fout); }
+            if( is_rout_step ) { field.write_field(t_rout); }
+            } );
 #else
-        field.write_field(t_fout);
+        if( is_fout_step ) { field.write_field_vtk(t_fout); }
+        if( is_rout_step ) { field.write_field(t_rout); }
 #endif
-        field.write_ValueStatCsv(t_fout);
     }
 
     // thread : join //
-    if ( parameters.coefCFROutput().is_just_before_fout_step(t) || parameters.is_step_end(t) ) { // overlap //
-        if (comm_.is_rank0()) {
+    if( coefCFROutput.is_just_before_fout_step(t) || coefCFROutput.is_just_before_rout_step(t) || parameters.is_step_end(t) ) { // overlap //
+        if(comm_.is_rank0()) {
             std::cout << std::endl;
             std::cout << "io join : t = " << t << std::endl;
             }
@@ -431,10 +440,10 @@ const
 //    if (rank_ == 0) { std::cout << __PRETTY_FUNCTION__ << std::endl; }
     const Parameters& parameters = field.parameters();
 
-    if ( parameters.coefCFROutput().is_fout_step(t) ) {
-        const int  t_fout = parameters.coefCFROutput().t_fout(t);
+    if ( parameters.coefCFROutput().is_mout_step(t) ) {
+        const int  t_mout = parameters.coefCFROutput().t_mout(t);
 
-        field.write_monitor(t_fout);
+        field.write_monitor(t_mout);
     }
 }
 

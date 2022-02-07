@@ -51,7 +51,6 @@ time_evolution(
             field.allTimeInfo().StartTimer("LBM_Calculation");
             {
                 lbmCalculation_.LBM_incompressible_flow(t, field);
-                lbmCalculation_.LBM_value_stat(t, field);
             }
             field.allTimeInfo().StopTimer("LBM_Calculation");
             field.allTimeInfo().SubmitElapsedTimeInfo("LBM_Calculation", 0, field.taskID().num_task_lbm_per_step(), field.parameters().step_now());

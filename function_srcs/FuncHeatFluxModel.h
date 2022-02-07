@@ -20,14 +20,20 @@ T q3w_HeatFlux(const T u_chi, const T T_chi, const T Tb, const T dzs, const T Tr
     constexpr double ep    = 5.0e-5;
 //    constexpr double ep    = 1.0e-5;
 //    constexpr double ep    = 1.0e-6; // nan
-    //    desert
+
+    //    Grassland (~5cm)
+    constexpr double z0m   = 0.00436;
+    constexpr double z0h   = 0.00041;
+
+//    //    desert
 //    constexpr double z0m   = 0.00267;
 //    constexpr double z0h   = 0.000049;
-    //    Gobi
-    constexpr double z0m   = 0.00280 + 0.00030;
-    constexpr double z0h   = 0.000011;
 
-    //    LOHDIM-LES
+//    //    Gobi
+//    constexpr double z0m   = 0.00280 + 0.00030;
+//    constexpr double z0h   = 0.000011;
+
+//    //    LOHDIM-LES
 //    constexpr double z0m   = 0.3;
 //    constexpr double z0h   = 0.0001;
 

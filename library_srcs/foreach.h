@@ -32,7 +32,7 @@
 
 
 // macro
-#ifdef __CUDA_ARCH__
+#if defined(__CUDA_ARCH__) || defined(ENABLE_HIP)
     #define FOR_EACH1D_BLOCKIDX(L, NL) \
         const auto L = blockIdx.x;
 
@@ -80,25 +80,30 @@ struct backend {};
 
 struct openmp    : backend {};
 struct cuda      : backend {};
+struct hip       : backend {};
 
 
-#ifdef USE_NVCC
-using opti = cuda;
+#if defined(USE_NVCC)
+  using opti = cuda;
+#elif defined(ENABLE_HIP)
+  using opti = hip;
 #else
-using opti = openmp;
+  using opti = openmp;
 #endif
 
 
 inline void sync()
 {
-#ifdef USE_NVCC
+#if defined(USE_NVCC)
     cudaDeviceSynchronize();
+#elif defined(ENABLE_HIP)
+    hipDeviceSynchronize();
 #else
 #endif
 }
 
 namespace helper {
-    #ifdef USE_NVCC
+    #if defined(USE_NVCC) || defined(ENABLE_HIP)
     template<class Func, class... Args> 
     __global__ void exec_gpu(
         Func    func,
@@ -128,16 +133,29 @@ void exec_block_amr(
     )
 {
     if (std::is_same<ExecutionBackend, cuda>::value) {
-#ifdef USE_NVCC
+      #if defined(USE_NVCC)
         helper::exec_gpu<Func, Args...> <<<
                 dim3(num_tasks, 1, 1), 
                 dim3(NX, NX, NX)
             >>> (func, args...);
         CUDA_SAFE_CALL(cudaDeviceSynchronize());
-#endif
+      #endif
     }
+    else if (std::is_same<ExecutionBackend, hip>::value) {
+      #if defined(ENABLE_HIP)
+        helper::exec_gpu<Func, Args...> <<<
+                dim3(num_tasks, 1, 1), 
+                dim3(NX, NX, NX)
+            >>> (func, args...);
+        HIP_SAFE_CALL(hipDeviceSynchronize());
+        //hipDeviceSynchronize();
+      #endif
+    }
+
     else if (std::is_same<ExecutionBackend, openmp>::value) {
+      #if ! (defined(USE_NVCC) || defined(ENABLE_HIP) )
         helper::exec_cpu<Func, Args...>(func, args...);
+      #endif
     }
     else {
         static_assert(std::is_base_of<backend, ExecutionBackend>::value, "undefined execution backend");
@@ -153,16 +171,28 @@ void exec_block_amr_L2F(
     )
 {
     if (std::is_same<ExecutionBackend, cuda>::value) {
-#ifdef USE_NVCC
+      #if defined(USE_NVCC)
         helper::exec_gpu<Func, Args...> <<<
                 dim3(num_tasks, 8, 1), 
                 dim3(NX, NX, NX)
             >>> (func, args...);
         CUDA_SAFE_CALL(cudaDeviceSynchronize());
-#endif
+      #endif
+    }
+    else if (std::is_same<ExecutionBackend, hip>::value) {
+      #if defined(ENABLE_HIP)
+        helper::exec_gpu<Func, Args...> <<<
+                dim3(num_tasks, 8, 1), 
+                dim3(NX, NX, NX)
+            >>> (func, args...);
+        HIP_SAFE_CALL(hipDeviceSynchronize());
+        //hipDeviceSynchronize();
+      #endif
     }
     else if (std::is_same<ExecutionBackend, openmp>::value) {
+      #if ! (defined(USE_NVCC) || defined(ENABLE_HIP) )
         helper::exec_cpu<Func, Args...>(func, args...);
+      #endif
     }
     else {
         static_assert(std::is_base_of<backend, ExecutionBackend>::value, "unexpected execution backend");
@@ -178,16 +208,28 @@ void exec_block_amr_F2L(
     )
 {
     if (std::is_same<ExecutionBackend, cuda>::value) {
-#ifdef USE_NVCC
+      #if defined(USE_NVCC)
         helper::exec_gpu<Func, Args...> <<<
                 dim3(num_tasks, 1, 1), 
                 dim3(NX/2, NX/2, NX/2)
             >>> (func, args...);
         CUDA_SAFE_CALL(cudaDeviceSynchronize());
-#endif
+      #endif
+    }
+    else if (std::is_same<ExecutionBackend, hip>::value) {
+      #if defined(ENABLE_HIP)
+        helper::exec_gpu<Func, Args...> <<<
+                dim3(num_tasks, 1, 1), 
+                dim3(NX/2, NX/2, NX/2)
+            >>> (func, args...);
+        HIP_SAFE_CALL(hipDeviceSynchronize());
+        //hipDeviceSynchronize();
+      #endif
     }
     else if (std::is_same<ExecutionBackend, openmp>::value) {
+      #if ! (defined(USE_NVCC) || defined(ENABLE_HIP) )
         helper::exec_cpu<Func, Args...>(func, args...);
+      #endif
     }
     else {
         static_assert(std::is_base_of<backend, ExecutionBackend>::value, "unexpected execution backend");
@@ -203,15 +245,25 @@ void exec_1d(
     )
 {
     if (std::is_same<ExecutionBackend, cuda>::value) {
-#ifdef USE_NVCC
+      #if defined(USE_NVCC)
         constexpr auto nth = 256;
         const auto nb = (nn_max + nth - 1)/nth;
         helper::exec_gpu<Func, Args...> <<< nb, nth >>> (func, args...);
         CUDA_SAFE_CALL(cudaDeviceSynchronize());
-#endif
+      #endif
+    }
+    else if (std::is_same<ExecutionBackend, hip>::value) {
+      #if defined(ENABLE_HIP)
+        constexpr auto nth = 256;
+        const auto nb = (nn_max + nth - 1)/nth;
+        helper::exec_gpu<Func, Args...> <<< nb, nth >>> (func, args...);
+        HIP_SAFE_CALL(hipDeviceSynchronize());
+      #endif
     }
     else if (std::is_same<ExecutionBackend, openmp>::value) {
+      #if ! (defined(USE_NVCC) || defined(ENABLE_HIP) )
         helper::exec_cpu<Func, Args...>(func, args...);
+      #endif
     }
     else {
         static_assert(std::is_base_of<backend, ExecutionBackend>::value, "unexpected execution backend");

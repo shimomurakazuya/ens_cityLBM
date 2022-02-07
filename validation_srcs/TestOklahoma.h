@@ -54,7 +54,8 @@ private:
         const Grid*         grids,
         const Tree&         tree,
         const Parameters&   parameters,
-              MeshValue*    meshValues
+              MeshValue*    meshValues,
+        const NudgingCoefAdaptation& nudgingCoefAdaptation
         );
 
     void  InitValue(
@@ -134,10 +135,11 @@ private:
 
 
     void  InitObservationDataOklahoma(
-        const Grid*         grids,
-        const Tree&         tree,
-        const Parameters&   parameters,
-              MeshValue*    meshValues
+        const Grid*                  grids,
+        const Tree&                  tree,
+        const Parameters&            parameters,
+              MeshValue*             meshValues,
+        const NudgingCoefAdaptation& nudgingCoefAdaptation
         );
 
 
