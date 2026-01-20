@@ -1,0 +1,50 @@
+{
+    "JOB_settings": {
+        "ACCOUNT": "",
+        "JOB_NAME": "oklahoma4m",
+        "NB_PROCS": 8,
+        "NB_THREADS": 12,
+        "OUT_DIR": "/data/g6/a214026/2025/CityLBM_ens8_4MPI",
+        "TIME": "01:00:00",
+        "USE_GPUs": true
+    },
+    "citylbm_settings": {
+        "cfrm_flags": [
+            1,
+            1,
+            1,
+            1
+        ],
+        "cfrm_steps": [
+            375,
+            375,
+            375,
+            375
+        ],
+        "domain_length": [
+            4096,
+            4096,
+            2560
+        ],
+        "domain_min": [
+            -2048,
+            -2048,
+            -8
+        ],
+        "n_ensemble_members": 2,
+        "number_of_grid_point": [
+            40,
+            2
+        ],
+        "ofs_ensemble_idx": 0,
+        "restart_flags_and_step": [
+            0,
+            99999
+        ],
+        "time_end": 24300.0,
+        "velocity_lbm": [
+            10.0,
+            0.1
+        ]
+    }
+}

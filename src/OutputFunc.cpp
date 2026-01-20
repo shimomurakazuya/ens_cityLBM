@@ -11,6 +11,17 @@
 #include "PostprocessNaturalConvection3d.h"
 #include "MemoryUsage.hpp"
 
+// include visualization
+#include "kvs_wrapper.h" // kawamura
+#include "FuncAMRMesh.h" // kawamura
+#include <chrono> //kawamura
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <cstdlib>
+// end add include
+
 
 void OutputFunc::
 OutputFluidData(int t, Field& field, WorkerThread& iothread)
@@ -398,6 +409,290 @@ const
         if( is_rout_step ) { field.write_field(t_rout); }
     }
 #else // w overlap //
+    if ( parameters.coefCFROutput().is_fout_step(t) ) 
+    {
+        const int  t_fout = parameters.coefCFROutput().t_fout(t);
+
+        //-------------------------//
+        //---Start Visualization---//
+        //-------------------------//
+        int mpi_rank;
+        MPI_Comm_rank( MPI_COMM_WORLD, &mpi_rank );
+
+        //
+        //全体の最大最小値を示すpfiファイルを生成
+        //
+        char filename[256];
+        sprintf(filename,"./particle_out/t_pfi_coords_minmax.txt");
+
+        const OptionParser& optionParser = field.optionParser();
+
+        //cityLBMのMin/Maxに合わせる
+        const float x_global_domain_min = -2048;
+        const float y_global_domain_min = -2048;
+        const float z_global_domain_min = -8;
+
+        const float x_global_domain_max =  2048;
+        const float y_global_domain_max =  2048;
+        const float z_global_domain_max =  2552;
+
+
+////        // 建物周辺のMin/Maxに合わせる
+//        const float x_global_domain_min = -620;
+//        const float y_global_domain_min = -770;
+//        const float z_global_domain_min = -8;
+//
+//        const float x_global_domain_max =  620;
+//        const float y_global_domain_max =  770;
+//        const float z_global_domain_max =  320;
+
+
+        // hasegawa 2020; mpirank==0のみfopen(). 全mpirankで書き込みのfopenは危険かも。
+        if(mpi_rank == 0) {
+            FILE* fp = fopen( filename, "w" );
+
+            if( fp )
+            {
+                fprintf( fp, "%f %f %f %f %f %f\n",
+                        x_global_domain_min,
+                        y_global_domain_min,
+                        z_global_domain_min,
+                        x_global_domain_max,
+                        y_global_domain_max,
+                        z_global_domain_max );
+                fclose( fp );
+            }
+        }
+
+        //
+        // Calculate Non sleeve leaves.
+        //
+
+        // Start measure time
+        std::chrono::system_clock::time_point  start, end;
+        if(mpi_rank == 0) {
+            start = std::chrono::system_clock::now();
+        }
+
+        const Tree& tree = field.tree();
+        const int   n_leaves = tree.number_of_nodes(); //袖領域を含めたリーフ数
+              int   nl = 0;               //num. of leaves without sleeve.
+              int*  non_sleeve_leaf_index = new int[ n_leaves ];
+
+        //袖領域を飛ばすために、重複の無いleafを数え上げる
+        for (int l=0; l<n_leaves; l++)
+        {
+            non_sleeve_leaf_index[ l ] = -1;
+            if( !tree.nodes(l)->nodeCalFlags().Cal() )
+            {
+                continue;
+            }
+            non_sleeve_leaf_index[ l ] = nl;
+            nl++;
+        }
+
+        //
+        // re-allocate from cell centered to vertex values
+        //
+        //float* cell_length = new float [ nl ];
+        std::vector<float> cell_length( nl );
+        //float* leaf_min_coord = new float [ 3*nl ];
+        std::vector<float> leaf_min_coord( 3*nl );
+
+        const int  nx = DefAMR::NX_LEAF;
+        const int  ny = DefAMR::NX_LEAF;
+        const int  nz = DefAMR::NX_LEAF;
+        const int  nvariables = 5;
+
+        //　建物周辺のリーフの数を数え上げる
+
+
+
+
+
+
+        float** values = new float*[nvariables];
+        for( int i=0; i<nvariables; i++ )
+        {
+            values[i] = new float[ (nx+1) * (ny+1) * (nz+1) * nl ];
+        }
+
+        const real c_ref = parameters.c_ref_lbm();
+
+        // 4 unstruct kvs_wrapper
+        int ncells = nl*nx*ny*nz;
+        int nnodes = nl*(nx+1)*(ny+1)*(nz+1);
+//        int nnodes = coords.size()/3;
+        std::vector<float> coords;
+        std::vector<unsigned int> connections;
+        connections.resize(ncells*8);
+        coords.resize(3*nl*(nx+1)*(ny+1)*(nz+1));
+
+        for (int l=0; l<n_leaves; l++)
+        {
+            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
+
+            const int index = non_sleeve_leaf_index[ l ];
+
+            const int lv = tree.nodes(l)->level();
+
+            const MeshValue& meshValue = field.meshValue( lv );
+
+            const Array3D<int> offsets = tree.nodes( l )->neighbor_mesh_offsets();
+
+            const int  offset     = offsets.offset0();
+
+            cell_length   [   index   ] = meshValue.coordinates().dx();
+            //leaf_min_coord[ 3*index   ] = meshValue.coordinates().x(offset);
+            //leaf_min_coord[ 3*index+1 ] = meshValue.coordinates().y(offset);
+            //leaf_min_coord[ 3*index+2 ] = meshValue.coordinates().z(offset);
+            leaf_min_coord[ 3*index   ] = meshValue.coordinates().xnode(offset);
+            leaf_min_coord[ 3*index+1 ] = meshValue.coordinates().ynode(offset);
+            leaf_min_coord[ 3*index+2 ] = meshValue.coordinates().znode(offset);
+            for (int k=0; k<nz+1; k++ )
+            {
+                for (int j=0; j<ny+1; j++ )
+                {
+                    for (int i=0; i<nx+1; i++)
+                    {
+                        const int cnt =
+                            i + j*(nx+1) + k*(nx+1)*(ny+1) + index*(nx+1)*(ny+1)*(nz+1);
+                        values[0][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().u(),
+                            i,j,k, nx, offsets ) * c_ref;
+                        values[1][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().v(),
+                            i,j,k, nx, offsets ) * c_ref;
+                        values[2][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().w(),
+                            i,j,k, nx, offsets ) * c_ref;
+                        values[3][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().T(),
+                            i,j,k, nx, offsets );
+                        values[4][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().scalar(),
+                            i,j,k, nx, offsets );
+                        //coords.push_back(meshValue.coordinates().x(cnt));
+                        //coords.push_back(meshValue.coordinates().y(cnt));
+                        //coords.push_back(meshValue.coordinates().z(cnt));
+//                        coords.push_back(meshValue.coordinates().x(offset)+ i* meshValue.coordinates().dx() );
+//                        coords.push_back(meshValue.coordinates().y(offset)+ j* meshValue.coordinates().dx() );
+//                        coords.push_back(meshValue.coordinates().z(offset)+ k* meshValue.coordinates().dx() );
+                        coords[3*cnt+0]=leaf_min_coord[ 3*index   ] + i* meshValue.coordinates().dx() ;
+                        coords[3*cnt+1]=leaf_min_coord[ 3*index+1 ] + j* meshValue.coordinates().dx() ;
+                        coords[3*cnt+2]=leaf_min_coord[ 3*index+2 ] + k* meshValue.coordinates().dx() ;
+
+                    }//end of for i
+                }//end of for j
+            }//end of for k
+        }//end of for l
+
+//        int nnodes = coords.size()/3;
+//        std::cout << "nnodes = " << nnodes << std::endl;
+//        std::cout << "ncells = " << ncells << std::endl;
+//        std::cout << "coords.size = " << coords.size() << std::endl;
+//        std::cout << __LINE__ <<std::endl;
+        int line_size  = static_cast<int>( nx+1 );
+        int slice_size = static_cast<int>( (nx+1) * (ny+1) );
+        long vertex_index = 0;
+        long connection_index = 0;
+        for (int l=0; l<n_leaves; l++)
+        {
+            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
+            const int index = non_sleeve_leaf_index[ l ];
+            //long connection_index = index*(nx)*(ny)*(nz);
+            //connection
+            vertex_index= index * (nx+1) * (ny+1) * (nz+1);
+            for (int k=0; k<nz; k++ )
+            {
+                for (int j=0; j<ny; j++ )
+                {
+                    for (int i=0; i<nx; i++)
+                    {
+                        const int local_vertex_index[8] =
+                        {
+                            vertex_index,
+                            vertex_index + 1,
+                            vertex_index + line_size,
+                            vertex_index + line_size + 1,
+                            vertex_index + slice_size,
+                            vertex_index + slice_size + 1,
+                            vertex_index + slice_size + line_size,
+                            vertex_index + slice_size + line_size + 1
+                        };
+                            vertex_index++;
+
+                            // hexahedra-1
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 0 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 1 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 3 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 2 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 4 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 5 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 7 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 6 ] );
+
+                    }//end of for i
+                                    vertex_index++;
+                }//end of for j
+                                vertex_index+= line_size;
+            }//end of for k
+//                               vertex_index+= slice_size;
+        }//end of for l
+
+         // Start measure time
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@Reconstruction time = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+
+        int resolution[4] = { nx+1, ny+1, nz+1, nl };
+        domain_parameters dom_unstruct = {
+            x_global_domain_min,
+            y_global_domain_min,
+            z_global_domain_min,
+            x_global_domain_max,
+            y_global_domain_max,
+            z_global_domain_max
+        };
+
+       static int time_step = 0;
+
+//      unstruct
+        ensemble_generate_particles( time_step, dom_unstruct,
+                            values, nvariables,
+                            coords.data(), nnodes,
+                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
+
+        time_step++;
+
+        for( int i=0; i<nvariables; i++ )
+        {
+            delete [] values[i];
+        }
+        delete [] values;
+        delete [] non_sleeve_leaf_index;
+        //delete [] cell_length;
+        //delete [] leaf_min_coord;
+
+        // Start measure time
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@Generation time = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+
+        //-------------------------//
+        //----End Visualization----//
+        //-------------------------//
+    }
+
+
     // thread : work //
     if( is_fout_step || is_rout_step ) {
         // copy_io //

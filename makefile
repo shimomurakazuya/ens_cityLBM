@@ -11,6 +11,7 @@ include config/devices/$(DEVICES)
 
 # problem selection
 TEST ?= oklahoma
+#TEST ?= cavity
 ## note: defined macros of the test are in `config/tests/*`
 include config/tests/$(TEST)
 

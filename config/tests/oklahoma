@@ -32,7 +32,7 @@ citylbm_addopt += PARAVIEW_DOWNSIZE_4
 #citylbm_addopt += PARAVIEW_SLICE
 #citylbm_addopt += USE_VALUE_STAT
 #citylbm_addopt += PARAVIEW_CELLDATA
-citylbm_addopt += PARAVIEW_ENS0
+#citylbm_addopt += PARAVIEW_ENS0
 
 ## feature/bindiff_wo_halo
 #citylbm_addopt += MESHVALUES_IO_MASK_HALO
@@ -59,4 +59,34 @@ citylbm_addopt += ENSEMBLE_SPIKE
 #@PBVR LDFLAGS += -lpbvrFunc
 #@PBVR LDFLAGS += -lkvsCore
 #@PBVR EXTRA += install_pbvr_files
+
+##add for PBVR
+#PBVR_DIR = ../../ispbvr_daemon
+#PBVR_DIR = /home/g6/a214026/pbvr/UNPBVR/IntegPBVRv320_glyph/CS-IS-PBVR/IS_DaemonAndSampler
+PBVR_DIR = /home/g6/a214026/pbvr/UNPBVR/IntegPBVRv350_ensamble_dev/CS-IS-PBVR/IS_DaemonAndSampler
+
+#include ${PBVR_DIR}/pbvr.conf
+#include ${PBVR_DIR}/arch/${PBVR_MACHINE}
+
+FUNC_DIR        = ${PBVR_DIR}/FunctionParser
+COMMON_DIR      = ${PBVR_DIR}/Common/
+KVS_SOURCE_DIR  = ${PBVR_DIR}/KVS/Source
+#INSITU_DIR      = ${PBVR_DIR}/InSituLib/AMR
+INSITU_DIR      = ${PBVR_DIR}/InSituLib/unstruct
+
+COMPILER_FLAGS += -I${INSITU_DIR} -I${KVS_SOURCE_DIR}
+INCLUDE += ${COMPILER_FLAGS}
+CXXFLAGS +=${INCLUDE}
+
+LINKER_FLAGS += -L${INSITU_DIR} -lInSituPBVR
+LINKER_FLAGS += -L${FUNC_DIR} -lpbvrFunc
+LINKER_FLAGS += -L${KVS_SOURCE_DIR}/Core/Release -lkvsCore
+
+#end for PBVR
+
+CFLAGS   += -Xcompiler "-O3 -qopenmp -ipo"
+LINKER_FLAGS   += -Xcompiler "-O3 -xHost -qopenmp -ipo"
+
+LDFLAGS += ${LINKER_FLAGS}
+
 

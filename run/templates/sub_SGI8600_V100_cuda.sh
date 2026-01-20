@@ -25,7 +25,11 @@ done
 # env
 . /etc/profile.d/modules.sh 
 module purge 
-module load gcc/7.4.0 mpt/2.23-ga cuda/11.0; export MPI_USE_CUDA=1
+#module load gcc/7.4.0 mpt/2.23-ga cuda/11.0; export MPI_USE_CUDA=1
+module load cuda/11.4 gnu/cur intel/2023.2.1  mpt/2.23-ga; export MPI_USE_CUDA=1
+
+export VIS_PARAM_DIR=$PWD
+export  PARTICLE_DIR=$PWD/particle_out
 
 module list 2>&1 
 export MPI_DSM_VERBOSE=1
