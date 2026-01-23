@@ -427,24 +427,24 @@ const
 
         const OptionParser& optionParser = field.optionParser();
 
-        //cityLBMのMin/Maxに合わせる
-        const float x_global_domain_min = -2048;
-        const float y_global_domain_min = -2048;
-        const float z_global_domain_min = -8;
-
-        const float x_global_domain_max =  2048;
-        const float y_global_domain_max =  2048;
-        const float z_global_domain_max =  2552;
-
-
-////        // 建物周辺のMin/Maxに合わせる
-//        const float x_global_domain_min = -620;
-//        const float y_global_domain_min = -770;
+//        //cityLBMのMin/Maxに合わせる
+//        const float x_global_domain_min = -2048;
+//        const float y_global_domain_min = -2048;
 //        const float z_global_domain_min = -8;
 //
-//        const float x_global_domain_max =  620;
-//        const float y_global_domain_max =  770;
-//        const float z_global_domain_max =  320;
+//        const float x_global_domain_max =  2048;
+//        const float y_global_domain_max =  2048;
+//        const float z_global_domain_max =  2552;
+
+
+//        // 建物周辺のMin/Maxに合わせる
+        const float x_global_domain_min = -620;
+        const float y_global_domain_min = -770;
+        const float z_global_domain_min = -8;
+
+        const float x_global_domain_max =  620;
+        const float y_global_domain_max =  770;
+        const float z_global_domain_max =  320;
 
 
         // hasegawa 2020; mpirank==0のみfopen(). 全mpirankで書き込みのfopenは危険かも。
@@ -478,6 +478,7 @@ const
         const int   n_leaves = tree.number_of_nodes(); //袖領域を含めたリーフ数
               int   nl = 0;               //num. of leaves without sleeve.
               int*  non_sleeve_leaf_index = new int[ n_leaves ];
+              int*  leaf_around_building  = new int[ n_leaves ];
 
         //袖領域を飛ばすために、重複の無いleafを数え上げる
         for (int l=0; l<n_leaves; l++)
@@ -505,11 +506,41 @@ const
         const int  nvariables = 5;
 
         //　建物周辺のリーフの数を数え上げる
+        int n_leaves_around_building = 0;
+
+        for (int l=0; l<n_leaves; l++)
+        {
+            leaf_around_building[ l ] = -1;
+            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
+
+            const int index = non_sleeve_leaf_index[ l ];
+
+            const int lv = tree.nodes(l)->level();
+
+            const MeshValue& meshValue = field.meshValue( lv );
+
+            const Array3D<int> offsets = tree.nodes( l )->neighbor_mesh_offsets();
+
+            const int  offset     = offsets.offset0();
+            const float leaf_min_coord_x = meshValue.coordinates().xnode(offset);
+            const float leaf_min_coord_y = meshValue.coordinates().ynode(offset);
+            const float leaf_min_coord_z = meshValue.coordinates().znode(offset);
+            if(     -620 < leaf_min_coord_x  && leaf_min_coord_x < 620 
+                &&  -770 < leaf_min_coord_y  && leaf_min_coord_y < 770
+                &&  -8   < leaf_min_coord_z  && leaf_min_coord_z < 320 )
+            {
+                leaf_around_building[ l ] = n_leaves_around_building;
+                n_leaves_around_building++;
+            }
 
 
+        }//end of for l
+        std::cout << "n_leaves_around_building = " << n_leaves_around_building << std::endl;
 
-
-
+        // リーフ数を建物周辺のもので上書き
+        nl = n_leaves_around_building;
+        cell_length.resize(nl);
+        leaf_min_coord.resize(3*nl);
 
         float** values = new float*[nvariables];
         for( int i=0; i<nvariables; i++ )
@@ -530,9 +561,13 @@ const
 
         for (int l=0; l<n_leaves; l++)
         {
-            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
+//            std::cout << "leaf_around_building[ l ] = " << leaf_around_building[ l ] << std::endl;
+//            if(l > 28728 ) std::cout<< "l ="  << l << std::endl; 
+//            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
+            if( leaf_around_building[ l ] == -1 ){ continue; }
 
-            const int index = non_sleeve_leaf_index[ l ];
+//            const int index = non_sleeve_leaf_index[ l ];
+            const int index = leaf_around_building[ l ];
 
             const int lv = tree.nodes(l)->level();
 
@@ -557,7 +592,7 @@ const
                     {
                         const int cnt =
                             i + j*(nx+1) + k*(nx+1)*(ny+1) + index*(nx+1)*(ny+1)*(nz+1);
-                        values[0][cnt] =
+                        values[4][cnt] =
                             FuncAMRMesh::CellToNode( meshValue.valueNS().u(),
                             i,j,k, nx, offsets ) * c_ref;
                         values[1][cnt] =
@@ -569,15 +604,10 @@ const
                         values[3][cnt] =
                             FuncAMRMesh::CellToNode( meshValue.valueNS().T(),
                             i,j,k, nx, offsets );
-                        values[4][cnt] =
+                        values[0][cnt] =
                             FuncAMRMesh::CellToNode( meshValue.valueNS().scalar(),
                             i,j,k, nx, offsets );
-                        //coords.push_back(meshValue.coordinates().x(cnt));
-                        //coords.push_back(meshValue.coordinates().y(cnt));
-                        //coords.push_back(meshValue.coordinates().z(cnt));
-//                        coords.push_back(meshValue.coordinates().x(offset)+ i* meshValue.coordinates().dx() );
-//                        coords.push_back(meshValue.coordinates().y(offset)+ j* meshValue.coordinates().dx() );
-//                        coords.push_back(meshValue.coordinates().z(offset)+ k* meshValue.coordinates().dx() );
+
                         coords[3*cnt+0]=leaf_min_coord[ 3*index   ] + i* meshValue.coordinates().dx() ;
                         coords[3*cnt+1]=leaf_min_coord[ 3*index+1 ] + j* meshValue.coordinates().dx() ;
                         coords[3*cnt+2]=leaf_min_coord[ 3*index+2 ] + k* meshValue.coordinates().dx() ;
@@ -598,8 +628,10 @@ const
         long connection_index = 0;
         for (int l=0; l<n_leaves; l++)
         {
-            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
-            const int index = non_sleeve_leaf_index[ l ];
+//            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
+//            const int index = non_sleeve_leaf_index[ l ];
+            if( leaf_around_building[ l ] == -1 ){ continue; }
+            const int index = leaf_around_building[ l ];
             //long connection_index = index*(nx)*(ny)*(nz);
             //connection
             vertex_index= index * (nx+1) * (ny+1) * (nz+1);
@@ -675,6 +707,7 @@ const
         }
         delete [] values;
         delete [] non_sleeve_leaf_index;
+        delete [] leaf_around_building;
         //delete [] cell_length;
         //delete [] leaf_min_coord;
 
