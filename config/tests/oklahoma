@@ -25,7 +25,7 @@ citylbm_addopt += NO_IODATA_RESTART
 #citylbm_addopt += COUT_MONITOR_PRECISION=16
 
 ## io paraview
-#citylbm_addopt += NO_IODATA_PARAVIEW
+citylbm_addopt += NO_IODATA_PARAVIEW
 #citylbm_addopt += PARAVIEW_FULL
 #citylbm_addopt += PARAVIEW_DOWNSIZE_2
 citylbm_addopt += PARAVIEW_DOWNSIZE_4

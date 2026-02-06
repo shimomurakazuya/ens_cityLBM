@@ -13,6 +13,9 @@
 //#include "ReadHDF5.h"
 #include "mpi_wrapper.hpp"
 
+#include <kvs/KVSMLObjectUnstructuredVolume>
+#include <kvs/UnstructuredVolumeExporter>
+
 // public //
 //void  IOData::
 //writeHDF5Values (
@@ -466,10 +469,10 @@ writeVTKFile (
     )
 const
 {
+#if 1
 #ifdef NO_IODATA_PARAVIEW
     if(comm_.is_rank0()) { std::cout << "skip VTK output (due to NO_IODATA_PARAVIEW defined)" << std::endl; }
 #else
-
 
 #ifdef PARAVIEW_ENS0
     if(comm_.col_id_wo_offset() != 0) { return; } // skip output for ensembles except ens 0
@@ -712,6 +715,261 @@ const
     if (comm_.col_vector().rank() == 0) { paraviewVTU.OutputPVTUFiles(step_); }
 
 #endif
+#endif
+#if 0 
+   // 各アンサンブルデータをkvsml方式で出力
+
+//    const Tree& tree = field.tree();
+    const int   n_leaves = tree.number_of_nodes(); //袖領域を含めたリーフ数
+    int   nl = 0;               //num. of leaves without sleeve.
+    int*  non_sleeve_leaf_index = new int[ n_leaves ];
+    int*  leaf_around_building  = new int[ n_leaves ];
+
+        //袖領域を飛ばすために、重複の無いleafを数え上げる
+        for (int l=0; l<n_leaves; l++)
+        {
+            non_sleeve_leaf_index[ l ] = -1;
+            if( !tree.nodes(l)->nodeCalFlags().Cal() )
+            {
+                continue;
+            }
+            non_sleeve_leaf_index[ l ] = nl;
+            nl++;
+        }
+
+        //
+        // re-allocate from cell centered to vertex values
+        //
+        //float* cell_length = new float [ nl ];
+        std::vector<float> cell_length( nl );
+        //float* leaf_min_coord = new float [ 3*nl ];
+        std::vector<float> leaf_min_coord( 3*nl );
+        const int tmp_nl = nl; //num. of leaves without sleeve.を保存
+
+        const int  nx = DefAMR::NX_LEAF;
+        const int  ny = DefAMR::NX_LEAF;
+        const int  nz = DefAMR::NX_LEAF;
+        const int  nvariables = 5;
+
+        //　建物周辺のリーフの数を数え上げる
+        int n_leaves_around_building = 0;
+
+        for (int l=0; l<n_leaves; l++)
+        {
+            leaf_around_building[ l ] = -1;
+            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
+
+            const int index = non_sleeve_leaf_index[ l ];
+
+            const int lv = tree.nodes(l)->level();
+
+            const auto& meshValue = meshValues[lv];
+//            const MeshValue& meshValue = field.meshValue( lv );
+
+            const Array3D<int> offsets = tree.nodes( l )->neighbor_mesh_offsets();
+
+            const int  offset     = offsets.offset0();
+            const float leaf_min_coord_x = meshValue.coordinates().xnode(offset);
+            const float leaf_min_coord_y = meshValue.coordinates().ynode(offset);
+            const float leaf_min_coord_z = meshValue.coordinates().znode(offset);
+            if(     -620 < leaf_min_coord_x  && leaf_min_coord_x < 620 
+                &&  -770 < leaf_min_coord_y  && leaf_min_coord_y < 770
+                &&  -8   < leaf_min_coord_z  && leaf_min_coord_z < 320 )
+//                &&  -8   < leaf_min_coord_z  && leaf_min_coord_z < 150 )
+            {
+                leaf_around_building[ l ] = n_leaves_around_building;
+                n_leaves_around_building++;
+            }
+
+
+        }//end of for l
+
+        // リーフ数を建物周辺のもので上書き
+        nl = n_leaves_around_building;
+        cell_length.resize(nl);
+        leaf_min_coord.resize(3*nl);
+
+        float** values = new float*[nvariables];
+        for( int i=0; i<nvariables; i++ )
+        {
+            values[i] = new float[ (nx+1) * (ny+1) * (nz+1) * nl ];
+        }
+
+        const real c_ref = parameters.c_ref_lbm();
+
+        // 4 unstruct kvs_wrapper
+        int ncells = nl*nx*ny*nz;
+        int nnodes = nl*(nx+1)*(ny+1)*(nz+1);
+//        int nnodes = coords.size()/3;
+        std::vector<float> coords;
+        std::vector<unsigned int> connections;
+        connections.resize(ncells*8);
+        coords.resize(3*nl*(nx+1)*(ny+1)*(nz+1));
+
+        for (int l=0; l<n_leaves; l++)
+        {
+//            std::cout << "leaf_around_building[ l ] = " << leaf_around_building[ l ] << std::endl;
+//            if(l > 28728 ) std::cout<< "l ="  << l << std::endl; 
+//            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
+            if( leaf_around_building[ l ] == -1 ){ continue; }
+
+//            const int index = non_sleeve_leaf_index[ l ];
+            const int index = leaf_around_building[ l ];
+
+            const int lv = tree.nodes(l)->level();
+
+            const auto& meshValue = meshValues[lv];
+//            const MeshValue& meshValue = field.meshValue( lv );
+
+            const Array3D<int> offsets = tree.nodes( l )->neighbor_mesh_offsets();
+
+            const int  offset     = offsets.offset0();
+
+            cell_length   [   index   ] = meshValue.coordinates().dx();
+            leaf_min_coord[ 3*index   ] = meshValue.coordinates().xnode(offset);
+            leaf_min_coord[ 3*index+1 ] = meshValue.coordinates().ynode(offset);
+            leaf_min_coord[ 3*index+2 ] = meshValue.coordinates().znode(offset);
+            for (int k=0; k<nz+1; k++ )
+            {
+                for (int j=0; j<ny+1; j++ )
+                {
+                    for (int i=0; i<nx+1; i++)
+                    {
+                        const int cnt =
+                            i + j*(nx+1) + k*(nx+1)*(ny+1) + index*(nx+1)*(ny+1)*(nz+1);
+//                        values[0][cnt] =
+                        values[4][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().u(),
+                            i,j,k, nx, offsets ) * c_ref;
+                        values[1][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().v(),
+                            i,j,k, nx, offsets ) * c_ref;
+                        values[2][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().w(),
+                            i,j,k, nx, offsets ) * c_ref;
+                        values[3][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().T(),
+                            i,j,k, nx, offsets );
+                        values[0][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().scalar(),
+                            i,j,k, nx, offsets ) ;
+                           
+                        coords[3*cnt+0]=leaf_min_coord[ 3*index   ] + i* meshValue.coordinates().dx() ;
+                        coords[3*cnt+1]=leaf_min_coord[ 3*index+1 ] + j* meshValue.coordinates().dx() ;
+                        coords[3*cnt+2]=leaf_min_coord[ 3*index+2 ] + k* meshValue.coordinates().dx() ;
+
+                    }//end of for i
+                }//end of for j
+            }//end of for k
+        }//end of for l
+
+        int line_size  = static_cast<int>( nx+1 );
+        int slice_size = static_cast<int>( (nx+1) * (ny+1) );
+        long vertex_index = 0;
+        long connection_index = 0;
+        for (int l=0; l<n_leaves; l++)
+        {
+            if( leaf_around_building[ l ] == -1 ){ continue; }
+            const int index = leaf_around_building[ l ];
+            //connection
+            vertex_index= index * (nx+1) * (ny+1) * (nz+1);
+            for (int k=0; k<nz; k++ )
+            {
+                for (int j=0; j<ny; j++ )
+                {
+                    for (int i=0; i<nx; i++)
+                    {
+                        const int local_vertex_index[8] =
+                        {
+                            vertex_index,
+                            vertex_index + 1,
+                            vertex_index + line_size,
+                            vertex_index + line_size + 1,
+                            vertex_index + slice_size,
+                            vertex_index + slice_size + 1,
+                            vertex_index + slice_size + line_size,
+                            vertex_index + slice_size + line_size + 1
+                        };
+                            vertex_index++;
+
+                            // hexahedra-1
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 0 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 1 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 3 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 2 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 4 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 5 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 7 ] );
+                            connections[ connection_index++ ] = static_cast<unsigned int>( local_vertex_index[ 6 ] );
+
+                    }//end of for i
+                                    vertex_index++;
+                }//end of for j
+                                vertex_index+= line_size;
+            }//end of for k
+//                               vertex_index+= slice_size;
+        }//end of for l
+
+//        int resolution[4] = { nx+1, ny+1, nz+1, nl };
+//        domain_parameters dom_unstruct = {
+//            x_global_domain_min,
+//            y_global_domain_min,
+//            z_global_domain_min,
+//            x_global_domain_max,
+//            y_global_domain_max,
+//            z_global_domain_max
+//        };
+
+//       static int time_step = 0;
+
+////      unstruct
+//        ensemble_generate_particles( time_step, dom_unstruct,
+//                            values, nvariables,
+//                            coords.data(), nnodes,
+//                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
+//
+        kvs::ValueArray<float> tmp_coords(coords);
+        kvs::ValueArray<unsigned int> tmp_connections(connections);
+        std::vector<float> values_ar(nnodes);
+        for (int i=0; i< nnodes; i++)
+        {
+            values_ar[i] = values[0][i];
+        }
+
+        kvs::ValueArray<float> tmp_values(values_ar);
+        std::cout << "values_ar.size = " << values_ar.size() << std::endl;
+		kvs::AnyValueArray array_values(tmp_values);
+
+        kvs::UnstructuredVolumeObject* ave_volume = new kvs::UnstructuredVolumeObject(kvs::UnstructuredVolumeObject::CellType::Hexahedra
+                ,nnodes,ncells,nvariables
+                ,tmp_coords, tmp_connections, array_values);
+
+        std::cout << *ave_volume << std::endl;
+
+        //kvsml ファイル出力     
+        int time_step =0;
+     std::stringstream ss;
+     ss << "cityLBM_ens" << std::setfill('0') << std::setw(2) << comm_.ensemble_id(); 
+     ss << "_";
+     ss << std::setfill('0') << std::setw(5) << time_step;
+     ss << "_";
+     ss << std::setfill('0') << std::setw(7) << comm_.row_id();
+     ss << "_";
+     ss << std::setfill('0') << std::setw(7) << comm_.n_rows();
+     ss << ".kvsml";
+
+     if(comm_.is_rank0()) std::cout << "kvsml_file_name = " << ss.str() << std::endl;
+//        const std::string& suffix = "cityLBM_" + std::to_string(i) + "_rank" + std::to_string(comm_.world().rank())  ".dat";
+//   if(mpi_rank ==0)
+//   {
+       kvs::KVSMLObjectUnstructuredVolume* kvsml_object = new kvs::UnstructuredVolumeExporter<kvs::KVSMLObjectUnstructuredVolume>( ave_volume );
+       kvsml_object->setWritingDataType( kvs::KVSMLObjectUnstructuredVolume::ExternalBinary );
+       kvsml_object->write( ss.str() );
+       delete kvsml_object;
+//   }
+#endif
+
+
 }
 
 

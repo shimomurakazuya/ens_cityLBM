@@ -5,7 +5,7 @@
         "NB_PROCS": 36,
         "NB_THREADS": 12,
         "OUT_DIR": "/data/g6/a214026/2025/CityLBM_ens8_4MPI",
-        "TIME": "03:00:00",
+        "TIME": "01:00:00",
         "USE_GPUs": true
     },
     "citylbm_settings": {
@@ -38,10 +38,10 @@
         ],
         "ofs_ensemble_idx": 0,
         "restart_flags_and_step": [
-            0,
-            99999
+            1,
+            132 
         ],
-        "time_end": 24300.0,
+        "time_end": 9600.0,
         "velocity_lbm": [
             10.0,
             0.1

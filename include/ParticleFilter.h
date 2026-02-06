@@ -170,6 +170,7 @@ private:
     {
         if(comm_.is_rank0()) {std::cout << __PRETTY_FUNCTION__ << ":  load time =" << t << std::endl;}    
 
+        std::cout << "filename_x(t) = " << filename_x(t) << std::endl;
         FILE* fp = fopen(filename_x(t).c_str(), "rb");
         runtime_assert(fp != NULL, "IOError");
         size_t size;

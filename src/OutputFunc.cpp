@@ -22,6 +22,8 @@
 #include <cstdlib>
 // end add include
 
+#include <kvs/KVSMLObjectUnstructuredVolume>
+#include <kvs/UnstructuredVolumeExporter>
 
 void OutputFunc::
 OutputFluidData(int t, Field& field, WorkerThread& iothread)
@@ -445,6 +447,7 @@ const
         const float x_global_domain_max =  620;
         const float y_global_domain_max =  770;
         const float z_global_domain_max =  320;
+//        const float z_global_domain_max =  150;
 
 
         // hasegawa 2020; mpirank==0のみfopen(). 全mpirankで書き込みのfopenは危険かも。
@@ -499,6 +502,7 @@ const
         std::vector<float> cell_length( nl );
         //float* leaf_min_coord = new float [ 3*nl ];
         std::vector<float> leaf_min_coord( 3*nl );
+        const int tmp_nl = nl; //num. of leaves without sleeve.を保存
 
         const int  nx = DefAMR::NX_LEAF;
         const int  ny = DefAMR::NX_LEAF;
@@ -528,6 +532,7 @@ const
             if(     -620 < leaf_min_coord_x  && leaf_min_coord_x < 620 
                 &&  -770 < leaf_min_coord_y  && leaf_min_coord_y < 770
                 &&  -8   < leaf_min_coord_z  && leaf_min_coord_z < 320 )
+//                &&  -8   < leaf_min_coord_z  && leaf_min_coord_z < 150 )
             {
                 leaf_around_building[ l ] = n_leaves_around_building;
                 n_leaves_around_building++;
@@ -535,7 +540,7 @@ const
 
 
         }//end of for l
-        std::cout << "n_leaves_around_building = " << n_leaves_around_building << std::endl;
+        std::cout <<  mpi_rank << ", n_leaves_around_building = " << n_leaves_around_building << std::endl;
 
         // リーフ数を建物周辺のもので上書き
         nl = n_leaves_around_building;
@@ -592,6 +597,7 @@ const
                     {
                         const int cnt =
                             i + j*(nx+1) + k*(nx+1)*(ny+1) + index*(nx+1)*(ny+1)*(nz+1);
+//                        values[0][cnt] =
                         values[4][cnt] =
                             FuncAMRMesh::CellToNode( meshValue.valueNS().u(),
                             i,j,k, nx, offsets ) * c_ref;
@@ -606,8 +612,11 @@ const
                             i,j,k, nx, offsets );
                         values[0][cnt] =
                             FuncAMRMesh::CellToNode( meshValue.valueNS().scalar(),
-                            i,j,k, nx, offsets );
-
+                            i,j,k, nx, offsets ) ;
+//                            i,j,k, nx, offsets ) * 1000;
+//                        速度の絶対値
+//                        values[0][cnt] = sqrt(values[4][cnt]*values[4][cnt] + values[1][cnt]*values[1][cnt] + values[2][cnt]*values[2][cnt] ) ;
+                            
                         coords[3*cnt+0]=leaf_min_coord[ 3*index   ] + i* meshValue.coordinates().dx() ;
                         coords[3*cnt+1]=leaf_min_coord[ 3*index+1 ] + j* meshValue.coordinates().dx() ;
                         coords[3*cnt+2]=leaf_min_coord[ 3*index+2 ] + k* meshValue.coordinates().dx() ;
@@ -701,13 +710,8 @@ const
 
         time_step++;
 
-        for( int i=0; i<nvariables; i++ )
-        {
-            delete [] values[i];
-        }
-        delete [] values;
-        delete [] non_sleeve_leaf_index;
-        delete [] leaf_around_building;
+//        delete [] non_sleeve_leaf_index;
+//        delete [] leaf_around_building;
         //delete [] cell_length;
         //delete [] leaf_min_coord;
 
@@ -720,9 +724,324 @@ const
             start = std::chrono::system_clock::now();
         }
 
+# if 0
+         float max; 
+         float min; 
+//
+         max = -1000000;
+         min =  1000000;
+//
+              const int N =(nx+1) * (ny+1) * (nz+1) * nl; 
+              for (int i=0; i<N; i++)
+              {
+                 max =  std::fmax(values[0][i],max ); // vel_mag
+                 min =  std::fmin(values[0][i],min ); // vel_mag
+
+              }//end of for i
+//
+              std::cout << mpi_rank << ", max[0] = " << max << std::endl;
+//              std::cout << "max[1] = " << max[1] << std::endl;
+//              std::cout << "max[2] = " << max[2] << std::endl;
+//              std::cout << "max[3] = " << max[3] << std::endl;
+//              std::cout << "max[4] = " << max[4] << std::endl;
+              std::cout << mpi_rank << ", min[0] = " << min << std::endl;
+//              std::cout << "min[1] = " << min[1] << std::endl;
+//              std::cout << "min[2] = " << min[2] << std::endl;
+//              std::cout << "min[3] = " << min[3] << std::endl;
+//              std::cout << "min[4] = " << min[4] << std::endl;
+
+
+        kvs::ValueArray<float> tmp_coords(coords);
+        kvs::ValueArray<unsigned int> tmp_connections(connections);
+        std::vector<float> values_ar(nnodes);
+        for (int i=0; i< nnodes; i++)
+        {
+            values_ar[i] = values[0][i];
+        }
+        kvs::ValueArray<float> tmp_values(values_ar);
+		kvs::AnyValueArray array_values(tmp_values);
+		//kvs::AnyValueArray array_values(values[0], nnodes);
+        std::cout << "tmp_values.size() = " << tmp_values.size() << ", nnodes = " << nnodes << ", tmp_coords.size() = " << tmp_coords.size() << std::endl;
+        for (int i= nnodes-10 ; i < nnodes ; i++)
+        {
+            std::cout << "array_values[i] = " << array_values.at<float>(i) << std::endl; 
+        }
+
+        kvs::UnstructuredVolumeObject* ave_volume = new kvs::UnstructuredVolumeObject(kvs::UnstructuredVolumeObject::CellType::Hexahedra
+                ,nnodes,ncells,nvariables
+                ,tmp_coords, tmp_connections, array_values);
+
+        ave_volume -> updateMinMaxCoords(); 
+        std::cout << *ave_volume << std::endl;
+        if(comm_.ensemble_id() == 0)
+        {
+            std::cout << mpi_rank << ", min:" << ave_volume->minObjectCoord()   << ", max:" << ave_volume->maxObjectCoord() << std::endl;
+            std::cout << mpi_rank << ", min:" << ave_volume->minExternalCoord() << ", max:" << ave_volume->maxExternalCoord() << std::endl;
+        }
+
+        //kvsml ファイル出力     
+     std::stringstream ss;
+     ss << "cityLBM_ens" << std::setfill('0') << std::setw(2) << comm_.ensemble_id(); 
+     ss << "_";
+     ss << std::setfill('0') << std::setw(5) << time_step;
+     ss << "_";
+     ss << std::setfill('0') << std::setw(7) << comm_.row_id();
+     ss << "_";
+     ss << std::setfill('0') << std::setw(7) << comm_.n_rows();
+     ss << ".kvsml";
+
+     if(comm_.is_rank0()) std::cout << "kvsml_file_name = " << ss.str() << std::endl;
+//        const std::string& suffix = "cityLBM_" + std::to_string(i) + "_rank" + std::to_string(comm_.world().rank())  ".dat";
+//   if(mpi_rank ==0)
+//   {
+       kvs::KVSMLObjectUnstructuredVolume* kvsml_object = new kvs::UnstructuredVolumeExporter<kvs::KVSMLObjectUnstructuredVolume>( ave_volume );
+       kvsml_object->setWritingDataType( kvs::KVSMLObjectUnstructuredVolume::ExternalBinary );
+       kvsml_object->write( ss.str() );
+       delete kvsml_object;
+//   }
+        time_step++;
+#endif
+//         float max[5]; 
+//         float min[5]; 
+//
+//            for (int i=0; i<5; i++)
+//            {
+//                max[i] = -1000000;
+//                min[i] =  1000000;
+//            }
+//
+//              const int N =(nx+1) * (ny+1) * (nz+1) * nl; 
+//              for (int i=0; i<N; i++)
+//              {
+//                 max[0] =  std::fmax(values[0][i],max[0] ); // vel_mag
+//                 max[1] =  std::fmax(values[1][i],max[1] ); // v
+//                 max[2] =  std::fmax(values[2][i],max[2] ); // w 
+//                 max[3] =  std::fmax(values[3][i],max[3] ); // T
+//                 max[4] =  std::fmax(values[4][i],max[4] ); // u
+//                 min[0] =  std::fmin(values[0][i],min[0] ); // vel_mag
+//                 min[1] =  std::fmin(values[1][i],min[1] ); // v
+//                 min[2] =  std::fmin(values[2][i],min[2] ); // w 
+//                 min[3] =  std::fmin(values[3][i],min[3] ); // T
+//                 min[4] =  std::fmin(values[4][i],min[4] ); // u
+//
+//              }//end of for i
+//
+//              std::cout << "max[0] = " << max[0] << std::endl;
+//              std::cout << "max[1] = " << max[1] << std::endl;
+//              std::cout << "max[2] = " << max[2] << std::endl;
+//              std::cout << "max[3] = " << max[3] << std::endl;
+//              std::cout << "max[4] = " << max[4] << std::endl;
+//              std::cout << "min[0] = " << min[0] << std::endl;
+//              std::cout << "min[1] = " << min[1] << std::endl;
+//              std::cout << "min[2] = " << min[2] << std::endl;
+//              std::cout << "min[3] = " << min[3] << std::endl;
+//              std::cout << "min[4] = " << min[4] << std::endl;
+
         //-------------------------//
         //----End Visualization----//
         //-------------------------//
+#if 0 
+        // Start measure time
+        if(mpi_rank == 0) {
+            start = std::chrono::system_clock::now();
+        }
+
+        // 従来のデータ集約 
+        // リーフ数を袖領域以外の値で上書き
+        nl = tmp_nl;
+        cell_length.resize(nl);
+        leaf_min_coord.resize(3*nl);
+
+        values = new float*[nvariables];
+        for( int i=0; i<nvariables; i++ )
+        {
+            values[i] = new float[ (nx+1) * (ny+1) * (nz+1) * nl ];
+        }
+
+        ncells = nl*nx*ny*nz;
+        nnodes = nl*(nx+1)*(ny+1)*(nz+1);
+//        std::vector<float> coords;
+//        std::vector<unsigned int> connections;
+        connections.resize(ncells*8);
+        coords.resize(3*nl*(nx+1)*(ny+1)*(nz+1));
+
+        for (int l=0; l<n_leaves; l++)
+        {
+            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
+
+            const int index = non_sleeve_leaf_index[ l ];
+
+            const int lv = tree.nodes(l)->level();
+
+            const MeshValue& meshValue = field.meshValue( lv );
+
+            const Array3D<int> offsets = tree.nodes( l )->neighbor_mesh_offsets();
+
+            const int  offset     = offsets.offset0();
+
+            cell_length   [   index   ] = meshValue.coordinates().dx();
+            //leaf_min_coord[ 3*index   ] = meshValue.coordinates().x(offset);
+            //leaf_min_coord[ 3*index+1 ] = meshValue.coordinates().y(offset);
+            //leaf_min_coord[ 3*index+2 ] = meshValue.coordinates().z(offset);
+            leaf_min_coord[ 3*index   ] = meshValue.coordinates().xnode(offset);
+            leaf_min_coord[ 3*index+1 ] = meshValue.coordinates().ynode(offset);
+            leaf_min_coord[ 3*index+2 ] = meshValue.coordinates().znode(offset);
+            for (int k=0; k<nz+1; k++ )
+            {
+                for (int j=0; j<ny+1; j++ )
+                {
+                    for (int i=0; i<nx+1; i++)
+                    {
+                        const int cnt =
+                            i + j*(nx+1) + k*(nx+1)*(ny+1) + index*(nx+1)*(ny+1)*(nz+1);
+                        values[4][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().u(),
+                            i,j,k, nx, offsets ) * c_ref;
+                        values[1][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().v(),
+                            i,j,k, nx, offsets ) * c_ref;
+                        values[2][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().w(),
+                            i,j,k, nx, offsets ) * c_ref;
+                        values[3][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().T(),
+                            i,j,k, nx, offsets );
+                        values[0][cnt] =
+                            FuncAMRMesh::CellToNode( meshValue.valueNS().scalar(),
+                            i,j,k, nx, offsets );
+
+                        coords[3*cnt+0]=leaf_min_coord[ 3*index   ] + i* meshValue.coordinates().dx() ;
+                        coords[3*cnt+1]=leaf_min_coord[ 3*index+1 ] + j* meshValue.coordinates().dx() ;
+                        coords[3*cnt+2]=leaf_min_coord[ 3*index+2 ] + k* meshValue.coordinates().dx() ;
+
+                    }//end of for i
+                }//end of for j
+            }//end of for k
+        }//end of for l
+
+        // 集約処理
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@Reconstruction time 4 allreduce = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+ 
+        // 集約用配列
+        const int N = (nx+1) * (ny+1) * (nz+1) * nl;
+        std::vector<float> reduce_values_average(N);
+        std::vector<float> reduce_values_varience(N);
+        std::vector<float> varience_values(N);
+      
+         if(comm_.ensemble_id()==0 ) std::cout << "mpi_rank = " << mpi_rank  << ", N = " << N << std::endl;
+
+        // 空間とアンサンブル方向について、集約のためのコミュニケータ分割が必要
+        // アンサンブル数の確認
+        const int n_col  = comm_.n_cols(); 
+        if(comm_.is_rank0())std::cout << "n_cols() = " << comm_.n_cols() << std::endl; 
+        comm_.row_vector().reduce_sum_array(values[0], reduce_values_average, N );
+
+        // 集約処理
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@average_all_reduce time = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+ 
+        for (auto& x : reduce_values_average) {
+            x /= n_col;
+        }
+
+#pragma omp parallel
+        for (int i=0; i< N; i++)
+        {
+            varience_values[i] = (reduce_values_average[i] - values[0][i] )*(reduce_values_average[i] - values[0][i]);
+        } 
+
+        for (auto& x : varience_values) {
+            x /= n_col;
+        }
+
+        // 集約処理
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@varience_calc time = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+ 
+        comm_.row_vector().reduce_sum_array(varience_values.data(), reduce_values_varience, N ); 
+
+        // 集約処理
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@varience_allreduce time = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+
+        
+
+
+#pragma omp parallel
+        for (int i=0; i< N; i++)
+        {
+            values[0][i] = reduce_values_average[i] ; 
+//            values[0][i] = reduce_values_varience[i] ; 
+        }
+
+    
+        generate_particles( time_step, dom_unstruct,
+                            values, nvariables,
+                            coords.data(), nnodes,
+                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
+
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@Generation_allreduce time = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+
+
+
+
+//        if(comm_.row_id() == 0 )
+//        {
+//            for (int i =N-10; i< N; i++ )
+//            {
+//                std::cout  << "values["<< i << "]  =" << values[0][i]  << std::endl;
+//            }
+//        }
+//        if(comm_.is_rank0() ) 
+//        {
+//             for (int i =N-10; i< N; i++ )
+//            {
+//                std::cout  << "reduce_values_average["<< i << "]  =" <<  reduce_values_average[i]  << std::endl;
+//            }
+//        }
+        for( int i=0; i<nvariables; i++ )
+        {
+            delete [] values[i];
+        }
+        delete [] values;
+#else
+        for( int i=0; i<nvariables; i++ )
+        {
+            delete [] values[i];
+        }
+        delete [] values;
+
+#endif
+        delete [] non_sleeve_leaf_index;
+        delete [] leaf_around_building;
+    
     }
 
 

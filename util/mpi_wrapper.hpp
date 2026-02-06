@@ -38,6 +38,9 @@ public:
     template<typename T> T reduce_sum(T t) const { T ret = 0; MPI_Allreduce(&t, &ret, 1, MPItypename<T>::name(), MPI_SUM, comm_); return ret; }
     template<typename T> T reduce_max(T t) const { T ret = 0; MPI_Allreduce(&t, &ret, 1, MPItypename<T>::name(), MPI_MAX, comm_); return ret; }
     template<typename T> T reduce_min(T t) const { T ret = 0; MPI_Allreduce(&t, &ret, 1, MPItypename<T>::name(), MPI_MIN, comm_); return ret; }
+    
+    // PBVR用特化のallreduce
+    template<typename T> void reduce_sum_array(T* t, std::vector<float>& ret,const int N) { MPI_Allreduce(t, ret.data(), N, MPItypename<T>::name(), MPI_SUM, comm_);}
 
     // utility
     template<class Func> void for_each_rank(Func&& func) const {
