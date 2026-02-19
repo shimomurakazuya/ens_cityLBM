@@ -599,16 +599,16 @@ const
                         const int cnt =
                             i + j*(nx+1) + k*(nx+1)*(ny+1) + index*(nx+1)*(ny+1)*(nz+1);
 //                        values[0][cnt] =
-                        values[4][cnt] =
+                        values[1][cnt] =
                             FuncAMRMesh::CellToNode( meshValue.valueNS().u(),
                             i,j,k, nx, offsets ) * c_ref;
-                        values[1][cnt] =
+                        values[2][cnt] =
                             FuncAMRMesh::CellToNode( meshValue.valueNS().v(),
                             i,j,k, nx, offsets ) * c_ref;
-                        values[2][cnt] =
+                        values[3][cnt] =
                             FuncAMRMesh::CellToNode( meshValue.valueNS().w(),
                             i,j,k, nx, offsets ) * c_ref;
-                        values[3][cnt] =
+                        values[4][cnt] =
                             FuncAMRMesh::CellToNode( meshValue.valueNS().T(),
                             i,j,k, nx, offsets );
                         values[0][cnt] =
@@ -708,13 +708,13 @@ const
 //                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
 
 //        // 各ノード(アンサンブルデータを出力)
-//        generate_particles( time_step, dom_unstruct,
-//                            values, nvariables,
-//                            coords.data(), nnodes,
-//                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
+        generate_particles( time_step, dom_unstruct,
+                            values, nvariables,
+                            coords.data(), nnodes,
+                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
 
 
-//        time_step++;
+        time_step++;
 
 //        delete [] non_sleeve_leaf_index;
 //        delete [] leaf_around_building;
