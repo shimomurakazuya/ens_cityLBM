@@ -41,6 +41,9 @@ public:
     
     // PBVR用特化のallreduce
     template<typename T> void reduce_sum_array(T* t, std::vector<float>& ret,const int N) { MPI_Allreduce(t, ret.data(), N, MPItypename<T>::name(), MPI_SUM, comm_);}
+    
+    // PBVR用のGather
+    template<typename T> void reduce_gather_array(T* send, std::vector<float>& ret,const int N) { MPI_Gather(send, N, MPItypename<T>::name(), ret.data(), N, MPItypename<T>::name(),0 , comm_);}
 
     // utility
     template<class Func> void for_each_rank(Func&& func) const {

@@ -429,7 +429,7 @@ const
 
         const OptionParser& optionParser = field.optionParser();
 
-//        //cityLBMのMin/Maxに合わせる
+////        //cityLBMのMin/Maxに合わせる
 //        const float x_global_domain_min = -2048;
 //        const float y_global_domain_min = -2048;
 //        const float z_global_domain_min = -8;
@@ -503,6 +503,7 @@ const
         //float* leaf_min_coord = new float [ 3*nl ];
         std::vector<float> leaf_min_coord( 3*nl );
         const int tmp_nl = nl; //num. of leaves without sleeve.を保存
+        if(comm_.is_rank0())std::cout <<  mpi_rank << ", num. of leaves without sleeve = " << tmp_nl << std::endl;
 
         const int  nx = DefAMR::NX_LEAF;
         const int  ny = DefAMR::NX_LEAF;
@@ -540,7 +541,8 @@ const
 
 
         }//end of for l
-        std::cout <<  mpi_rank << ", n_leaves_around_building = " << n_leaves_around_building << std::endl;
+        if(comm_.is_rank0())std::cout <<  mpi_rank << ", n_leaves_around_building = " << n_leaves_around_building << std::endl;
+        
 
         // リーフ数を建物周辺のもので上書き
         nl = n_leaves_around_building;
@@ -567,7 +569,6 @@ const
         for (int l=0; l<n_leaves; l++)
         {
 //            std::cout << "leaf_around_building[ l ] = " << leaf_around_building[ l ] << std::endl;
-//            if(l > 28728 ) std::cout<< "l ="  << l << std::endl; 
 //            if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
             if( leaf_around_building[ l ] == -1 ){ continue; }
 
@@ -627,8 +628,6 @@ const
         }//end of for l
 
 //        int nnodes = coords.size()/3;
-//        std::cout << "nnodes = " << nnodes << std::endl;
-//        std::cout << "ncells = " << ncells << std::endl;
 //        std::cout << "coords.size = " << coords.size() << std::endl;
 //        std::cout << __LINE__ <<std::endl;
         int line_size  = static_cast<int>( nx+1 );
@@ -702,13 +701,20 @@ const
 
        static int time_step = 0;
 
-//      unstruct
-        ensemble_generate_particles( time_step, dom_unstruct,
-                            values, nvariables,
-                            coords.data(), nnodes,
-                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
+//:      unstruct
+//        ensemble_generate_particles( time_step, dom_unstruct,
+//                            values, nvariables,
+//                            coords.data(), nnodes,
+//                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
 
-        time_step++;
+//        // 各ノード(アンサンブルデータを出力)
+//        generate_particles( time_step, dom_unstruct,
+//                            values, nvariables,
+//                            coords.data(), nnodes,
+//                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
+
+
+//        time_step++;
 
 //        delete [] non_sleeve_leaf_index;
 //        delete [] leaf_around_building;
@@ -864,7 +870,6 @@ const
 //        std::vector<unsigned int> connections;
         connections.resize(ncells*8);
         coords.resize(3*nl*(nx+1)*(ny+1)*(nz+1));
-
         for (int l=0; l<n_leaves; l++)
         {
             if( non_sleeve_leaf_index[ l ] == -1 ){ continue; }
@@ -880,9 +885,6 @@ const
             const int  offset     = offsets.offset0();
 
             cell_length   [   index   ] = meshValue.coordinates().dx();
-            //leaf_min_coord[ 3*index   ] = meshValue.coordinates().x(offset);
-            //leaf_min_coord[ 3*index+1 ] = meshValue.coordinates().y(offset);
-            //leaf_min_coord[ 3*index+2 ] = meshValue.coordinates().z(offset);
             leaf_min_coord[ 3*index   ] = meshValue.coordinates().xnode(offset);
             leaf_min_coord[ 3*index+1 ] = meshValue.coordinates().ynode(offset);
             leaf_min_coord[ 3*index+2 ] = meshValue.coordinates().znode(offset);
@@ -918,8 +920,27 @@ const
                 }//end of for j
             }//end of for k
         }//end of for l
-
         // 集約処理
+        const int N = (nx+1) * (ny+1) * (nz+1) * nl;
+        std::vector<float> reduce_values_average(N);
+        std::vector<float> reduce_values_average1(N);
+        std::vector<float> reduce_values_average2(N);
+        std::vector<float> reduce_values_average3(N);
+        std::vector<float> reduce_values_average4(N);
+        std::vector<float> reduce_values_test(N);
+        std::vector<float> reduce_values_test1(N);
+        std::vector<float> reduce_values_test2(N);
+        std::vector<float> reduce_values_test3(N);
+        std::vector<float> reduce_values_test4(N);
+        std::vector<float> reduce_values_varience(N);
+        std::vector<float> varience_values(N);
+        std::vector<float> varience_values1(N);
+        std::vector<float> varience_values2(N);
+        std::vector<float> varience_values3(N);
+        std::vector<float> varience_values4(N);
+        int Nv = 5;
+        int mpi_size = 36;
+ 
         if(mpi_rank == 0) {
             end = std::chrono::system_clock::now();
             double elapsed =
@@ -928,12 +949,49 @@ const
             start = std::chrono::system_clock::now();
         }
  
+        comm_.world().reduce_sum_array(values[0], reduce_values_test, N );
+        comm_.world().reduce_sum_array(values[1], reduce_values_test1, N );
+        comm_.world().reduce_sum_array(values[2], reduce_values_test2, N );
+        comm_.world().reduce_sum_array(values[3], reduce_values_test3, N );
+        comm_.world().reduce_sum_array(values[4], reduce_values_test4, N );
+
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@allnode_all_reduce = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+
+        // アンサンブル方向の集約 
+        comm_.row_vector().reduce_sum_array(values[0], reduce_values_test, N );
+        comm_.row_vector().reduce_sum_array(values[1], reduce_values_test1, N );
+        comm_.row_vector().reduce_sum_array(values[2], reduce_values_test2, N );
+        comm_.row_vector().reduce_sum_array(values[3], reduce_values_test3, N );
+        comm_.row_vector().reduce_sum_array(values[4], reduce_values_test4, N );
+        
+        // allgather
+        std::vector<float> recv(N * comm_.n_rows());
+        comm_.col_vector().reduce_gather_array(values[0], recv, N ); 
+        comm_.col_vector().reduce_gather_array(values[1], recv, N ); 
+        comm_.col_vector().reduce_gather_array(values[2], recv, N ); 
+        comm_.col_vector().reduce_gather_array(values[3], recv, N ); 
+        comm_.col_vector().reduce_gather_array(values[4], recv, N ); 
+        
+
+        
+
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@allnode_reduce_gather = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+ 
+#if 0
         // 集約用配列
-        const int N = (nx+1) * (ny+1) * (nz+1) * nl;
-        std::vector<float> reduce_values_average(N);
-        std::vector<float> reduce_values_varience(N);
-        std::vector<float> varience_values(N);
-      
+     
          if(comm_.ensemble_id()==0 ) std::cout << "mpi_rank = " << mpi_rank  << ", N = " << N << std::endl;
 
         // 空間とアンサンブル方向について、集約のためのコミュニケータ分割が必要
@@ -941,6 +999,11 @@ const
         const int n_col  = comm_.n_cols(); 
         if(comm_.is_rank0())std::cout << "n_cols() = " << comm_.n_cols() << std::endl; 
         comm_.row_vector().reduce_sum_array(values[0], reduce_values_average, N );
+        comm_.row_vector().reduce_sum_array(values[1], reduce_values_average1, N );
+        comm_.row_vector().reduce_sum_array(values[2], reduce_values_average2, N );
+        comm_.row_vector().reduce_sum_array(values[3], reduce_values_average3, N );
+        comm_.row_vector().reduce_sum_array(values[4], reduce_values_average4, N );
+
 
         // 集約処理
         if(mpi_rank == 0) {
@@ -950,19 +1013,71 @@ const
             std::cout << "@@average_all_reduce time = " << elapsed << " [msec]" << std::endl;
             start = std::chrono::system_clock::now();
         }
- 
-        for (auto& x : reduce_values_average) {
-            x /= n_col;
+
+//        for (int i=0; i< 5; i++)
+//        { 
+//            //for (auto& x : reduce_values_average) {
+//            for (auto& x : recv) {
+//                x /= n_col;
+//            }
+//        }
+
+        for (int i=0; i< N; i++)
+        { 
+                reduce_values_average[i]  /= mpi_size;
+                reduce_values_average1[i] /= mpi_size;
+                reduce_values_average2[i] /= mpi_size;
+                reduce_values_average3[i] /= mpi_size;
+                reduce_values_average4[i] /= mpi_size;
         }
 
-#pragma omp parallel
-        for (int i=0; i< N; i++)
-        {
-            varience_values[i] = (reduce_values_average[i] - values[0][i] )*(reduce_values_average[i] - values[0][i]);
-        } 
 
-        for (auto& x : varience_values) {
-            x /= n_col;
+        // 集約処理
+        if(mpi_rank == 0) {
+            end = std::chrono::system_clock::now();
+            double elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            std::cout << "@@average_calc time = " << elapsed << " [msec]" << std::endl;
+//            std::cout << "@@average_all_reduce time = " << elapsed << " [msec]" << std::endl;
+            start = std::chrono::system_clock::now();
+        }
+ 
+#if 0
+//        for (int i = 0;i < Nv; i++)
+//        {
+                for (int i=0; i< N; i++)
+                {
+                    varience_values[i]  = (reduce_values_average[i]  - values[0][i] )*(reduce_values_average[i]  - values[0][i] );
+                    varience_values1[i] = (reduce_values_average1[i] - values[1][i] )*(reduce_values_average1[i] - values[1][i] );
+                    varience_values2[i] = (reduce_values_average2[i] - values[2][i] )*(reduce_values_average2[i] - values[2][i] );
+                    varience_values3[i] = (reduce_values_average3[i] - values[3][i] )*(reduce_values_average3[i] - values[3][i] );
+                    varience_values4[i] = (reduce_values_average4[i] - values[4][i] )*(reduce_values_average4[i] - values[4][i] );
+                } 
+//        }
+
+//        for (int i = 0;i < Nv; i++)
+//        {
+//            for (int i=0; i< recv.size(); i++)
+//            {
+//                varience_values[i] = (reduce_values_average[i] - values[0][i] )*(reduce_values_average[i] - values[0][i]);
+//            } 
+//        }
+
+
+        for (int i = 0;i < Nv; i++)
+        {
+//            for (auto& x : varience_values) {
+//                x /= n_col;
+//            }
+                for (int i=0; i< N; i++)
+                {
+                    varience_values[i]  /=mpi_size ;
+                    varience_values1[i] /=mpi_size ;
+                    varience_values2[i] /=mpi_size ;
+                    varience_values3[i] /=mpi_size ;
+                    varience_values4[i] /=mpi_size ;
+                } 
+
         }
 
         // 集約処理
@@ -971,10 +1086,18 @@ const
             double elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
             std::cout << "@@varience_calc time = " << elapsed << " [msec]" << std::endl;
+//            std::cout << "@@average_all_reduce time = " << elapsed << " [msec]" << std::endl;
             start = std::chrono::system_clock::now();
         }
  
-        comm_.row_vector().reduce_sum_array(varience_values.data(), reduce_values_varience, N ); 
+//        comm_.row_vector().reduce_sum_array(varience_values.data(), reduce_values_varience, N ); 
+ 
+        comm_.world().reduce_sum_array(varience_values.data(), reduce_values_test, N );
+        comm_.world().reduce_sum_array(varience_values.data(), reduce_values_test, N );
+        comm_.world().reduce_sum_array(varience_values.data(), reduce_values_test, N );
+        comm_.world().reduce_sum_array(varience_values.data(), reduce_values_test, N );
+        comm_.world().reduce_sum_array(varience_values.data(), reduce_values_test, N );
+
 
         // 集約処理
         if(mpi_rank == 0) {
@@ -985,21 +1108,17 @@ const
             start = std::chrono::system_clock::now();
         }
 
-        
-
-
-#pragma omp parallel
-        for (int i=0; i< N; i++)
-        {
-            values[0][i] = reduce_values_average[i] ; 
-//            values[0][i] = reduce_values_varience[i] ; 
-        }
-
-    
-        generate_particles( time_step, dom_unstruct,
-                            values, nvariables,
-                            coords.data(), nnodes,
-                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
+#endif
+//#pragma omp parallel
+//        for (int i=0; i< N; i++)
+//        {
+//            values[0][i] = reduce_values_average[i] ; 
+//        }
+//    
+//        generate_particles( time_step, dom_unstruct,
+//                            values, nvariables,
+//                            coords.data(), nnodes,
+//                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
 
         if(mpi_rank == 0) {
             end = std::chrono::system_clock::now();
@@ -1009,8 +1128,9 @@ const
             start = std::chrono::system_clock::now();
         }
 
+#endif
 
-
+        time_step++;
 
 //        if(comm_.row_id() == 0 )
 //        {
