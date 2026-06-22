@@ -12,7 +12,7 @@
 #include "MemoryUsage.hpp"
 
 // include visualization
-#include "kvs_wrapper.h" // kawamura
+#include "pbvr_output.h" // PBVR particle output wrapper (isolates vismodule headers / avoids Node clash)
 #include "FuncAMRMesh.h" // kawamura
 #include <chrono> //kawamura
 #include <iostream>
@@ -22,8 +22,8 @@
 #include <cstdlib>
 // end add include
 
-#include <kvs/KVSMLObjectUnstructuredVolume>
-#include <kvs/UnstructuredVolumeExporter>
+//#include <vismodule/KVSMLObjectUnstructuredVolume>  // moved into pbvr_output.cpp
+//#include <vismodule/UnstructuredVolumeExporter>  // moved into pbvr_output.cpp
 
 void OutputFunc::
 OutputFluidData(int t, Field& field, WorkerThread& iothread)
@@ -690,14 +690,7 @@ const
         }
 
         int resolution[4] = { nx+1, ny+1, nz+1, nl };
-        domain_parameters dom_unstruct = {
-            x_global_domain_min,
-            y_global_domain_min,
-            z_global_domain_min,
-            x_global_domain_max,
-            y_global_domain_max,
-            z_global_domain_max
-        };
+        // domain は pbvr_generate_particles 内で構築（pbvr_output.cpp）
 
        static int time_step = 0;
 
@@ -708,10 +701,12 @@ const
 //                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
 
 //        // 各ノード(アンサンブルデータを出力)
-        generate_particles( time_step, dom_unstruct,
+        pbvr_generate_particles( time_step, comm_.ensemble_size(),
+                            x_global_domain_min, y_global_domain_min, z_global_domain_min,
+                            x_global_domain_max, y_global_domain_max, z_global_domain_max,
                             values, nvariables,
                             coords.data(), nnodes,
-                            connections.data(), ncells, pbvr::VolumeObjectBase::CellType::Hexahedra );
+                            connections.data(), ncells );
 
 
         time_step++;
@@ -757,23 +752,23 @@ const
 //              std::cout << "min[4] = " << min[4] << std::endl;
 
 
-        kvs::ValueArray<float> tmp_coords(coords);
-        kvs::ValueArray<unsigned int> tmp_connections(connections);
+        vismodule::ValueArray<float> tmp_coords(coords);
+        vismodule::ValueArray<unsigned int> tmp_connections(connections);
         std::vector<float> values_ar(nnodes);
         for (int i=0; i< nnodes; i++)
         {
             values_ar[i] = values[0][i];
         }
-        kvs::ValueArray<float> tmp_values(values_ar);
-		kvs::AnyValueArray array_values(tmp_values);
-		//kvs::AnyValueArray array_values(values[0], nnodes);
+        vismodule::ValueArray<float> tmp_values(values_ar);
+		vismodule::AnyValueArray array_values(tmp_values);
+		//vismodule::AnyValueArray array_values(values[0], nnodes);
         std::cout << "tmp_values.size() = " << tmp_values.size() << ", nnodes = " << nnodes << ", tmp_coords.size() = " << tmp_coords.size() << std::endl;
         for (int i= nnodes-10 ; i < nnodes ; i++)
         {
             std::cout << "array_values[i] = " << array_values.at<float>(i) << std::endl; 
         }
 
-        kvs::UnstructuredVolumeObject* ave_volume = new kvs::UnstructuredVolumeObject(kvs::UnstructuredVolumeObject::CellType::Hexahedra
+        vismodule::UnstructuredVolumeObject* ave_volume = new vismodule::UnstructuredVolumeObject(vismodule::UnstructuredVolumeObject::CellType::Hexahedra
                 ,nnodes,ncells,nvariables
                 ,tmp_coords, tmp_connections, array_values);
 
@@ -800,8 +795,8 @@ const
 //        const std::string& suffix = "cityLBM_" + std::to_string(i) + "_rank" + std::to_string(comm_.world().rank())  ".dat";
 //   if(mpi_rank ==0)
 //   {
-       kvs::KVSMLObjectUnstructuredVolume* kvsml_object = new kvs::UnstructuredVolumeExporter<kvs::KVSMLObjectUnstructuredVolume>( ave_volume );
-       kvsml_object->setWritingDataType( kvs::KVSMLObjectUnstructuredVolume::ExternalBinary );
+       vismodule::KVSMLObjectUnstructuredVolume* kvsml_object = new vismodule::UnstructuredVolumeExporter<vismodule::KVSMLObjectUnstructuredVolume>( ave_volume );
+       kvsml_object->setWritingDataType( vismodule::KVSMLObjectUnstructuredVolume::ExternalBinary );
        kvsml_object->write( ss.str() );
        delete kvsml_object;
 //   }
