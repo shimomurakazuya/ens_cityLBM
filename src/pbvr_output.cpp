@@ -20,10 +20,12 @@ void pbvr_generate_particles(
         dom_min_x, dom_min_y, dom_min_z,
         dom_max_x, dom_max_y, dom_max_z
     };
+    std::cout << "-----------------------pbvr start -----------------------------" << std::endl;
     ensemble_generate_particles(
         time_step, num_ensemble, dom,
         values, nvariables,
         coordinates, ncoords,
         connections, ncells,
         vismodule::VolumeObjectBase::CellType::Hexahedra );
+    std::cout << "-----------------------pbvr end -----------------------------" << std::endl;
 }

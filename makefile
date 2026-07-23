@@ -41,12 +41,17 @@ else
 ifneq (, $(findstring hipcc, $(MPICXX_CXX)))
 MPICXXFLAGS_EXTRA += -fopenmp
 else
+ifneq (, $(findstring icpx,$(MPICXX_CXX)))
+MPICXXFLAGS_EXTRA += -qopenmp
+MPICXXFLAGS_EXTRA += -ipo
+else
 ifneq (, $(findstring icpc,$(MPICXX_CXX)))
 MPICXXFLAGS_EXTRA += -qopenmp
 MPICXXFLAGS_EXTRA += -ipo -qopt-report=5
 #MPICXXFLAGS_EXTRA += -xHost
 else
 $(error "unknown compiler: $(MPICXX_CXX)")
+endif
 endif
 endif
 endif

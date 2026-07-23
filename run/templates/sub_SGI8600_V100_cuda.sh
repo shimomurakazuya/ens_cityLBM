@@ -26,7 +26,12 @@ done
 . /etc/profile.d/modules.sh 
 module purge 
 #module load gcc/7.4.0 mpt/2.23-ga cuda/11.0; export MPI_USE_CUDA=1
-module load cuda/11.4 gnu/cur intel/2023.2.1  mpt/2.23-ga; export MPI_USE_CUDA=1
+#module load cuda/11.4 gnu/cur intel/2023.2.1  mpt/2.23-ga; export MPI_USE_CUDA=1
+module load cuda/11.4 gnu/cur intel/2023.2.1  mpt/cur; export MPI_USE_CUDA=1
+
+export MPI_NUM_MEMORY_REGIONS=0   # ★必須：これだけで破損解消
+export OMP_WAIT_POLICY=passive 
+export KMP_BLOCKTIME=0
 
 export VIS_PARAM_DIR=$PWD
 export  PARTICLE_DIR=$PWD/particle_out

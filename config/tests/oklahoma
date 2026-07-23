@@ -20,7 +20,7 @@ citylbm_addopt += FASTPOST_IGNORE_MISSING
 ## io
 #citylbm_addopt += NO_FIELD_WRITEDAT
 #citylbm_addopt += NO_POSTPROCESS_MONITOR 
-#citylbm_addopt += NO_IODATA_RESTART
+citylbm_addopt += NO_IODATA_RESTART
 #citylbm_addopt += NO_IOTHREAD
 #citylbm_addopt += COUT_MONITOR_PRECISION=16
 
