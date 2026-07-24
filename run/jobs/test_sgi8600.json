@@ -5,7 +5,7 @@
         "NB_PROCS": 4,
         "NB_THREADS": 12,
         "OUT_DIR": "/data/g6/a214026/2025/CityLBM_4vr_test",
-        "TIME": "01:00:00",
+        "TIME": "05:00:00",
         "USE_GPUs": true
     },
     "citylbm_settings": {
