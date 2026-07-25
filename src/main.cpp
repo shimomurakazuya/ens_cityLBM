@@ -42,7 +42,14 @@ int main(int argc, char* argv[])
         hipSetDevice(0);
       #endif
     #endif
-    MPI_Init(&argc, &argv);
+    // MPI_THREAD_MULTIPLE を要求: OpenMP多スレッド + CUDA-aware MPI(GPUDirect) で
+    // IBを複数スレッドから叩くため。MPTの単一スレッドMLX5高速路(MLX5_SINGLE_THREADED=1)を
+    // 回避し "multithreading violation" によるIB破損/SIGSEGVを防ぐ。
+    int mpi_thread_provided = MPI_THREAD_SINGLE;
+    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &mpi_thread_provided);
+    { int wr = 0; MPI_Comm_rank(MPI_COMM_WORLD, &wr);
+      if (wr == 0) std::cout << "MPI_Init_thread: requested MULTIPLE(" << MPI_THREAD_MULTIPLE
+                             << "), provided=" << mpi_thread_provided << std::endl; }
     auto&& comm = MPICommEnsemble(opt.n_ensemble_members(), opt.ofs_ensemble_idx());
     comm.cout_info();
     if(comm.is_rank0()) { 
