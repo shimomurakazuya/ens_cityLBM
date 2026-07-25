@@ -70,17 +70,20 @@ private:
     const MPICommEnsemble comm_;
     const util::mpi::int_type rank_;
     const VTKOutputScale  vtkOutputScale_;
+    std::string  tag_;   // 別名(ファイル名タグ)用。空なら従来通り
 
 public:
     ParaviewVTU() = delete;
 
     ParaviewVTU(
-    const MPICommEnsemble comm, 
-    VTKOutputScale vtkOutputScale = VTKOutputScale::Full
-    ) : 
-    comm_(comm), 
+    const MPICommEnsemble comm,
+    VTKOutputScale vtkOutputScale = VTKOutputScale::Full,
+    std::string tag = ""
+    ) :
+    comm_(comm),
     rank_(comm.world().rank()),
-    vtkOutputScale_(vtkOutputScale) 
+    vtkOutputScale_(vtkOutputScale),
+    tag_(tag)
     { }
 
     ~ParaviewVTU() {};
@@ -202,11 +205,12 @@ private:
     {
         const auto str_rank = to_str_zf(rank);
         const auto str_step = to_str_zf(step);
-        return (vtkOutputScale_ == VTKOutputScale::Full      ) ? Filenames::vtu_value_name0                + "-rank" + str_rank + "-step" + str_step + ".vtu":
-               (vtkOutputScale_ == VTKOutputScale::Downsize2 ) ? Filenames::vtu_value_name0 + "-downsize2" + "-rank" + str_rank + "-step" + str_step + ".vtu":
-               (vtkOutputScale_ == VTKOutputScale::Downsize4 ) ? Filenames::vtu_value_name0 + "-downsize4" + "-rank" + str_rank + "-step" + str_step + ".vtu":
-               (vtkOutputScale_ == VTKOutputScale::Slice_Full) ? Filenames::vtu_value_name0 + "-slice"     + "-rank" + str_rank + "-step" + str_step + ".vtu":
-                                                                 Filenames::vtu_value_name0 + "-unknown"   + "-rank" + str_rank + "-step" + str_step + ".vtu";
+        const std::string tagseg = tag_.empty() ? "" : ("-" + tag_);   // 別名タグ（空なら従来通り）
+        return (vtkOutputScale_ == VTKOutputScale::Full      ) ? Filenames::vtu_value_name0 + tagseg                + "-rank" + str_rank + "-step" + str_step + ".vtu":
+               (vtkOutputScale_ == VTKOutputScale::Downsize2 ) ? Filenames::vtu_value_name0 + tagseg + "-downsize2" + "-rank" + str_rank + "-step" + str_step + ".vtu":
+               (vtkOutputScale_ == VTKOutputScale::Downsize4 ) ? Filenames::vtu_value_name0 + tagseg + "-downsize4" + "-rank" + str_rank + "-step" + str_step + ".vtu":
+               (vtkOutputScale_ == VTKOutputScale::Slice_Full) ? Filenames::vtu_value_name0 + tagseg + "-slice"     + "-rank" + str_rank + "-step" + str_step + ".vtu":
+                                                                 Filenames::vtu_value_name0 + tagseg + "-unknown"   + "-rank" + str_rank + "-step" + str_step + ".vtu";
     }
 
 
@@ -214,11 +218,12 @@ private:
     {
         const auto str_ens = to_str_zf(comm_.col_id());
         const auto str_step = to_str_zf(step);
-        return (vtkOutputScale_ == VTKOutputScale::Full     )  ? Filenames::pvtu_value_name0                + "-ens" + str_ens + "-step" + str_step + ".pvtu":
-               (vtkOutputScale_ == VTKOutputScale::Downsize2)  ? Filenames::pvtu_value_name0 + "-downsize2" + "-ens" + str_ens + "-step" + str_step + ".pvtu":
-               (vtkOutputScale_ == VTKOutputScale::Downsize4)  ? Filenames::pvtu_value_name0 + "-downsize4" + "-ens" + str_ens + "-step" + str_step + ".pvtu":
-               (vtkOutputScale_ == VTKOutputScale::Slice_Full) ? Filenames::pvtu_value_name0 + "-slice"     + "-ens" + str_ens + "-step" + str_step + ".pvtu":
-                                                                 Filenames::pvtu_value_name0 + "-unknown"   + "-ens" + str_ens + "-step" + str_step + ".pvtu";
+        const std::string tagseg = tag_.empty() ? "" : ("-" + tag_);   // 別名タグ（空なら従来通り）
+        return (vtkOutputScale_ == VTKOutputScale::Full     )  ? Filenames::pvtu_value_name0 + tagseg                + "-ens" + str_ens + "-step" + str_step + ".pvtu":
+               (vtkOutputScale_ == VTKOutputScale::Downsize2)  ? Filenames::pvtu_value_name0 + tagseg + "-downsize2" + "-ens" + str_ens + "-step" + str_step + ".pvtu":
+               (vtkOutputScale_ == VTKOutputScale::Downsize4)  ? Filenames::pvtu_value_name0 + tagseg + "-downsize4" + "-ens" + str_ens + "-step" + str_step + ".pvtu":
+               (vtkOutputScale_ == VTKOutputScale::Slice_Full) ? Filenames::pvtu_value_name0 + tagseg + "-slice"     + "-ens" + str_ens + "-step" + str_step + ".pvtu":
+                                                                 Filenames::pvtu_value_name0 + tagseg + "-unknown"   + "-ens" + str_ens + "-step" + str_step + ".pvtu";
     }
 
 };

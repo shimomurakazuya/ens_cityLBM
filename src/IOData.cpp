@@ -1,7 +1,12 @@
 
 #include <string>
 #include <zlib.h>
-
+#include <chrono>
+#include <cmath>
+#include <cstdlib>
+#if defined(USE_NVCC)
+#include <cuda_runtime.h>
+#endif
 #include "IOData.h"
 #include "defineFilenames.h"
 #include "defineAMR.h"
@@ -687,6 +692,9 @@ const
     }
 
 
+    // 既存 per-member 物理場 VTU 出力: 統計VTUのみ出力するため無効化して残置（有効化は kOutputPerMemberVTU=true）
+    const bool kOutputPerMemberVTU = false;
+    if (kOutputPerMemberVTU) {
     ParaviewVTU  paraviewVTU(comm_, vtkOutputScale);
     paraviewVTU.set_number_of_points_and_cells(point_count, cell_count);
     paraviewVTU.set_Point_and_Cells( xyz_vtu.data(), connectivity_vtu.data(), offsets_vtu.data(), types_vtu.data() );
@@ -713,6 +721,91 @@ const
 
     paraviewVTU.OutputVTUFiles(step_);
     if (comm_.col_vector().rank() == 0) { paraviewVTU.OutputPVTUFiles(step_); }
+    } // if (kOutputPerMemberVTU)
+
+    // ===== 別経路: アンサンブル統計 VTU（全変数 mean/var/cv、統計VTUのみ出力）=====
+    // 集約軸 = row_vector()（member 横断, size=ensemble_size）。reduce_sum_array=MPI_Allreduce。
+    // 全 member が本関数に到達する必要があるため PARAVIEW_ENS0 時は無効（早期returnでdeadlock回避）。
+#ifndef PARAVIEW_ENS0
+    // 切り分け用トグル: 環境変数 PBVR_ENSEMBLE_STATS=0 でアンサンブル統計の集約・出力を丸ごとスキップ。
+    // writeVTKFile のグリッド構築・GPU抽出は残るため、crash が本ブロック由来か否かを切り分けられる。
+    // 全ランクが同一 env を読むため collective(reduce_sum_array) 不整合/deadlock は起きない。
+    const char* pbvr_ens_stats_env = std::getenv("PBVR_ENSEMBLE_STATS");
+    const bool  kDoEnsembleStats   = !(pbvr_ens_stats_env && pbvr_ens_stats_env[0] == '0');
+    if (comm_.is_rank0()) std::cout << "[ensemble_stats] enabled=" << (kDoEnsembleStats ? 1 : 0) << std::endl;
+    if (kDoEnsembleStats)
+    {
+#if defined(USE_NVCC)
+        // 【必須】LBM の非同期 GPU 処理を完了させ CUDA 状態を確定してから、統計の
+        // CUDA-aware 集団通信（row_vector の Allreduce）に入る。
+        // これが無いと、in-flight の LBM GPU 処理と MPT の CUDA-aware/RMA 進行スレッドが
+        // 競合し、後続の LBM ハロー交換が cuda_mpt.c:259 "CUDA_SUCCESS==rc" で SIGSEGV
+        // する（ens2/DS4 で実証済み。この同期を入れると statsON でも完走）。削除不可。
+        cudaDeviceSynchronize();
+#endif
+        const int    M   = comm_.ensemble_size();
+        const double eps = 1e-20;
+        // 集約対象＝vel/rho/T/scalar 全部（既存 node 配列を流用。c_ref は vel_vtu に織込済）
+        // mean/var/cv は OutputVTUFiles まで生存させる必要があるため Fld に保持（ポインタ渡しのため）。
+        struct Fld { std::string name; const float* v; int nc; std::vector<float> sum, sumsq, mean, var, cv; };
+        std::vector<Fld> flds = {
+            {"vel", vel_vtu.data(), 3},
+            {"rho", rho_vtu.data(), 1},
+            {"T",   T_vtu.data(),   1},
+        };
+        for (int n = 0; n < n_scalars; ++n)
+            flds.push_back({ "scalar" + std::to_string(n), scalars_vtu.at(n).data(), 1 });
+
+        // --- (A) member 軸 Allreduce: ParaView「スパコン処理時間」区間 ---
+        auto t0 = std::chrono::system_clock::now();
+        for (auto& f : flds) {
+            const int Nc = static_cast<int>(point_count) * f.nc;
+            f.sum.resize(Nc); f.sumsq.resize(Nc);
+            std::vector<float> sq(Nc);
+            comm_.row_vector().reduce_sum_array((float*)f.v, f.sum, Nc);   // Σx  (=MPI_Allreduce)
+            for (int i = 0; i < Nc; ++i) sq[i] = f.v[i] * f.v[i];
+            comm_.row_vector().reduce_sum_array(sq.data(), f.sumsq, Nc);   // Σx²
+        }
+        auto t1 = std::chrono::system_clock::now();
+        if (comm_.is_rank0())
+            std::cout << "@@ens_stat_aggregate = "
+                      << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()
+                      << " [msec]" << std::endl;
+
+        // --- (B) 統計 VTU 出力: member0 のみ、ParaView「ファイル出力時間」区間 ---
+        if (comm_.col_id_wo_offset() == 0) {
+            auto t2 = std::chrono::system_clock::now();
+            ParaviewVTU statVTU(comm_, vtkOutputScale, "ensstat"); // 別名(-ensstat)。パッチ②
+            statVTU.set_number_of_points_and_cells(point_count, cell_count);
+            statVTU.set_Point_and_Cells( xyz_vtu.data(), connectivity_vtu.data(),
+                                         offsets_vtu.data(), types_vtu.data() );
+            for (auto& f : flds) {
+                const int Nc = static_cast<int>(point_count) * f.nc;
+                f.mean.resize(Nc); f.var.resize(Nc); f.cv.resize(Nc);
+                for (int i = 0; i < Nc; ++i) {
+                    float m = f.sum[i] / M;
+                    float v = f.sumsq[i] / M - m * m; if (v < 0) v = 0;
+                    f.mean[i] = m; f.var[i] = v;
+                    f.cv[i] = (std::fabs(m) > eps) ? std::sqrt(v) / std::fabs(m) : 0.f;
+                }
+                statVTU.push_back_PointData("mean_"+f.name, (BYTE*)f.mean.data(), f.nc, VTKDataType::Float32);
+                statVTU.push_back_PointData("var_" +f.name, (BYTE*)f.var .data(), f.nc, VTKDataType::Float32);
+                statVTU.push_back_PointData("cv_"  +f.name, (BYTE*)f.cv  .data(), f.nc, VTKDataType::Float32);
+            }
+            statVTU.OutputVTUFiles(step_);
+            if (comm_.col_vector().rank() == 0) statVTU.OutputPVTUFiles(step_);
+            auto t3 = std::chrono::system_clock::now();
+            std::cout << "@@ens_stat_output = "
+                      << std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count()
+                      << " [msec]" << std::endl;
+        }
+#if defined(USE_NVCC)
+        // 【必須】統計の CUDA-aware 集団通信を完全に終え CUDA 状態を確定してから LBM へ戻す
+        // （前段の同期と対で、統計ブロックと LBM 通信の CUDA 状態を分離する）。削除不可。
+        cudaDeviceSynchronize();
+#endif
+    }
+#endif // !PARAVIEW_ENS0
 
 #endif
 #endif
