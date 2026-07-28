@@ -708,6 +708,30 @@ const
                             coords.data(), nnodes,
                             connections.data(), ncells );
 
+        // 各アンサンブル別の可視化（通常PBVR=base）。既定OFF、PBVR_PER_MEMBER=1 で有効化。
+        // 1ノード=1メンバなので base のノード毎出力=メンバ毎出力。出力先を専用dirへ一時切替し
+        // （history/state/粒子を ensemble 出力と分離）、呼び出し後に env を復元する。
+        static const bool do_per_member = [](){
+            const char* e = std::getenv("PBVR_PER_MEMBER");
+            return e && e[0] == '1';
+        }();
+        if ( do_per_member ) {
+            const char* opd = std::getenv("PARTICLE_DIR");
+            const char* ovp = std::getenv("VIS_PARAM_DIR");
+            const std::string spd = opd ? opd : "";
+            const std::string svp = ovp ? ovp : "";
+            setenv("PARTICLE_DIR",  "./particle_out_permember", 1);
+            setenv("VIS_PARAM_DIR", "./vis_param_permember",    1); // TF(default.json) をここに配置
+            pbvr_generate_particles_base( time_step,
+                                x_global_domain_min, y_global_domain_min, z_global_domain_min,
+                                x_global_domain_max, y_global_domain_max, z_global_domain_max,
+                                values, nvariables,
+                                coords.data(), nnodes,
+                                connections.data(), ncells );
+            if (opd) setenv("PARTICLE_DIR",  spd.c_str(), 1); else unsetenv("PARTICLE_DIR");
+            if (ovp) setenv("VIS_PARAM_DIR", svp.c_str(), 1); else unsetenv("VIS_PARAM_DIR");
+        }
+
 
         time_step++;
 
