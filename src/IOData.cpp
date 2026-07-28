@@ -744,7 +744,7 @@ const
         cudaDeviceSynchronize();
 #endif
         const int    M   = comm_.ensemble_size();
-        const double eps = 1e-20;
+        const double eps = 1e-5;
         // 集約対象＝vel/rho/T/scalar 全部（既存 node 配列を流用。c_ref は vel_vtu に織込済）
         // mean/var/cv は OutputVTUFiles まで生存させる必要があるため Fld に保持（ポインタ渡しのため）。
         struct Fld { std::string name; const float* v; int nc; std::vector<float> sum, sumsq, mean, var, cv; };
@@ -755,6 +755,22 @@ const
         };
         for (int n = 0; n < n_scalars; ++n)
             flds.push_back({ "scalar" + std::to_string(n), scalars_vtu.at(n).data(), 1 });
+
+        // 汚染物質の統計を PBVR と同条件（log10(max(q,1e-8))）にする（案B: 置換・データサイズ不変）。
+        // 既存ループ（上）はそのまま残し、対象フィールドの参照ポインタのみ log バッファへ差し替える。
+        // → mean_scalar<POLL> は log10(幾何平均)、var/cv も対数スケールとなり PBVR と一致。
+        // scalar_poll_log は下の (A) の reduce まで生存させる必要があるためこのスコープで宣言する。
+        const int POLL = 0;   // 汚染物質 scalar の index（=q1）。n_scalars>1 の場合は要確認
+        std::vector<float> scalar_poll_log( scalars_vtu.at(POLL).size() );
+        {
+            const int Np = static_cast<int>(scalar_poll_log.size());
+            for (int i = 0; i < Np; ++i) {
+                const float q = scalars_vtu.at(POLL)[i];
+                scalar_poll_log[i] = std::log10( q > 1.0e-8f ? q : 1.0e-8f );   // 足切り→ log10(1e-8) = -8
+            }
+            for (auto& f : flds)
+                if (f.name == "scalar" + std::to_string(POLL)) { f.v = scalar_poll_log.data(); break; }
+        }
 
         // --- (A) member 軸 Allreduce: ParaView「スパコン処理時間」区間 ---
         auto t0 = std::chrono::system_clock::now();
